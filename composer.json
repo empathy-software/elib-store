@@ -1,7 +1,7 @@
 {
-    "name": "mikejw/elib-base",
+    "name": "mikejw/elib-store",
     "type": "library",
-    "description": "Miscellaneous library for Empathy PHP Framework",
+    "description": "Store components for the Empathy PHP Framework",
     "keywords": [
         "lib"
     ],
