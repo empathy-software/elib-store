@@ -1,7 +1,0 @@
----
-api: 
-    read: 
-        url: 'http://{username}.tumblr.com/api/read?num={num}'
-        auth: false
-        required_params: 
-            - username
