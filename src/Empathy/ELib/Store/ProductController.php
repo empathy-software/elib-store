@@ -172,9 +172,6 @@ class ProductController extends AdminController
                 // update db
                 $p->image = $u->file;
                 $p->save(Model::getTable('ProductItem'), array(), 2);
-
-                //$this->redirect_cgi('archive.cgi?id='.$p->id);
-                $this->execScript('archive', array($p->id));
                 $this->redirect('admin/product/'.$p->id);
             }
         }
@@ -267,6 +264,7 @@ class ProductController extends AdminController
         $p->name = 'New Product';
         $p->description = 'No description.';
         $p->status = 'DEFAULT';
+        $p->vendor_verified = 'DEFAULT';
         $p->insert(Model::getTable('ProductItem'), 1, array(), 0);
         $this->redirect('admin/category/'.$_GET['id']);
     }
@@ -331,9 +329,6 @@ class ProductController extends AdminController
                 }
                 $v->image = $u->file;
                 $v->save(Model::getTable('ProductVariant'), array(), 0);
-
-                //$this->redirect_cgi('archive.cgi?id='.$p->id);
-                $this->execScript('archive', array($p->id));
                 $this->redirect('admin/product/'.$p->id);
             }
         }
