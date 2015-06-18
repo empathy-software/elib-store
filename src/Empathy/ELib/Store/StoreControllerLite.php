@@ -106,6 +106,8 @@ class StoreControllerLite extends EController
                 break;
             }
 
+            array_push($cats, $_GET['id']);
+
             $sql .= ' AND category_id IN'.$p->buildUnionString($cats);
         }
 
