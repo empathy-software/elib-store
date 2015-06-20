@@ -90,7 +90,7 @@
  *******************************************************************************
 */
 
-namespace ELib\ThirdParty;
+namespace Empathy\ELib\ThirdParty;
 
 class PaypalClass {
     
