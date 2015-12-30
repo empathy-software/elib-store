@@ -3,6 +3,7 @@
 namespace Empathy\ELib\Store;
 
 use Empathy\ELib\Tree;
+use Empathy\MVC\Config;
 
 class CategoriesTree extends Tree
 {
@@ -74,7 +75,7 @@ class CategoriesTree extends Tree
 
             $markup .= ">\n";
             if ($children > 0) {
-                $markup .= "<a class=\"toggle\" href=\"http://".WEB_ROOT.PUBLIC_DIR."/$url/".$value['id'].'/?page=1';
+                $markup .= "<a class=\"toggle\" href=\"http://".Config::get('WEB_ROOT').Config::get('PUBLIC_DIR')."/$url/".$value['id'].'/?page=1';
                 if ($toggle == '-') {
                     $markup .= '&amp;collapsed=1';
                 }
@@ -82,11 +83,11 @@ class CategoriesTree extends Tree
             } else {
                 $markup .= "<span class=\"toggle\">&nbsp;</span>";
             }
-            $markup .= "<img src=\"http://".WEB_ROOT.PUBLIC_DIR."/elib/$folder\" alt=\"\" />\n";
+            $markup .= "<img src=\"http://".Config::get('WEB_ROOT').Config::get('PUBLIC_DIR')."/elib/$folder\" alt=\"\" />\n";
             if ($current_id == $value['id']) {
                 $markup .= "<span class=\"label current\">".$value['label']."</span>";
             } else {
-                $markup .= "<span class=\"label\"><a href=\"http://".WEB_ROOT.PUBLIC_DIR."/$url/".$value['id']."/?page=1\">".$value['label']."</a></span>";
+                $markup .= "<span class=\"label\"><a href=\"http://".Config::get('WEB_ROOT').Config::get('PUBLIC_DIR')."/$url/".$value['id']."/?page=1\">".$value['label']."</a></span>";
             }
             if ($children > 0) {
                 $markup .= $this->buildMarkup($value['children'], $level, $current_id, $value['id']);
