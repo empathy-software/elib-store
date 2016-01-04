@@ -23,13 +23,15 @@
 <th>Description</th>
 <th>Sold In Store</th>
 {*<th>Image</th>*}
+{*
+<th><a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/category/{$category->id}/?order_by=price{if $order_by eq 'price'}%20DESC{/if}">Price</a></th>
+<th>Stock</th>
+*}
 
-<!--<th><a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/category/{$category->id}/?order_by=price{if $order_by eq 'price'}%20DESC{/if}">Price</a></th>-->
-<!--<th>Stock</th>-->
 <th>&nbsp;</th>
 </tr>
 {section name=product_item loop=$products}
-<tr class="{cycle values="alt, }">
+<tr class="{cycle values="alt,"}">
 <td class="id">{$products[product_item].id}</td>
 <td><a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/product/{$products[product_item].id}/">{$products[product_item].name}</a></td>
 <td>{$products[product_item].description|strip_tags|truncate:50:"..."}</td>
