@@ -67,9 +67,25 @@ class StoreControllerLite extends EController
             $_GET['vendor_id'] = $this->vendor_lock;
         }
 
-     
+        $cats = ProductsLayout::getTopCats();
 
-        $this->assign('top_cats', ProductsLayout::getTopCats());
+
+        $top_cat = array(
+            'id' => 0,
+            'name' => 'All',
+            'hidden' => false
+        );
+        array_unshift($cats, $top_cat);
+    
+        foreach ($cats as $c) {
+            if ($c['id'] == $category_id) {
+
+                $this->assign('current_category', $c['name']);
+            }
+        }
+        $this->assign('top_cats', $cats);
+
+
         if (!isset($_GET['vendor_id'])) {
             $_GET['vendor_id'] = 0;
         } else {
