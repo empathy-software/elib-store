@@ -85,6 +85,10 @@ class StoreControllerLite extends EController
         }
         $this->assign('top_cats', $cats);
 
+        $c = Model::load('CategoryItem');
+        $descendants = array();
+        $c->buildDescendantIDs($category_id, $descendants);
+
 
         if (!isset($_GET['vendor_id'])) {
             $_GET['vendor_id'] = 0;
@@ -108,24 +112,7 @@ class StoreControllerLite extends EController
         }
 
 
-
-        if (isset($_GET['id']) && $_GET['id'] > 0) {
-            $cats = array();
-            switch ($_GET['id']) {
-            case 1:
-                $cats = array(3,7,4,5,6);
-                break;
-            case 2:
-                $cats = array(8);
-                break;
-            default:
-                break;
-            }
-
-            array_push($cats, $_GET['id']);
-
-            $sql .= ' AND category_id IN'.$p->buildUnionString($cats);
-        }
+        $sql .= ' AND category_id IN'.$p->buildUnionString($descendants);
 
         $sql .= ' AND vendor_verified = 1';
 
