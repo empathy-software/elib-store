@@ -111,8 +111,9 @@ class StoreControllerLite extends EController
             $sql .= ' AND vendor_id = '.$_GET['vendor_id'];
         }
 
-
-        $sql .= ' AND category_id IN'.$p->buildUnionString($descendants);
+        if ($category_id != 0) {
+            $sql .= ' AND category_id IN'.$p->buildUnionString($descendants);
+        }
 
         $sql .= ' AND vendor_verified = 1';
 
