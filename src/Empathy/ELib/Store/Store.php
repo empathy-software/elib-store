@@ -155,6 +155,8 @@ class Store
                         }
                         $p->vendor_id = $v->id;
                     }
+                } else {
+                    $p->vendor_verified = 1;
                 }
                 $p->id = $p->insert(Model::getTable('ProductItem'), 1, array(), 0);
                 $this->addProductVariantInternal($p->id); // create first variant
