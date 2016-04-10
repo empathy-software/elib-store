@@ -5,7 +5,7 @@ namespace Empathy\ELib\Store;
 use Empathy\ELib\Model;
 use Empathy\ELib\EController;
 use Empathy\ELib\ThirdParty\PaypalClass;
-
+use Empathy\MVC\Config;
 
 
 class PaypalController extends EController
@@ -94,7 +94,7 @@ class PaypalController extends EController
         //$product[0]['price'] = 1.99;
         //$product[0]['code'] = 23;
 
-        $interface = 'http://'.WEB_ROOT.PUBLIC_DIR.'/paypal/';
+        $interface = 'http://'.Config::get('WEB_ROOT').Config::get('PUBLIC_DIR').'/paypal/';
         $message = '';
         $p = new PaypalClass();
         $p->ipn_log = false;
