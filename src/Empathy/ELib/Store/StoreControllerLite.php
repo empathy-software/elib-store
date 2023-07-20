@@ -206,7 +206,7 @@ class StoreControllerLite extends EController
         $this->assign('vendor_id', $p->vendor_id);
         $this->assign('product', $p);
         $this->assign('vendor', $v);
-
+        $this->assign('colours', array());
     }
 
     public function cart()
