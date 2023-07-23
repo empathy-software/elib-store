@@ -45,7 +45,7 @@
 
 
 
-{if sizeof($errors) > 0}
+{if isset($errors) and sizeof($errors) > 0}
 <ul id="error">
 {foreach from=$errors item=error}
 <li>{$error}</li>
@@ -77,7 +77,7 @@
 
 <form action="" method="post">
 
-{if sizeof($property.option) > 0}
+{if isset($property.option) and sizeof($property.option) > 0}
 {foreach from=$property.option item=option key=option_id}
 <p><label>&nbsp;</label>
 <span><span class="option" id="option_{$option_id}">{$option}</span></span>

@@ -66,6 +66,7 @@ class ImageUpload
         $this->origX = imagesx($this->orig);
         $this->origY = imagesy($this->orig);
 
+        /*
         if($this->origX != $this->origY
            || $this->origX < 450)
         {
@@ -73,6 +74,7 @@ class ImageUpload
             $this->remove(array($this->file));
             $error = true;
         }
+        */
 
         return $error;
     }
