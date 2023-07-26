@@ -1,33 +1,25 @@
 {include file="elib://admin/admin_header.tpl"}
 
 
-<div id="operations">
-
-<div class="grey" style="padding:0.5em;">
-
-<div id="op_right">
-<form action="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/properties" method="get">
-<div><button type="submit" name="manage_properties" value="1">Manage Properties</button></div>
-</form>
-</div>
-
-<form action="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/category/add_category/{$category->id}" method="get">
-<div><button type="submit" name="add_category" value="1"{if sizeof($products) > 0} disabled="disabled"{/if}>Add Category</button></div>
-</form>
-<form action="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/category/rename/{$category->id}" method="get">
-<div><button type="submit" name="rename" value="1"{if $category->id eq 0 || $event eq 'rename'} disabled="disabled"{/if}>Rename Category</button></div>
-</form>
-<form class="confirm" action="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/category/delete/{$category->id}" method="get">
-<div><button type="submit" name="delete_category" value="1"{if $category->id eq 0} disabled="disabled"{/if}>Delete Category</button></div>
-</form>
-<form action="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/product/add/{$category->id}" method="get">
-<div><button type="submit" name="add_product" value="1"{if $category_has_children} disabled="disabled"{/if}>Add Product</button></div>
-</form>
-<form action="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/category/active_properties/{$category->id}" method="get">
-<div><button type="submit" name="active_properties" value="1"{if $category->id eq 0 || $event eq 'active_properties'} disabled="disabled"{/if}>Active Properties</button></div>
-</form>
-
-</div>
+<div class="form-group cms-actions">
+    <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/properties" class="btn btn-sm btn-primary">
+        Manage Properties
+    </a>
+    <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/category/add_category/{$category->id}" class="btn btn-sm btn-primary {if sizeof($products) > 0}disabled{/if}">
+        Add Category
+    </a>
+    <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/category/rename/{$category->id}" class="btn btn-sm btn-primary {if $category->id eq 0 || $event eq 'rename'} disabled{/if}">
+        Rename Category
+    </a>
+    <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/category/delete/{$category->id}" class="confirm btn btn-sm btn-primary {if $category->id eq 0} disabled{/if}">
+        Delete Category
+    </a>
+    <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/product/add/{$category->id}" class="btn btn-sm btn-primary {if $category_has_children} disabled{/if}">
+        Add Product
+    </a>
+    <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/category/active_properties/{$category->id}" class="btn btn-sm btn-primary {if $category->id eq 0 || $event eq 'active_properties'} disabled{/if}">
+        Active Properties
+    </a>
 </div>
 
 
