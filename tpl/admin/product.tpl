@@ -31,9 +31,14 @@
 <form action="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/product/edit_colours/{$product->id}" method="get">
 <div><button type="submit" name="edit_colours" value="1">Edit Colours</button></div>
 </form>
+    <form action="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/product/variants_wizard/{$product->id}" method="get">
+        <div><button type="submit" name="variants_wizard" value="1"{if (isset($variants) and sizeof($variants) > 0)} disabled="disabled"{/if}>Variants Wizard</button></div>
+    </form>
+{*
 <form action="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/product/variants_wizard/{$product->id}" method="get">
-<div><button type="submit" name="variants_wizard" value="1"{if sizeof($variants) > 0 || !$has_colours} disabled="disabled"{/if}>Variants Wizard</button></div>
+<div><button type="submit" name="variants_wizard" value="1"{if (isset($variants) and sizeof($variants) > 0) || !$has_colours} disabled="disabled"{/if}>Variants Wizard</button></div>
 </form>
+*}
 
 {/if}
 

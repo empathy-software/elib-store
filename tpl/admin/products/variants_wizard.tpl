@@ -1,7 +1,7 @@
 
 
 
-{if sizeof($errors) > 0}
+{if isset($errors) and sizeof($errors) > 0}
 <ul id="error">
 {foreach from=$errors item=error}
 <li>{$error}</li>
@@ -26,7 +26,7 @@
 <p>&nbsp;</p>
 <p>&nbsp;</p>
 
-{if sizeof($colours) > 0}
+{if isset($colours) and sizeof($colours) > 0}
 <p>
 {foreach from=$colours item=colour}
 <input type="hidden" name="property[2][]" value="{$colour}" />

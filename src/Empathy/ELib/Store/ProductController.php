@@ -530,6 +530,7 @@ class ProductController extends AdminController
             $v->weight_lb = $_POST['weight_lb'];
             $v->weight_oz = $_POST['weight_oz'];
             $v->price = $_POST['price'];
+            $v->status = 1;
 
             $v->validates();
             if ($v->hasValErrors()) {

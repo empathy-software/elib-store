@@ -37,9 +37,12 @@ class BrandsTree extends Tree
 
         $ancestors = $this->brand_ancestors;
 
+        $class = "clearfix";
         if (!in_array($last_id, $ancestors)) {
-            $markup .= " class=\"hidden_sections\"";
+            $markup .= " hidden_sections";
         }
+        $markup .= " class=\"$class\"";
+
         if ($level == 0) {
             $markup .= " id=\"tree\"";
             $level++;
@@ -47,29 +50,28 @@ class BrandsTree extends Tree
         $markup .=">\n";
         foreach ($data as $index => $value) {
             $toggle = '+';
-            //$folder = 't_folder_closed.gif';
-            $folder = 'data.gif';
+            $folder = '<i class="far fa-file"></i>';
             $url = 'brand';
 
             if (in_array($value['id'], $ancestors)) {
                 $toggle = '-';
-                //	    $folder = 't_folder_open.gif';
-            }
-
-            if (isset($value['banner']) && $value['banner'] == 1) {
-                $folder = 'data.gif';
-                $url = 'banner';
             }
 
             $value['label'] = htmlentities($value['name']);
 
-            //$children = sizeof($value['children']);
             $children = 0;
+            $class = "clearfix";
             $markup .= "<li";
 
             if ($current_id == $value['id']) {
-                $markup .= " class=\"current\"";
+                $class .= " current";
             }
+
+            if (isset($value['hidden']) && $value['hidden']) {
+                $class .= " hidden";
+            }
+
+            $markup .= " class=\"$class\"";
 
             $markup .= ">\n";
             if ($children > 0) {
@@ -81,7 +83,7 @@ class BrandsTree extends Tree
             } else {
                 $markup .= "<span class=\"toggle\">&nbsp;</span>";
             }
-            $markup .= "<img src=\"http://".Config::get('WEB_ROOT').Config::get('PUBLIC_DIR')."/elib/$folder\" alt=\"\" />\n";
+            $markup .= $folder;
 
             if ($current_id == $value['id']) {
                 $markup .= "<span class=\"label current\">".$value['label']."</span>";

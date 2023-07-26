@@ -7,7 +7,7 @@
 <img src="http://{$WEB_ROOT}{$PUBLIC_DIR}/{if $product->image eq ''}elib/blank.gif{else}uploads/tn_{$product->image}{/if}" alt="" />
 </div>
 
-{if sizeof($errors) > 0}
+{if isset($errors) and sizeof($errors) > 0}
 <ul id="error">
 {foreach from=$errors item=error}
 <li>{$error}</li>
