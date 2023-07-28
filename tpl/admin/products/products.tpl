@@ -24,7 +24,6 @@
             {/section}
             </tbody>
         </table>
-
     {/if}
 
     {if sizeof($p_nav) > 1}
