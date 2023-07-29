@@ -50,6 +50,7 @@ class CategoryController extends AdminController
 
         $p_nav = $p->getPaginatePages(Model::getTable('ProductItem'), $sql, $_GET['page'], REQUESTS_PER_PAGE);
         $this->presenter->assign('p_nav', $p_nav);
+        $this->assign('page', $_GET['page']);
         $product = $p->getAllCustomPaginate(Model::getTable('ProductItem'), $sql, $_GET['page'], REQUESTS_PER_PAGE);
 
         foreach ($product as &$product_item) {
