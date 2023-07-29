@@ -1,5 +1,5 @@
 
-
+<h2>Variants</h2>
 
 {if sizeof($variants) > 0}
     <div class="variants flex-wrap row">

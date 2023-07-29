@@ -36,7 +36,7 @@
     <div class="col-md-3">
         {if in_array($event, array('default_event', 'edit', 'upload_image'))}
             {include file="elib://admin/products/product.tpl"}
-        {elseif $event eq 'upload_variant_image'}
+        {elseif in_array($event,  array('upload_variant_image', 'edit_variant', 'variant_properties'))}
             {include file="elib://admin/products/variant.tpl"}
         {/if}
     </div>
@@ -64,7 +64,6 @@
         {elseif $event eq 'variants_wizard'}
             {include file="elib://admin/products/variants_wizard.tpl"}
         {/if}
-
     </div>
 </div>
 

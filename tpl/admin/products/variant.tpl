@@ -8,9 +8,19 @@
     {assign var="image" value="img/blank.gif"}
 {/if}
 
-<div class="card {$class}" >
+<div class="variant card {$class}" >
     <img class="card-img-top" src="http://{$WEB_ROOT}{$PUBLIC_DIR}/{$image}" alt="" />
     <div class="card-body">
+
+        {if isset($showActions) and $showActions}
+            <ul class="actions">
+                <li><a class="btn btn-sm btn-primary" href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/product/edit_variant/{$v.id}">Edit</a></li>
+                <li><a class="btn btn-sm btn-primary" href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/product/upload_variant_image/{$v.id}">Upload Image</a></li>
+                <li><a class="confirm btn btn-sm btn-primary" class="confirm" href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/product/delete_variant/{$v.id}">Delete</a></li>
+                <li><a class="btn btn-sm btn-primary" href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/product/variant_properties/{$v.id}">Properties</a></li>
+            </ul>
+        {/if}
+
         <div class="card-text">
             <small class="text-muted">
                 <table class="table">
@@ -32,7 +42,7 @@
                     </tr>
                     {foreach from=$v.properties key=id item=property}
                         <tr>
-                            <th scope="row">{$property.property_name}</th>
+                            <th scope="row"><span class="text-primary">{$property.property_name}</span></th>
                             <td>{$property.option_val}</td>
                         </tr>
                     {/foreach}
@@ -40,13 +50,6 @@
             </small>
         </div>
 
-        {if isset($showActions) and $showActions}
-            <ul class="operations">
-                <li><a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/product/edit_variant/{$v.id}">Edit</a></li>
-                <li><a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/product/upload_variant_image/{$v.id}">Upload Image</a></li>
-                <li><a class="confirm" href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/product/delete_variant/{$v.id}">Delete</a></li>
-                <li><a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/product/variant_properties/{$v.id}">Properties</a></li>
-            </ul>
-        {/if}
+
     </div>
 </div>

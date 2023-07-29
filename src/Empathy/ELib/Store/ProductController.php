@@ -275,7 +275,22 @@ class ProductController extends AdminController
 
     public function edit_variant()
     {
+        $this->assertID();
         $this->setTemplate('elib://admin/product.tpl');
+        $v = Model::load('ProductVariant');
+        $v->id = $_GET['id'];
+        $v->load();
+        $this->assign('variant', $v);
+        $p = Model::load('ProductItem');
+        $p->id = $v->product_id;
+        $p->load();
+        $this->presenter->assign('product', $p);
+        // get variant data
+        $v_array = json_decode(json_encode($v), JSON_OBJECT_AS_ARRAY);
+        $props = Model::load('Property');
+        $v_array['properties'] = $props->loadForVariant($v_array['id']);
+        $this->assign('v', $v_array);
+        
         if (isset($_POST['save'])) {
             $v = Model::load('ProductVariant');
             $v->id = $_POST['id'];
@@ -290,21 +305,11 @@ class ProductController extends AdminController
                 $this->presenter->assign('errors', $v->getValErrors());
             } else {
                 $v->save(Model::getTable('ProductVariant'), array(), 1);
-                $this->redirect('admin/product/'.$v->product_id);
+                $this->redirect('admin/product/' . $v->product_id);
             }
-
-        } else {
-            $this->assertID();
-            $v = Model::load('ProductVariant');
-            $v->id = $_GET['id'];
-            $v->load();
-            $this->presenter->assign('variant', $v);
+        } elseif (isset($_POST['cancel'])) {
+            $this->redirect('admin/product/' . $v->product_id);
         }
-
-        $p = Model::load('ProductItem');
-        $p->id = $v->product_id;
-        $p->load();
-        $this->presenter->assign('product', $p);
     }
 
     public function upload_variant_image()
