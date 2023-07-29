@@ -2,9 +2,9 @@
 
 
 {if sizeof($variants) > 0}
-    <div class="variants">
+    <div class="variants flex-wrap row">
         {section name=variant loop=$variants}
-            <div class="card float-left col-lg-4" >
+            <div class="card col-lg-4" >
                 <img class="card-img-top" src="http://{$WEB_ROOT}{$PUBLIC_DIR}/{if $variants[variant].image eq ''}uploads/{$product->image}{else}uploads/{$variants[variant].image}{/if}" alt="" />
                 <div class="card-body">
                     <div class="card-text">
