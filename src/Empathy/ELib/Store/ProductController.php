@@ -54,8 +54,10 @@ class ProductController extends AdminController
             } else {
                 //$p->price = $_POST['price'];
                 $p->save(Model::getTable('ProductItem'), array('description'), 1);
-                $this->redirect('admin/product/'.$p->id);
+                $this->redirect('admin/product/' . $p->id);
             }
+        } else if (isset($_POST['cancel'])) {
+            $this->redirect('admin/product/' . $_GET['id']);
         } else {
             $p->id = $_GET['id'];
             $p->load();
@@ -174,6 +176,8 @@ class ProductController extends AdminController
                 $p->save(Model::getTable('ProductItem'), array(), 2);
                 $this->redirect('admin/product/'.$p->id);
             }
+        } elseif (isset($_POST['cancel'])) {
+            $this->redirect('admin/product/' . $_POST['id']);
         }
     }
 
@@ -310,12 +314,20 @@ class ProductController extends AdminController
         $v = Model::load('ProductVariant');
         $v->id = $_GET['id'];
         $v->load();
+
         $this->presenter->assign('variant', $v);
+
+        // get variant data
+        $v_array = json_decode(json_encode($v), JSON_OBJECT_AS_ARRAY);
+        $props = Model::load('Property');
+        $v_array['properties'] = $props->loadForVariant($v_array['id']);
+        $this->assign('v', $v_array);
 
         $p = Model::load('ProductItem');
         $p->id = $v->product_id;
         $p->load();
         $this->presenter->assign("product", $p);
+        
 
         if (isset($_POST['upload'])) {
             $d = array(array('tn_', 100, 100), array('mid_', 400, 276));
@@ -331,6 +343,8 @@ class ProductController extends AdminController
                 $v->save(Model::getTable('ProductVariant'), array(), 0);
                 $this->redirect('admin/product/'.$p->id);
             }
+        } elseif (isset($_POST['cancel'])) {
+            $this->redirect('admin/product/' . $p->id);
         }
     }
 

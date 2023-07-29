@@ -1,7 +1,7 @@
 {include file="elib://admin/admin_header.tpl"}
 
 
-{if $event eq 'default_event' || $event eq 'edit' || $event eq 'edit_colours'}
+{if in_array($event, array('default_event', 'edit', 'edit_colours', 'upload_image', 'upload_variant_image')) }
     <div class="form-group cms-actions">
         {if $event eq 'edit_colours'}
         <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/product/add_colour/{$product->id}" class="btn btn-sm btn-primary">
@@ -34,8 +34,10 @@
 
 <div class="row justify-content-between">
     <div class="col-md-3">
-        {if $event eq 'default_event'}
+        {if in_array($event, array('default_event', 'edit', 'upload_image'))}
             {include file="elib://admin/products/product.tpl"}
+        {elseif $event eq 'upload_variant_image'}
+            {include file="elib://admin/products/variant.tpl"}
         {/if}
     </div>
     <div class="col-md-9">
