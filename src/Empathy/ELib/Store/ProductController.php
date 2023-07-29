@@ -374,11 +374,21 @@ class ProductController extends AdminController
             $v->id = $_GET['id'];
             $v->load();
             $this->redirect('admin/product/' . $v->product_id);
+        } elseif (isset($_POST['cancel'])) {
+            $this->redirect('admin/product/' . $_GET['id']);
         }
+
 
         $v = Model::load('ProductVariant');
         $v->id = $_GET['id'];
         $v->load();
+
+        // get variant data
+        $v_array = json_decode(json_encode($v), JSON_OBJECT_AS_ARRAY);
+        $property = Model::load('Property');
+        $v_array['properties'] = $property->loadForVariant($v_array['id']);
+        $this->assign('v', $v_array);
+
 
         $p = Model::load('ProductItem');
         $p->id = $v->product_id;
@@ -398,7 +408,6 @@ class ProductController extends AdminController
         $this->presenter->assign('variant', $v);
 
         if (sizeof($props) > 0) {
-            $property = Model::load('Property');
             $properties = $property->getAllWithOptions($props);
             $this->presenter->assign('properties', $properties);
 
