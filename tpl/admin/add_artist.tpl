@@ -4,13 +4,7 @@
 
 <div class="grey" style="padding:0.5em;">
 
-{if isset($errors) and sizeof($errors) > 0}
-<ul id="error">
-{foreach from=$errors item=error}
-<li>{$error}</li>
-{/foreach}
-</ul>
-{/if}
+ {include file="elib://comp_errors.tpl"}
 
 <h2>Add New Artist</h2>
 

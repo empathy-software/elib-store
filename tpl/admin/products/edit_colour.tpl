@@ -1,14 +1,7 @@
 
 
+{include file="elib://comp_errors.tpl"}
 
-
-{if sizeof($error) > 0}
-<ul id="error">
-{foreach from=$error item=error_item}
-<li>{$error_item}</li>
-{/foreach}
-</ul>
-{/if}
 
 <fieldset><legend>Edit Product Colour</legend>
 <form action="" method="post" enctype="multipart/form-data">

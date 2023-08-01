@@ -25,13 +25,9 @@
     </div>
 
     <div class="col-md-7">
-        {if isset($errors) and sizeof($errors) > 0}
-            <ul id="error">
-                {foreach from=$errors item=error}
-                    <li>{$error}</li>
-                {/foreach}
-            </ul>
-        {/if}
+
+        {include file="elib://comp_errors.tpl"}
+
         {if $event eq 'rename'}
             {include file="elib://admin/rename_brand.tpl"}
         {elseif $event eq 'edit_bio'}

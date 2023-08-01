@@ -132,6 +132,7 @@ class StoreControllerLite extends EController
 
         $this->assign('products', $products);
         $this->assign('p_nav', $p_nav);
+        $this->assign('page', $_GET['page']);
 
         $this->assign('vendor_id', $_GET['vendor_id']);
         if (isset($_GET['id'])) {
