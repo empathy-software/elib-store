@@ -176,7 +176,9 @@ class CategoryController extends AdminController
                     $c->insert(Model::getTable('CategoryProperty'), 1, array(), 0);
                 }
             }
-            $this->redirect('admin/category/'.$_GET['id']);
+            $this->redirect('admin/category/' . $_GET['id']);
+        } elseif (isset($_POST['cancel'])) {
+            $this->redirecT('admin/category/' . $_GET['id']);
         } else {
             $p = Model::load('Property');
             $properties = $p->getAllWithOptions(array());
