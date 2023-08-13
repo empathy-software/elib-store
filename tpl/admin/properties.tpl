@@ -2,105 +2,72 @@
 
 
 {if $event neq 'rename'}
-<div id="operations">
-<div class="grey_top">
-<div class="top_right">
-<div class="top_left"></div>
-</div>
-</div>
-
-<div class="grey" style="padding:0.5em;">
-
-<form action="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/properties/add" method="get">
-<div><button type="submit" name="add" value="1">Add</button></div>
-</form>
-
-
-</div>
-<div class="grey_bottom">
-<div class="bottom_right">
-<div class="bottom_left"></div>
-</div>
-</div>
-</div>
-
-
-<p style="line-height: 0.5em;">&nbsp;</p>
+    <div class="form-group cms-actions">
+        <a class="btn btn-sm btn-primary" href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/properties/add">Add</a>
+    </div>
 {/if}
 
 
-
-
-
-
-
-
-<div class="grey_top">
-<div class="top_right">
-<div class="top_left"></div>
-</div>
-</div>
-
-<div class="grey">
-
-    {include file="elib://comp_errors.tpl"}
+{include file="elib://comp_errors.tpl"}
 
 
 {if $event eq 'rename'}
-<fieldset><legend>Rename Property</legend>
-<form action="" method="post">
-<p><label>Name</label>
-<input type="text" value="{$property->name}" name="name" />
-</p>
-<p><label>&nbsp;</label>
-<button type="submit" name="save">Save</button>
-</p>
-</form>
-</fieldset>
-
+    <h2>Rename Property</h2>
+    <form method="post">
+        <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" value="{$property->name}" class="form-control" name="name" id="name">
+        </div>
+        <input type="hidden" name="id" value="{$artist->id}"/>
+        <button type="submit" class="btn btn-primary" name="save">Save</button>
+        <button type="submit" class="btn btn-primary" name="cancel">Cancel</button>
+    </form>
 {else}
-<div id="properties">
+    <div id="properties">
+        {foreach from=$properties key=id item=property}
+            <div class="property">
+                <div class="form-row d-flex align-items-center">
+                    <div class="col-sm-8 my-1">
+                        <h2>{$property.name}</h2>
+                    </div>
+                    <div class="col-sm-4 my-1">
+                        <a class="btn btn-sm btn-primary"
+                           href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/properties/rename/{$id}">
+                            Rename
+                        </a>
+                    </div>
+                </div>
+                <form action="" method="post">
+                    {if isset($property.option) and sizeof($property.option) > 0}
+                        {foreach from=$property.option item=option key=option_id}
+                            <div class="form-group">
+                                <label class="sr-only" for="option_{$option_id}">Name</label>
+                                <span class="option" id="option_{$option_id}">{$option}</span>
+                            </div>
+                        {/foreach}
+                    {/if}
 
-{foreach from=$properties key=id item=property}
-
-<fieldset><legend>{$property.name}</legend>
-
-<p style="margin: 0.5em;"><a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/properties/rename/{$id}">Rename</a></p>
-
-<form action="" method="post">
-
-{if isset($property.option) and sizeof($property.option) > 0}
-{foreach from=$property.option item=option key=option_id}
-<p><label>&nbsp;</label>
-<span><span class="option" id="option_{$option_id}">{$option}</span></span>
-</p>
-{/foreach}
+                    <div class="form-row align-items-center">
+                        <div class="col-sm-8 my-1">
+                            <label class="sr-only" for="option">Name</label>
+                            <input
+                                    type="text"
+                                    value="{if $submitted_option->property_id eq $id}{$submitted_option->option_val}{/if}"
+                                    class="form-control"
+                                    name="option"
+                                    id="option"
+                            />
+                        </div>
+                        <div class="col-sm-4 my-1">
+                            <button class="btn btn-sm btn-primary" type="submit" name="add_option">Add</button>
+                        </div>
+                    </div>
+                    <input type="hidden" name="id" value="{$id}"/>
+                </form>
+            </div>
+        {/foreach}
+    </div>
 {/if}
-
-<p><label>&nbsp;</label>
-<input type="text" value="{if $submitted_option->property_id eq $id}{$submitted_option->option_val}{/if}" name="option" />
-<input type="hidden" name="id" value="{$id}" />
-<button type="submit" name="add_option">Add</button>
-</p>
-</form>
-</fieldset>
-{/foreach}
-</div>
-
-{/if}
-
-
-<p class="clear">&nbsp;</p>
-
-</div>
-<div class="grey_bottom">
-<div class="bottom_right">
-<div class="bottom_left"></div>
-</div>
-</div>
-
-
-
 
 
 

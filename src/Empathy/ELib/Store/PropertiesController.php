@@ -76,6 +76,8 @@ class PropertiesController extends AdminController
                     $p->save(Model::getTable('Property'), array(), 1);
                     $this->redirect('admin/properties');
                 }
+            } elseif (isset($_POST['cancel'])) {
+                $this->redirect('admin/properties');
 
             } else {
                 $p = Model::load('Property');
