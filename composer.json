@@ -14,7 +14,7 @@
         }
     ],
     "require": {
-        "mikejw/elib-base": "^4",
+        "mikejw/elib-base": "^4"
     },
     "autoload": {
         "psr-0": {
