@@ -6,10 +6,10 @@
         "lib"
     ],
     "homepage": "http://empathyphp.co.uk",
-    "license": "GPL3",
+    "license": "MIT",
     "authors": [
         {
-            "name": "Mike Whiting",
+            "name": "Michael J. Whiting",
             "email": "mail@mikejw.co.uk"
         }
     ],
