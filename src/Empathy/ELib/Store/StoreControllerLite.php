@@ -14,7 +14,6 @@ use Empathy\ELib\Storage\CategoryProperty;
 use Empathy\ELib\Storage\Property;
 use Empathy\ELib\Storage\ProductVariantPropertyOption;
 use Empathy\MVC\DI;
-use OV\Storage\Vendor;
 
 
 //class StoreControllerLite extends AuthedController
