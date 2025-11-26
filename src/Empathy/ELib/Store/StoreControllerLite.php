@@ -2,12 +2,19 @@
 
 namespace Empathy\ELib\Store;
 
-use Empathy\ELib\Model,
-    Empathy\ELib\AuthedController,
-    Empathy\ELib\EController,
-    Empathy\ELib\User\CurrentUser,
-    Empathy\MVC\Session;
-
+use Empathy\MVC\Model;
+use Empathy\ELib\AuthedController;
+use Empathy\ELib\EController;
+use Empathy\MVC\Session;
+use Empathy\ELib\Storage\ProductItem;
+use Empathy\ELib\Storage\ProductVariant;
+use Empathy\ELib\Storage\CategoryItem;
+use Empathy\ELib\Storage\ShippingAddress;
+use Empathy\ELib\Storage\CategoryProperty;
+use Empathy\ELib\Storage\Property;
+use Empathy\ELib\Storage\ProductVariantPropertyOption;
+use Empathy\MVC\DI;
+use OV\Storage\Vendor;
 
 
 //class StoreControllerLite extends AuthedController
@@ -45,8 +52,6 @@ class StoreControllerLite extends EController
 
     public function minimalLayout()
     {
- 
-
         if (0 && CurrentUser::loggedIn()) {
             $ui_array = array('page', 'vendor_id', 'id');
             $this->loadUIVars('ui_blog', $ui_array);
@@ -85,7 +90,7 @@ class StoreControllerLite extends EController
         }
         $this->assign('top_cats', $cats);
 
-        $c = Model::load('CategoryItem');
+        $c = Model::load(CategoryItem::class);
         $descendants = array();
         $c->buildDescendantIDs($category_id, $descendants);
 
@@ -96,23 +101,23 @@ class StoreControllerLite extends EController
             $_GET['vendor_id'] = (int) $_GET['vendor_id'];
         }
 
-
-
-        $p = Model::load('ProductItem');
-
-
+        $p = Model::load(ProductItem::class);
 
         $status = '('
             .\Empathy\ELib\Storage\ProductItemStatus::AVAILABLE.', '
             .\Empathy\ELib\Storage\ProductItemStatus::SOLD_OUT
             .')';
         $sql = ' WHERE status IN'.$status;
+        $params = [];
         if ($_GET['vendor_id'] > 0) {
-            $sql .= ' AND vendor_id = '.$_GET['vendor_id'];
+            $sql .= ' AND vendor_id = ?';
+            $params[] = $_GET['vendor_id'];
         }
 
         if ($category_id != 0) {
-            $sql .= ' AND category_id IN'.$p->buildUnionString($descendants);
+            $descendantsString = $p->buildUnionString($descendants);
+            $sql .= ' AND category_id IN ' . $descendantsString[0];
+            $params = array_merge($params, $descendantsString[1]);
         }
 
         $sql .= ' AND vendor_verified = 1';
@@ -125,8 +130,9 @@ class StoreControllerLite extends EController
 
 
         $per_page = 8;
-        $products = $p->getAllCustomPaginate(Model::getTable('ProductItem'), $sql, $_GET['page'], $per_page);
-        $p_nav = $p->getPaginatePages(Model::getTable('ProductItem'), $sql, $_GET['page'], $per_page);
+
+        $products = $p->getAllCustomPaginate($sql, $_GET['page'], $per_page, $params);
+        $p_nav = $p->getPaginatePages($sql, $_GET['page'], $per_page, $params);
 
         $this->pages = $p_nav;
 
@@ -149,12 +155,12 @@ class StoreControllerLite extends EController
             }
         }
 
+        $v = Model::load(ProductVariant::class);
         if (sizeof($options) > 0) {
-            $v = Model::load('ProductVariant');
             $variant_id = $v->findVariant($options, $product_id);
         } else {
-            $sql = ' WHERE product_id = '.$prodcut_id.' LIMIT 0, 1';
-            $variant = $v->getAllCustom(Model::getTable('ProductVariant'), $sql);
+            $sql = ' WHERE product_id = ? LIMIT 0, 1';
+            $variant = $v->getAllCustom($sql, [$product_id]);
             if (sizeof($variant) > 0) {
                 $variant_id = $variant[0]['id'];
             }
@@ -166,12 +172,11 @@ class StoreControllerLite extends EController
 
             // set vendor lock
             if (Session::get('vendor_lock') == false) {
-                $v = Model::load('ProductVariant');
-                $v->id = $variant_id;
-                $v->load();
-                $p = Model::load('ProductItem');
+                $v = Model::load(ProductVariant::class);
+                $v->load($variant_id);
+                $p = Model::load(ProductItem::class);
                 $p->id = $v->product_id;
-                $p->load();
+                $p->load($p->id);
                 Session::set('vendor_lock', $p->vendor_id);
             }
 
@@ -182,13 +187,17 @@ class StoreControllerLite extends EController
     public function minimalProductView()
     {
         $this->setTemplate('store_product.tpl');
-        $p = Model::load('ProductItem');
+        $p = Model::load(ProductItem::class);
         $p->id = $this->filterInt('id');
-        $p->load();
+        $p->load($p->id);
 
-        $v = Model::load('Vendor');
-        $v->id = $p->vendor_id;
-        $v->load();
+        $vendorModel = DI::getContainer()->get('VendorModel');
+        if ($vendorModel) {
+            $v = Model::load($vendorModel);
+            $v->id = $p->vendor_id;
+            $v->load($v->id);
+            $this->assign('vendor', $v);
+        }
 
         if (isset($_POST['add'])) {
             $this->addProductToCart($p->id);
@@ -198,7 +207,7 @@ class StoreControllerLite extends EController
         $this->getPropertiesAndOptions($p, 0);
 
         // breadcrumb
-        $c = Model::load('CategoryItem');
+        $c = Model::load(CategoryItem::class);
         $bc = array();
         $c->buildBreadCrumb($p->category_id, $bc);
         $bc = array_reverse($bc);
@@ -206,7 +215,6 @@ class StoreControllerLite extends EController
 
         $this->assign('vendor_id', $p->vendor_id);
         $this->assign('product', $p);
-        $this->assign('vendor', $v);
         $this->assign('colours', array());
     }
 
@@ -241,9 +249,9 @@ class StoreControllerLite extends EController
                 array_push($ids, $item['id']);
             }
 
-            $v = Model::load('ProductVariant');
+            $v = Model::load(ProductVariant::class);
             $cat_ids = $v->getCategories($ids);
-            $cat = Model::load('CategoryItem');
+            $cat = Model::load(CategoryItem::class);
             $calc = new ShippingCalculator($c->calcTotal($items), $cat_ids, $cat, sizeof($items), false);
             $shipping = $calc->getFee();
             $shipping = 0;
@@ -262,10 +270,10 @@ class StoreControllerLite extends EController
     public function checkout()
     {
         $this->setTemplate('checkout.tpl');
-        $s = Model::load('ShippingAddress');
+        $s = Model::load(ShippingAddress::class);
 
-        $sql = ' WHERE user_id = '.CurrentUser::getUserID().' ORDER BY id DESC';
-        $addresses = $s->getAllCustom(Model::getTable('ShippingAddress'), $sql);
+        $sql = ' WHERE user_id = ? ORDER BY id DESC';
+        $addresses = $s->getAllCustom($sql, [DI::getContainer()->get('CurrentUser')->getUserID()]);
 
         $this->assign('addresses', $addresses);
 
@@ -288,10 +296,10 @@ class StoreControllerLite extends EController
         //$p->id = $product_id;
         //$p->load();
 
-        $c = Model::load('CategoryItem');
+        $c = Model::load(CategoryItem::class);
         $cats = $c->getAncestorIds($p->category_id, array());
 
-        $cp = Model::load('CategoryProperty');
+        $cp = Model::load(CategoryProperty::class);
 
         array_push($cats, $p->category_id);
         $props = $cp->getPropertiesByCategory($cats);
@@ -304,11 +312,11 @@ class StoreControllerLite extends EController
         //$this->assign('variant', $v);
 
         $opts = array();
-        $pv = Model::load('ProductVariantPropertyOption');
+        $pv = Model::load(ProductVariantPropertyOption::class);
         $opts = $pv->buildUnionString($pv->getActiveOptions($p->id));
 
         if (sizeof($props) > 0) {
-            $property = Model::load('Property');
+            $property = Model::load(Property::class);
             $properties = $property->getAllWithOptionsForProduct($props, $opts);
             $this->assign('properties', $properties);
 

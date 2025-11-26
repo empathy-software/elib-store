@@ -2,8 +2,9 @@
 
 namespace Empathy\ELib\Store;
 
-use Empathy\ELib\Model,
-    Empathy\MVC\Session;
+use Empathy\MVC\Model;
+use Empathy\MVC\Session;
+use Empathy\ELib\Storage\ProductVariant;
 
 class ShoppingCart
 {
@@ -26,7 +27,7 @@ class ShoppingCart
             foreach ($cart as $v => $qty) {
                 array_push($ids, $v);
             }
-            $v = Model::load('ProductVariant');
+            $v = Model::load(ProductVariant::class);
             $id_string = $v->buildUnionString($ids);
             $product_data = $v->getCartData($id_string);
 

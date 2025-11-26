@@ -2,10 +2,8 @@
 
 namespace Empathy\ELib\Storage;
 
-use Empathy\ELib\Model,
-    Empathy\MVC\Entity;
-
-
+use Empathy\MVC\Model;
+use Empathy\MVC\Entity;
 
 class OrderItem extends Entity
 {
@@ -29,8 +27,8 @@ class OrderItem extends Entity
     {
         $order = array();
         $sql = 'SELECT t3.id AS order_id, username, t2.status, stamp, SUM(t4.price) AS total'
-            .' FROM '.Model::getTable('UserItem').' t1, '.Model::getTable('OrderStatus').' t2, '.Model::getTable('OrderItem').' t3'
-            .' LEFT JOIN '.Model::getTable('LineItem').' t4 ON t4.order_id = t3.id'
+            .' FROM '.Model::getTable(UserItem::class).' t1, '.Model::getTable(OrderStatus::class).' t2, '.Model::getTable('OrderItem').' t3'
+            .' LEFT JOIN '.Model::getTable(LineItem::class).' t4 ON t4.order_id = t3.id'
             .' WHERE t1.id = t3.user_id AND t2.id = t3.status'
             .' GROUP BY t3.id'
             .' ORDER BY stamp DESC';

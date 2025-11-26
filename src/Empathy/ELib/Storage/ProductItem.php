@@ -2,8 +2,8 @@
 
 namespace Empathy\ELib\Storage;
 
-use Empathy\ELib\Model,
-    Empathy\MVC\Entity;
+use Empathy\MVC\Model;
+use Empathy\MVC\Entity;
 
 
 
@@ -36,9 +36,9 @@ class ProductItem extends Entity
     public function hasOneVariant()
     {
         $id = 0;
-        $sql = 'SELECT id FROM '.Model::getTable('ProductVariant').' WHERE product_id = '.$this->id;
+        $sql = 'SELECT id FROM '.Model::getTable(ProductVariant::class).' WHERE product_id = ?';
         $error = 'Could not check for single variant on product.';
-        $result = $this->query($sql, $error);
+        $result = $this->query($sql, $error, [$this->id]);
         if ($result->rowCount() == 1) {
             $row = $result->fetch();
             $id = $row['id'];
@@ -50,9 +50,9 @@ class ProductItem extends Entity
     public function hasVariants()
     {
         $variants = false;
-        $sql = 'SELECT id FROM '.Model::getTable('ProductVariant').' WHERE product_id = '.$this->id;
+        $sql = 'SELECT id FROM '.Model::getTable(ProductVariant::class).' WHERE product_id = ?';
         $error = 'Could not check for product variants.';
-        $result = $this->query($sql, $error);
+        $result = $this->query($sql, $error, [$this->id]);
         if ($result->rowCount() > 0) {
             $variants = true;
         }
@@ -62,9 +62,9 @@ class ProductItem extends Entity
 
     public function convertCategory()
     {
-        $sql = "SELECT name from ".Model::getTable('CategoryItem')." WHERE id = $this->category_id";
+        $sql = "SELECT name from ".Model::getTable(CategoryItem::class)." WHERE id = ?";
         $error = "Could not get category name.";
-        $result = $this->query($sql, $error);
+        $result = $this->query($sql, $error, [$this->category_id]);
         $row = $result->fetch();
 
         return $row['name'];
@@ -73,10 +73,10 @@ class ProductItem extends Entity
     public function getOnlyVariantID()
     {
         $id = 0;
-        $sql = 'SELECT id FROM '.Model::getTable('ProductVariant')
-            .' WHERE product_id = '.$this->id.' LIMIT 0,1';
+        $sql = 'SELECT id FROM '.Model::getTable(ProductVariant::class)
+            .' WHERE product_id = ? LIMIT 0,1';
         $error = 'Could not get id for only product variant.';
-        $result = $this->query($sql, $error);
+        $result = $this->query($sql, $error, [$this->id]);
         if ($result->rowCount() > 0) {
             $row = $result->fetch();
             $id = $row['id'];
@@ -90,7 +90,7 @@ class ProductItem extends Entity
     public function getAllImages()
     {
         $image = array();
-        $sql = 'SELECT image FROM '.Model::getTable('ProductItem');
+        $sql = 'SELECT image FROM '.Model::getTable(ProductItem::class);
         $error = 'Could not get product images.';
         $result = $this->query($sql, $error);
         if ($result->rowCount() > 0) {
@@ -98,7 +98,7 @@ class ProductItem extends Entity
                 array_push($image, $row['image']);
             }
         }
-        $sql = 'SELECT image FROM '.Model::getTable('ProductVariant');
+        $sql = 'SELECT image FROM '.Model::getTable(ProductVariant::class);
         $error = 'Could not get variant images.';
         $result = $this->query($sql, $error);
         if ($result->rowCount() > 0) {
@@ -113,11 +113,11 @@ class ProductItem extends Entity
     public function getPrice()
     {
         $price = 0;
-        $sql = 'SELECT MIN(price) AS price FROM '.Model::getTable('ProductVariant')
-            .' WHERE product_id = '.$this->id
+        $sql = 'SELECT MIN(price) AS price FROM '.Model::getTable(ProductVariant::class)
+            .' WHERE product_id = ?'
             .' AND product_id > 0';
         $error = 'Could not get price.';
-        $result = $this->query($sql, $error);
+        $result = $this->query($sql, $error, [$this->id]);
         if ($result->rowCount() == 1) {
             $row = $result->fetch();
             $price = $row['price'];
@@ -130,11 +130,11 @@ class ProductItem extends Entity
     public function getMinPrice($id)
     {
         $price = 0;
-        $sql = 'SELECT MIN(price) AS price FROM '.Model::getTable('ProductVariant')
-            .' WHERE product_id = '.$id
+        $sql = 'SELECT MIN(price) AS price FROM '.Model::getTable(ProductVariant::class)
+            .' WHERE product_id = ?'
             .' AND status = '.ProductVariantStatus::AVAILABLE;
         $error = 'Could not get price.';
-        $result = $this->query($sql, $error);
+        $result = $this->query($sql, $error, [$id]);
         if ($result->rowCount() == 1) {
             $row = $result->fetch();
             $price = $row['price'];
@@ -146,12 +146,12 @@ class ProductItem extends Entity
     public function loadIDByName($name)
     {
         $id = 0;
-        $sql = 'SELECT id FROM '.Model::getTable('ProductItem')
-            .' WHERE name LIKE \''.str_replace('-', ' ', $name).'\'';
+        $sql = 'SELECT id FROM '.Model::getTable(ProductItem::class)
+            .' WHERE name LIKE ?';
 
         echo $sql;
         $error = 'Could not get product id by name.';
-        $result = $this->query($sql, $error);
+        $result = $this->query($sql, $error, ['\''.str_replace('-', ' ', $name).'\'']);
         if ($result->rowCount() == 1) {
             $row = $result->fetch();
             $id = $row['id'];

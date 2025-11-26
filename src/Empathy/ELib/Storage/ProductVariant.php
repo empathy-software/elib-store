@@ -2,11 +2,9 @@
 
 namespace Empathy\ELib\Storage;
 
-use Empathy\ELib\Model,
-    Empathy\MVC\Entity,
-    Empathy\MVC\Validate;
-
-
+use Empathy\MVC\Model;
+use Empathy\MVC\Entity;
+use Empathy\MVC\Validate;
 
 class ProductVariant extends Entity
 {
@@ -33,13 +31,13 @@ class ProductVariant extends Entity
     public function getVariantName($id)
     {
         $name = array();
-        $sql = 'SELECT option_val FROM '.Model::getTable('ProductVariantPropertyOption')
+        $sql = 'SELECT option_val FROM '.Model::getTable(ProductVariantPropertyOption::class)
             .' t1, '.Model::getTable('PropertyOption').' t2 WHERE t2.id = t1.property_option_id'
-            .' AND product_variant_id = '.$id;
+            .' AND product_variant_id = ?';
         $error = 'Could not get option values for variant name.';
-        $result = $this->query($sql, $error);
+        $result = $this->query($sql, $error, [$id]);
         if ($result->rowCount() > 0) {
-            foreach ($resut as $row) {
+            foreach ($result as $row) {
                 array_push($name, $row['option_val']);
             }
         }
@@ -54,6 +52,8 @@ class ProductVariant extends Entity
         $variant_name = array($name);
         $last_id = 0;
 
+        $productIdString = $this->buildUnionString($product_id);
+
         $sql = 'SELECT t1.id, t4.name AS property_name, t3.option_val, t1.weight_g, t1.weight_lb'
             .' FROM '.Model::getTable('ProductVariant').' t1'
             .' LEFT JOIN '.Model::getTable('ProductVariantPropertyOption').' t2'
@@ -62,7 +62,7 @@ class ProductVariant extends Entity
             .' ON t3.id = t2.property_option_id'
             .' LEFT JOIN '.Model::getTable('Property').' t4'
             .' ON t4.id = t3.property_id'
-            .' WHERE t1.product_id IN ('.$product_id.')';
+            .' WHERE t1.product_id IN ' . $productIdString[0];
 
         // old
         /*
@@ -73,7 +73,7 @@ class ProductVariant extends Entity
         */
 
         $error = 'Could not get properties for product.';
-        $result = $this->query($sql, $error);
+        $result = $this->query($sql, $error, $productIdString[1]);
         if ($result->rowCount() > 0) {
             foreach ($result as $row) {
                 if ($last_id != 0) {
@@ -104,10 +104,10 @@ class ProductVariant extends Entity
     public function getAllForOption($option_id)
     {
         $variants = array();
-        $sql = 'SELECT v.id AS id, p.name AS name, v.image AS image FROM '.Model::getTable('ProductVariantPropertyOption').' o, '.Model::getTable('ProductVariant')
-            .' v, '.Model::getTable('ProductItem').' p WHERE p.id = v.product_id AND o.product_variant_id = v.id AND o.property_option_id = '.$option_id;
+        $sql = 'SELECT v.id AS id, p.name AS name, v.image AS image FROM '.Model::getTable(ProductVariantPropertyOption::class).' o, '.Model::getTable(ProductVariant::class)
+            .' v, '.Model::getTable(ProductItem::class).' p WHERE p.id = v.product_id AND o.product_variant_id = v.id AND o.property_option_id = ?';
         $error = 'Could not get variants by property.';
-        $result = $this->query($sql, $error);
+        $result = $this->query($sql, $error, [$option_id]);
         if ($result->rowCount() > 0) {
             foreach ($result as $row) {
                 array_push($variants, $row);
@@ -122,14 +122,14 @@ class ProductVariant extends Entity
         $products = array();
 
         $sql = 'SELECT t5.name, t1.product_id, t1.price, t1.id, t4.name AS p_name, t3.option_val, t1.weight_g, t1.weight_lb'
-            .' FROM '.Model::getTable('ProductItem').' t5, '.Model::getTable('ProductVariant').' t1'
-            .' LEFT JOIN '.Model::getTable('ProductVariantPropertyOption').' t2'
+            .' FROM '.Model::getTable(ProductItem::class).' t5, '.Model::getTable(ProductVariant::class).' t1'
+            .' LEFT JOIN '.Model::getTable(ProductVariantPropertyOption::class).' t2'
             .' ON t2.product_variant_id = t1.id'
-            .' LEFT JOIN '.Model::getTable('PropertyOption').' t3'
+            .' LEFT JOIN '.Model::getTable(PropertyOption::class).' t3'
             .' ON t3.id = t2.property_option_id'
-            .' LEFT JOIN '.Model::getTable('Property').' t4'
+            .' LEFT JOIN '.Model::getTable(Property::class).' t4'
             .' ON t4.id = t3.property_id'
-            .' WHERE t1.id IN '.$ids
+            .' WHERE t1.id IN '.$ids[0]
             .' AND t5.id = t1.product_id';
 
         // old
@@ -145,7 +145,7 @@ class ProductVariant extends Entity
         */
 
         $error = 'Could not load data for shopping cart.';
-        $result = $this->query($sql, $error);
+        $result = $this->query($sql, $error, $ids[1]);
         if ($result->rowCount() > 0) {
             $name = '';
             $options = array();
@@ -192,19 +192,19 @@ class ProductVariant extends Entity
     {
         $variants = array();
         $sql = 'SELECT t1.id, t1.image, t1.weight_g, t1.weight_lb, t1.weight_oz, t1.price, t3.image AS other_image'
-            .' FROM '.Model::getTable('ProductVariant').' t1'
-            .' LEFT JOIN '.Model::getTable('ProductVariantPropertyOption').' t2'
+            .' FROM '.Model::getTable(ProductVariant::class).' t1'
+            .' LEFT JOIN '.Model::getTable(ProductVariantPropertyOption::class).' t2'
             .' ON t2.product_variant_id = t1.id'
-            .' LEFT JOIN '.Model::getTable('PropertyOption').' t0'
+            .' LEFT JOIN '.Model::getTable(PropertyOption::class).' t0'
             .' ON t0.id = t2.property_option_id'
-            .' LEFT JOIN '.Model::getTable('ProductColour').' t3'
+            .' LEFT JOIN '.Model::getTable(ProductColour::class).' t3'
             .' ON t3.property_option_id = t0.id'
-            .' WHERE t1.product_id = '.$product_id
+            .' WHERE t1.product_id = ?'
             .' AND t0.property_id = 2'
             .' AND t3.product_id = t1.product_id';
 
         $error = 'Could not get variants.';
-        $result = $this->query($sql, $error);
+        $result = $this->query($sql, $error, [$product_id]);
         if ($result->rowCount() > 0) {
             foreach ($result as $row) {
                 array_push($variants, $row);
@@ -218,12 +218,12 @@ class ProductVariant extends Entity
     {
         $i = 2;
         $variant_id = 0;
-        $sql = 'SELECT t1.id FROM '.Model::getTable('ProductVariant').' t1';
+        $sql = 'SELECT t1.id FROM '.Model::getTable(ProductVariant::class).' t1';
         foreach ($options as $option) {
             if ($i == 2) {
-                $sql .= ' LEFT JOIN '.Model::getTable('ProductVariantPropertyOption').' t'.$i.' ON t'.$i.'.product_variant_id = t'.($i - 1).'.id';
+                $sql .= ' LEFT JOIN '.Model::getTable(ProductVariantPropertyOption::class).' t'.$i.' ON t'.$i.'.product_variant_id = t'.($i - 1).'.id';
             } else {
-                $sql .= ' LEFT JOIN '.Model::getTable('ProductVariantPropertyOption').' t'.$i.' ON t'.$i.'.product_variant_id = t'.($i - 1).'.product_variant_id';
+                $sql .= ' LEFT JOIN '.Model::getTable(ProductVariantPropertyOption::class).' t'.$i.' ON t'.$i.'.product_variant_id = t'.($i - 1).'.product_variant_id';
             }
             $i++;
         }
@@ -252,13 +252,14 @@ class ProductVariant extends Entity
 
     public function getCategories($ids)
     {
+        $idsString = $this->buildUnionString($ids);
         $cat_ids = array();
-        $sql = 'SELECT DISTINCT t1.category_id AS id FROM '.Model::getTable('ProductItem').' t1,'
-            .' '.Model::getTable('ProductVariant').' t2'
+        $sql = 'SELECT DISTINCT t1.category_id AS id FROM '.Model::getTable(ProductItem::class).' t1,'
+            .' '.Model::getTable(ProductVariant::class).' t2'
             .' WHERE t2.product_id = t1.id'
-            .' AND t2.id IN'.$this->buildUnionString($ids);
+            .' AND t2.id IN ' . $idsString[0];
         $error = 'Could not get category ids';
-        $result = $this->query($sql, $error);
+        $result = $this->query($sql, $error, $idsString[1]);
         if ($result->rowCount() > 0) {
             foreach ($result as $row) {
                 array_push($cat_ids, $row['id']);

@@ -2,8 +2,8 @@
 
 namespace Empathy\ELib\Storage;
 
-use Empathy\ELib\Model,
-    Empathy\MVC\Entity;
+use Empathy\MVC\Model;
+use Empathy\MVC\Entity;
 
 class ArtistItem extends Entity
 {
@@ -28,7 +28,7 @@ class ArtistItem extends Entity
     {
         $i = 0;
         $nodes = array();
-        $sql = 'SELECT id,artist_alias,forename,surname FROM '.Model::getTable('ArtistItem').' ORDER BY surname, forename';
+        $sql = 'SELECT id,artist_alias,forename,surname FROM '.Model::getTable(self::class).' ORDER BY surname, forename';
         $error = 'Could not get artists.';
         $result = $this->query($sql, $error);
         if ($result->rowCount() > 0) {
@@ -50,7 +50,7 @@ class ArtistItem extends Entity
     public function getArtists()
     {
         $artist = array();
-        $sql = 'SELECT * FROM '.Model::getTable('ArtistItem')
+        $sql = 'SELECT * FROM '.Model::getTable(self::class)
             .' WHERE active = 1'
             .' ORDER BY surname, forename';
 
@@ -77,9 +77,9 @@ class ArtistItem extends Entity
     {
         $sql = 'SELECT t1.id AS artist_id, t3.id AS product_id, t1.artist_alias,'
             .' t1.forename, t1.surname, t1.bio, t3.name, t3.image, t3.category_id, t3.price'
-            .' FROM '.Model::getTable('ArtistItem').' t1'
-            .' LEFT JOIN '.Model::getTable('ProductArtist').' t2 ON t2.artist_id = t1.id'
-            .' LEFT JOIN '.Model::getTable('ProductItem').' t3 ON t3.id = t2.product_id'
+            .' FROM '.Model::getTable(self::class).' t1'
+            .' LEFT JOIN '.Model::getTable(ProductArtist::class).' t2 ON t2.artist_id = t1.id'
+            .' LEFT JOIN '.Model::getTable(ProductItem::class).' t3 ON t3.id = t2.product_id'
             .' ORDER BY t1.id';
         $error = 'Could not get bios.';
         $result = $this->query($sql, $error);

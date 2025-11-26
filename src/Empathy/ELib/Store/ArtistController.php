@@ -2,7 +2,7 @@
 
 namespace Empathy\ELib\Store;
 
-use Empathy\ELib\Model;
+use Empathy\MVC\Model;
 
 class ArtistController extends AdminController
 {

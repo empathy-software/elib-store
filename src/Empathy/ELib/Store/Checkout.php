@@ -5,6 +5,8 @@ namespace Empathy\ELib\Store;
 use Empathy\ELib\Model;
 use Empathy\ELib\User\CurrentUser;
 use Empathy\MVC\Session;
+use Empathy\MVC\Storage\ShippingAddress;
+use Empathy\MVC\Storage\OrderItem;
 
 
 class Checkout
@@ -13,11 +15,11 @@ class Checkout
 
     public function __construct($items, $c)
     {
-        $s = Model::load('ShippingAddress');
+        $s = Model::load(ShippingAddress::class);
         $s->id = Session::get('shipping_address_id');
         $s->load();
 
-        $o = Model::load('OrderItem');
+        $o = Model::load(OrderItem::class);
         $o->user_id = CurrentUser::getUserID();
         $o->status = 'DEFAULT';
         $o->stamp = 'MYSQLTIME';
@@ -30,7 +32,7 @@ class Checkout
         $o->zip = $s->zip;
         $o->country = $s->country;
 
-        $this->invoice_no = $o->insert(Model::getTable('OrderItem'), 1, array(), 0);
+        $this->invoice_no = $o->insert();
 
         if(!defined('ELIB_PAYPAL_TEST_MODE')
            || (defined('ELIB_PAYPAL_TEST_MODE') && !ELIB_PAYPAL_TEST_MODE))

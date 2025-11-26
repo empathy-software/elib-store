@@ -2,20 +2,22 @@
 
 namespace Empathy\ELib\Store;
 
-use Empathy\ELib\Model;
+use Empathy\MVC\Model;
+use Empathy\ELib\Storage\Property;
+use Empathy\ELib\Storage\PropertyOption;
 
 class PropertiesController extends AdminController
 {
     public function default_event()
     {
         $this->setTemplate('elib://admin/properties.tpl');
-        $p = Model::load('Property');
+        $p = Model::load(Property::class);
         $properties = $p->getAllWithOptions(array());
         $this->presenter->assign('properties', $properties);
 
         if (isset($_POST['add_option'])) {
             if (isset($_POST['id']) && is_numeric($_POST['id'])) {
-                $o = Model::load('PropertyOption');
+                $o = Model::load(PropertyOption::class);
                 $o->property_id = $_POST['id'];
                 $o->option_val = $_POST['option'];
                 $o->validates();
@@ -23,7 +25,7 @@ class PropertiesController extends AdminController
                     $this->presenter->assign('submitted_option', $o);
                     $this->presenter->assign('errors', $o->getValErrors());
                 } else {
-                    $o->insert(Model::getTable('PropertyOption'), 1, array(), 1);
+                    $o->insert();
                     $this->redirect('admin/properties');
                 }
             }
@@ -32,15 +34,14 @@ class PropertiesController extends AdminController
         if ($this->isXMLHttpRequest()) {
             $return_code = 1;
             if (isset($_POST['id']) && is_numeric($_POST['id'])) {
-                $o = Model::load('PropertyOption');
-                $o->id = $_POST['id'];
-                $o->load();
+                $o = Model::load(PropertyOption::class);
+                $o->load($_POST['id']);
                 $o->option_val = $_POST['value'];
                 $o->validates();
                 if ($o->hasValErrors()) {
                     $return_code = 2;
                 } else {
-                    $o->save(Model::getTable('PropertyOption'), array(), 1);
+                    $o->save();
                     $return_code = 0;
                 }
             }
@@ -53,9 +54,9 @@ class PropertiesController extends AdminController
     public function add()
     {
         $this->setTemplate('elib://admin/properties.tpl');
-        $p = Model::load('Property');
+        $p = Model::load(Property::class);
         $p->name = '#New Property';
-        $p->insert(Model::getTable('Property'), 1, array(), 0);
+        $p->insert();
         $this->redirect('admin/properties');
     }
 
@@ -64,29 +65,25 @@ class PropertiesController extends AdminController
         $this->setTemplate('elib://admin/properties.tpl');
         if (isset($_GET['id']) && is_numeric($_GET['id'])) {
             if (isset($_POST['save'])) {
-                $p = Model::load('Property');
-                $p->id = $_GET['id'];
-                $p->load();
+                $p = Model::load(Property::class);
+                $p->load(_GET['id']);
                 $p->name = $_POST['name'];
                 $p->validates();
                 if ($p->hasValErrors()) {
                     $this->presenter->assign('property', $p);
                     $this->presenter->assign('errors', $p->getValErrors());
                 } else {
-                    $p->save(Model::getTable('Property'), array(), 1);
+                    $p->save();
                     $this->redirect('admin/properties');
                 }
             } elseif (isset($_POST['cancel'])) {
                 $this->redirect('admin/properties');
 
             } else {
-                $p = Model::load('Property');
-                $p->id = $_GET['id'];
-                $p->load();
+                $p = Model::load(Property::class);
+                $p->load($_GET['id']);
                 $this->presenter->assign('property', $p);
             }
         }
-
     }
-
 }

@@ -3,6 +3,7 @@
 namespace Empathy\ELib\Store;
 
 use Empathy\ELib\Model;
+use Empathy\MVC\Storage\BrandItem;
 
 class BrandController extends AdminController
 {
@@ -31,9 +32,9 @@ class BrandController extends AdminController
 
     public function add()
     {
-        $b = Model::load('BrandItem');
+        $b = Model::load(BrandItem::class);
         $b->name = 'New Brand';
-        $id = $b->insert(Model::getTable('BrandItem'), 1, array(), 1);
+        $id = $b->insert();
         $this->redirect('admin/brand/'.$id);
     }
 
@@ -41,7 +42,7 @@ class BrandController extends AdminController
     {
         $this->buildNav();
         if (isset($_POST['save'])) {
-            $b = Model::load('BrandItem');
+            $b = Model::load(BrandItem::class);
             $b->id = $_POST['id'];
             $b->load();
             $b->name = $_POST['artist_alias'];
@@ -50,15 +51,14 @@ class BrandController extends AdminController
                 $this->presenter->assign('brand', $b);
                 $this->presenter->assign('errors', $b->getValErrors());
             } else {
-                $b->save(Model::getTable('BrandItem'), array(), 1);
+                $b->save();
                 $this->redirect('admin/brand/' . $b->id);
             }
         } elseif (isset($_POST['cancel'])) {
             $this->redirect('admin/brand/' . $_POST['id']);
         } else {
-            $b = Model::load('BrandItem');
-            $b->id = $_GET['id'];
-            $b->load();
+            $b = Model::load(BrandItem::class);
+            $b->load($_GET['id']);
             $this->presenter->assign('brand', $b);
         }
     }
@@ -74,8 +74,7 @@ class BrandController extends AdminController
     {
         $this->assertID();
         $b = Model::load('BrandItem');
-        $b->id = $_GET['id'];
-        $b->load();
+        $b->load( $_GET['id']);
         $b->delete();
         $this->redirect('admin/brand/');
     }
@@ -83,16 +82,15 @@ class BrandController extends AdminController
     public function edit_bio()
     {
         if (isset($_POST['save'])) {
-            $b = Model::load('BrandItem');
-            $b->id = $_POST['id'];
-            $b->load();
+            $b = Model::load(BrandItem::class);
+            $b->load($_POST['id']);
             $b->about = $_POST['bio'];
             $b->validates();
             if ($b->hasValErrors()) {
                 $this->presenter->assign('brand', $b);
                 $this->presenter->assign('errors', $b->getValErrors());
             } else {
-                $b->save(Model::getTable('BrandItem'), array('bio'), 1);
+                $b->save(['bio']);
                 $this->redirect('admin/brand/'.$_GET['id']);
             }
         } elseif (isset($_POST['cancel'])) {
@@ -100,9 +98,8 @@ class BrandController extends AdminController
         }
 
         $this->buildNav();
-        $b = Model::load('BrandItem');
-        $b->id = $_GET['id'];
-        $b->load();
+        $b = Model::load(BrandItem::class);
+        $b->load($_GET['id']);
         $this->presenter->assign('brand', $b);
     }
 

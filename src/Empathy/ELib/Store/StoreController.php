@@ -2,9 +2,13 @@
 
 namespace Empathy\ELib\Store;
 
-use Empathy\ELib\Model,
-    Empathy\ELib\User\CurrentUser,
-    Empathy\ELib\Country\Country;
+use Empathy\MVC\Model;
+use Empathy\ELib\Country\Country;
+use Empathy\ELib\Storage\CategoryItem;
+use Empathy\ELib\Storage\BrandItem;
+use Empathy\ELib\Storage\ProductColour;
+use Empathy\ELib\Storage\ShippingAddress;
+use Empathy\MVC\DI;
 
 class StoreController extends StoreControllerLite
 {
@@ -29,7 +33,7 @@ class StoreController extends StoreControllerLite
         }
 
         if (isset($_GET['category_name'])) {
-            $cl = Model::load('CategoryItem');
+            $cl = Model::load(CategoryItem::class);
             $category_id = $cl->loadIDByName($_GET['category_name']);
         }
 
@@ -118,8 +122,8 @@ class StoreController extends StoreControllerLite
                 if (sizeof($options) > 0) {
                     $variant_id = $v->findVariant($options, $p->id);
                 } else {
-                    $sql = ' WHERE product_id = '.$p->id.' LIMIT 0, 1';
-                    $variant = $v->getAllCustom(Model::getTable('ProductVariant'), $sql);
+                    $sql = ' WHERE product_id = ? LIMIT 0, 1';
+                    $variant = $v->getAllCustom($sql, [$p->id]);
                     if (sizeof($variant) > 0) {
                         $variant_id = $variant[0]['id'];
                     }
@@ -140,7 +144,7 @@ class StoreController extends StoreControllerLite
             $this->assign('p_nav', $l->getPNav());
 
             if ($_GET['product_id'] != 0) {
-                $c = Model::load('ProductColour');
+                $c = Model::load(ProductColour::class);
                 $colours = $c->getColoursIndexed($_GET['product_id']);
                 if (sizeof($colours) > 0) {
                     $this->assign('colours', $colours);
@@ -149,9 +153,9 @@ class StoreController extends StoreControllerLite
                 if(defined('ELIB_USE_PRODUCT_BRANDS') &&
                    ELIB_USE_PRODUCT_BRANDS == true)
                 {
-                    $b = Model::load('BrandItem');
+                    $b = Model::load(BrandItem::class);
                     $b->id = $p->brand_id;
-                    $b->load();
+                    $b->load($b->id);
                     $this->assign('brand', $b->name);
                 }
                 $this->assign('product_view', 1);
@@ -185,9 +189,9 @@ class StoreController extends StoreControllerLite
         }
 
         // seo
-        $c = Model::load('CategoryItem');
+        $c = Model::load(CategoryItem::class);
         $c->id = $p->category_id;
-        $c->load();
+        $c->load($c->id);
         $this->assign('price', $p->getPrice());
 
         $custom_title = '';
@@ -218,13 +222,14 @@ class StoreController extends StoreControllerLite
         $cat_string = $c->buildUnionString($ids);
 
         // remove root category unless in root
-        $cat_string = str_replace('(0,', '(', $cat_string);
+        $cat_string[0] = str_replace('(0,', '(', $cat_string[0]);
+        shift($cat_string[1]);
 
-        $sql = ' WHERE category_id IN '.$cat_string
+        $sql = ' WHERE category_id IN '.$cat_string[0]
             .' AND image IS NOT NULL'
             .' AND url IS NOT NULL'
             .' ORDER BY id DESC';
-        $promos = $p->getAllCustom(Model::getTable('PromoItem'), $sql);
+        $promos = $p->getAllCustom($sql, $cat_string[1]);
         shuffle($promos);
         $this->presenter->assign('promos', $promos);
     }
@@ -239,9 +244,8 @@ class StoreController extends StoreControllerLite
         $this->setTemplate('address.tpl');
         if (isset($_GET['id']) && is_numeric($_GET['id'])) {
             if (isset($_POST['save'])) {
-                $s = Model::load('ShippingAddress');
-                $s->id = $_GET['id'];
-                $s->load();
+                $s = Model::load(ShippingAddress::class);
+                $s->load($_GET['id']);
                 $s->first_name = $_POST['first_name'];
                 $s->last_name = $_POST['last_name'];
                 $s->address1 = $_POST['address1'];
@@ -258,11 +262,11 @@ class StoreController extends StoreControllerLite
                     $this->presenter->assign('errors', $s->getValErrors());
 
                 } else {
-                    $s->save(Model::getTable('ShippingAddress'), array(), 1);
+                    $s->save();
                     $this->redirect('store/checkout');
                 }
             } else {
-                $s = Model::load('ShippingAddress');
+                $s = Model::load(ShippingAddress::class);
                 $s->id = $_GET['id'];
                 $s->load();
                 $this->presenter->assign('address', $s);
@@ -282,8 +286,8 @@ class StoreController extends StoreControllerLite
         $this->presenter->assign('sc', 'GB');
 
         if (isset($_POST['save'])) {
-            $s = Model::load('ShippingAddress');
-            $s->user_id = CurrentUser::getUserID();;
+            $s = Model::load(ShippingAddress::class);
+            $s->user_id = DI::getContainer()->get('CurrentUser')->getUserID();
             $s->first_name = $_POST['first_name'];
             $s->last_name = $_POST['last_name'];
             $s->address1 = $_POST['address1'];
@@ -298,7 +302,7 @@ class StoreController extends StoreControllerLite
                 $this->presenter->assign('sc', $s->country);
                 $this->presenter->assign('errors', $s->getValErrors());
             } else {
-                $s->insert(Model::getTable('ShippingAddress'), 1, array(), 0);
+                $s->insert();
                 $this->redirect('store/checkout');
             }
         }

@@ -2,8 +2,8 @@
 
 namespace Empathy\ELib\Storage;
 
-use Empathy\ELib\Model,
-    Empathy\MVC\Entity;
+use Empathy\MVC\Model;
+use Empathy\MVC\Entity;
 
 class BrandItem extends Entity
 {
@@ -24,7 +24,7 @@ class BrandItem extends Entity
     {
         $i = 0;
         $nodes = array();
-        $sql = 'SELECT id,name FROM '.Model::getTable('BrandItem').' ORDER BY name';
+        $sql = 'SELECT id,name FROM '.Model::getTable(self::class).' ORDER BY name';
         $error = 'Could not get brands.';
         $result = $this->query($sql, $error);
         if ($result->rowCount() > 0) {
@@ -45,7 +45,7 @@ class BrandItem extends Entity
     {
         $brand = array();
         $brand[0] = 'None';
-        $sql = 'SELECT * FROM '.Model::getTable('BrandItem').' ORDER BY name';
+        $sql = 'SELECT * FROM '.Model::getTable(self::class).' ORDER BY name';
         $error = 'Could not get list of brands.';
         $result = $this->query($sql, $error);
         if ($result->rowCount() > 0) {

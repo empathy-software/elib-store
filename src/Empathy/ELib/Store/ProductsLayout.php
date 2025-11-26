@@ -1,8 +1,10 @@
 <?php
 
 namespace Empathy\ELib\Store;
+use Empathy\ELib\Storage\ProductItem;
+use Empathy\ELib\Storage\CategoryItem;
 
-use Empathy\ELib\Model;
+use Empathy\MVC\Model;
 
 define('BUTTONS_PER_PAGE', 12);
 
@@ -66,9 +68,9 @@ class ProductsLayout
 
         $this->category->buildDescendantIDs($c_id, $descendants);
 
-        $d = '('.implode(',', $descendants).')';
+        $descendantsString = $this->category->buildUnionString($descendants);
 
-        $products = $this->product->getAllCustom(Model::getTable('ProductItem'), ' WHERE category_id IN'.$d);
+        $products = $this->product->getAllCustom(' WHERE category_id IN '. $descendantsString[0], $descendantsString[1]);
         if (sizeof($products) > 0) {
             shuffle($products);
             $p = $products[0];
@@ -96,7 +98,7 @@ class ProductsLayout
         $button = array();
 
         if (!$this->category->getChildren($this->category->id)) {
-            $sql = ' WHERE category_id = '.$this->category->id
+            $sql = ' WHERE category_id = ?'
                 .' AND t1.status = '.\ELib\Storage\ProductItemStatus::AVAILABLE
                 .' AND t1.brand_id = t2.id'
                 .' AND t3.product_id = t1.id';
@@ -112,7 +114,12 @@ class ProductsLayout
             $order = 'price';
 
             $select = '*,t1.name AS product_name, t1.image AS image, t2.name AS brand_name, t1.id AS product_id, MIN(t3.price) AS price';
-            $products = $this->product->getAllCustomPaginateMultiJoinGroup($select, Model::getTable('ProductItem'), Model::getTable('BrandItem'), Model::getTable('ProductVariant'), $sql, $page, $per_page, $group, $order);
+            $products = $this->product->getAllCustomPaginateMultiJoinGroup(
+                $select,
+                Model::getTable('BrandItem'),
+                Model::getTable('ProductVariant'),
+                $sql, $page, $per_page, $group, $order, [$this->category->id]
+            );
 
             foreach ($products as $p) {
                 $button['name'] = $p['brand_name'].' '.$p['product_name'];
@@ -122,7 +129,11 @@ class ProductsLayout
                 array_push($this->buttons, $button);
             }
 
-            $this->p_nav = $this->product->getPaginatePagesMultiJoinGroup($select, Model::getTable('ProductItem'), Model::getTable('BrandItem'), Model::getTable('ProductVariant'), $sql, $page, $per_page, $group, $order);
+            $this->p_nav = $this->product->getPaginatePagesMultiJoinGroup(
+                $select,
+                Model::getTable('BrandItem'),
+                Model::getTable('ProductVariant'),
+                $sql, $page, $per_page, $group, $order, [$this->category->id]);
 
         } else {
             $children = $this->category->getChildren($this->category->id);
@@ -130,7 +141,7 @@ class ProductsLayout
                 $button = array();
                 $this->category->id = $child;
                 if ($this->category->hasChildren()) {
-                    $this->category->load();
+                    $this->category->load($child);
                     $button['name'] = $this->category->name;
                     $button['image'] = $this->randomImage($this->category->id);
                     $button['category_id'] = $this->category->id;
@@ -142,7 +153,7 @@ class ProductsLayout
                     $button['name'] = $this->category->name;
                     $button['category_id'] = $this->category->id;
 
-                    $products = $this->product->getAllCustom(Model::getTable('ProductItem'), ' WHERE category_id = '.$this->category->id);
+                    $products = $this->product->getAllCustom(' WHERE category_id = ?', [$this->category->id]);
                     //shuffle($products);
                     if (sizeof($products) > 0) {
                         $p = $products[0];
@@ -165,7 +176,7 @@ class ProductsLayout
     {
         $button = array();
 
-        $variants = $this->variant->getAllCustom(Model::getTable('ProductVariant'), ' WHERE product_id = '.$this->product->id);
+        $variants = $this->variant->getAllCustom(' WHERE product_id = ?', [$this->product->id]);
         shuffle($variants);
         foreach ($variants as $v) {
             $button['name'] = $this->variant->getVariantName($v['id']);
@@ -185,7 +196,7 @@ class ProductsLayout
             }
 
             // set image to first variant image
-            $variants = $this->variant->getAllCustom(Model::getTable('ProductVariant'), ' WHERE product_id = '.$this->product->id.' ORDER BY id');
+            $variants = $this->variant->getAllCustom(' WHERE product_id = ? ORDER BY id', [$this->product->id]);
             if (sizeof($variants) > 0) {
                 $this->product->image = $variants[0]['image'];
             }
@@ -236,19 +247,16 @@ class ProductsLayout
             $button['variant_id'] = $v['id'];
             array_push($this->buttons, $button);
         }
-
     }
 
     public static function getTopCats()
     {
         $categories = array();
         if ($_GET['module'] == 'store') {
-            $c = Model::load('CategoryItem');
+            $c = Model::load(CategoryItem::class);
             $sql = ' WHERE category_id = 0 AND hidden = 0 ORDER BY name';
-            $categories = $c->getAllCustom(Model::getTable('CategoryItem'), $sql);
+            $categories = $c->getAllCustom($sql);
         }
-
         return $categories;
     }
-
 }

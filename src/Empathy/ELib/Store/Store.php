@@ -2,14 +2,16 @@
 
 namespace Empathy\ELib\Store;
 
-use Empathy\ELib\Model,
-    Empathy\ELib\User\CurrentUser,
-    Empathy\MVC\Session,
-    Empathy\ELib\Storage\ProductItemStatus,
-    Empathy\ELib\Storage\ProductVariantStatus;
-
-
-
+use Empathy\ELib\Model;
+use Empathy\MVC\Session;
+use Empathy\ELib\Storage\ProductItemStatus;
+use Empathy\ELib\Storage\ProductVariantStatus;
+use Empathy\ELib\Storage\Vendor;
+use Empathy\ELib\Storage\ProductItem;
+use Empathy\ELib\Storage\CategoryItem;
+use Empathy\ELib\Storage\BrandItem;
+use Empathy\ELib\Storage\ProductVariantPropertyOption;
+use Empathy\MVC\DI;
 
 define('REQUESTS_PER_PAGE', 12);
 
@@ -47,34 +49,41 @@ class Store
 
         $this->buildNav();
 
-        $p = Model::load('ProductItem');
+        $p = Model::load(ProductItem::class);
         if (isset($_GET['id']) && is_numeric($_GET['id'])) {
             $showCat = $_GET['id'];
         } else {
             $showCat = 0;
         }
 
-        $sql = ' WHERE category_id = '.$_GET['id'];
+        $params = [];
+
+        $sql = ' WHERE category_id = ?';
+
+        $params[] = $_GET['id'];
 
         if ($_GET['brand_id'] > 0) {
-            $sql .= ' AND brand_id = '.$_GET['brand_id'];
+            $sql .= ' AND brand_id = ?';
+            $params[] = $_GET['brand_id'];
         }
 
         // status
         $sql .= ' AND status != '.ProductItemStatus::DELETED;
 
         // vendor
-        $v = Model::load('Vendor');
-        $vendor_id = $v->getIDByUserID(CurrentUser::getUserID());
-        $sql .= ' AND vendor_id = '.$vendor_id;
+        $v = Model::load(Vendor::class);
+        $vendor_id = $v->getIDByUserID(DI::getContainer()->get('CurrentUser'));
+        $sql .= ' AND vendor_id = ?';
+        $params[] = $vendor_id;
 
-        $sql .= ' ORDER BY '.$_GET['order_by'];
+        $sql .= ' ORDER BY ?';
+        $params[] = $_GET['order_by'];
 
-        $p_nav = $p->getPaginatePages(Model::getTable('ProductItem'), $sql, $_GET['page'], REQUESTS_PER_PAGE);
+        $p_nav = $p->getPaginatePages(Model::getTable('ProductItem'), $sql, $_GET['page'], REQUESTS_PER_PAGE, $params);
 
         $this->c->assign('p_nav', $p_nav);
 
-        $product = $p->getAllCustomPaginate(Model::getTable('ProductItem'), $sql, $_GET['page'], REQUESTS_PER_PAGE);
+        $product = $p->getAllCustomPaginate($sql, $_GET['page'], REQUESTS_PER_PAGE, $params);
         foreach ($product as &$p_item) {
             $p_item['status_text'] = ProductItemStatus::getStatus($p_item['status']);
             //$p_item['min_price'] = $p->getMinPrice($p_item['id']);
@@ -93,9 +102,8 @@ class Store
             $_GET['collapsed'] = 0;
         }
 
-        $c = Model::load('CategoryItem');
-        $c->id = $_GET['id'];
-        $c->load();
+        $c = Model::load(CategoryItem::class);
+        $c->load($_GET['id']);
 
         $ct = new CategoriesTree($c, $_GET['collapsed'], 'storeadmin/products');
 
@@ -120,21 +128,21 @@ class Store
     // (new function)
     public function addProductVariantInternal($product_id)
     {
-        $v = Model::load('ProductVariant');
+        $v = Model::load(ProductVariant::class);
         $v->product_id = $product_id;
         $v->price = 'DEFAULT';
         $v->status = 'DEFAULT';
-        $v->insert(Model::getTable('ProductVariant'), 1, array(), 0);
+        $v->insert();
     }
 
     public function addProduct()
     {
         $_GET['id'] = (int) $_GET['id'];
         if ($_GET['id'] > 0) {
-            $c = Model::load('CategoryItem');
+            $c = Model::load(CategoryItem::class);
             $c->id = $_GET['id'];
             if (!$c->hasChildren()) {
-                $p = Model::load('ProductItem');
+                $p = Model::load(ProductItem::class);
                 $p->category_id = $_GET['id'];
                 $p->name = 'New Product';
                 $p->description = 'No description.';
@@ -142,11 +150,11 @@ class Store
 
                 if(defined('ELIB_MULTIPLE_VENDORS') &&
                    ELIB_MULTIPLE_VENDORS == true) {
-                    $user_id = CurrentUser::getUserID();
-                    $v = Model::load('Vendor');
+                    $user_id = DI::getContainer()->get('CurrentUser');
+                    $v = Model::load(Vendor::class);
                     $v->id = $v->getIDByUserID($user_id);                    
                     if ($v->id > 0) {
-                        $v->load();
+                        $v->load($v->id);
 
                         if ($v->verified !== null) {
                             $p->vendor_verified = 1;
@@ -158,7 +166,7 @@ class Store
                 } else {
                     $p->vendor_verified = 1;
                 }
-                $p->id = $p->insert(Model::getTable('ProductItem'), 1, array(), 0);
+                $p->id = $p->insert();
                 $this->addProductVariantInternal($p->id); // create first variant
                 $this->c->redirect('storeadmin/edit_product/'.$p->id);
             }
@@ -169,10 +177,8 @@ class Store
     public function viewProduct()
     {
         //$this->setTemplate('elib://admin/product.tpl');
-        $p = Model::load('ProductItem');
-
-        $p->id = $_GET['id'];
-        $p->load();
+        $p = Model::load(ProductItem::class);
+        $p->load($_GET['id']);
         $this->c->assign('product_status', ProductItemStatus::getStatus($p->status));
 
         $this->c->assign("product", $p);
@@ -198,9 +204,9 @@ class Store
             }
             $variants = array_merge($variants, $v->getAllCustom(Model::getTable('ProductVariant'), $sql));
         } else {
-            $sql = ' WHERE product_id = '.$p->id;
-            $sql .= ' AND status != '.ProductVariantStatus::DELETED;
-            $variants = $v->getAllCustom(Model::getTable('ProductVariant'), $sql);
+            $sql = ' WHERE product_id = ?';
+            $sql .= ' AND status != ?';
+            $variants = $v->getAllCustom($sql, [$p->id, ProductVariantStatus::DELETED]);
         }
 
         $property = Model::load('Property');
@@ -259,10 +265,9 @@ class Store
     public function setVariantAvailable()
     {
         $v = Model::load('ProductVariant');
-        $v->id = $_GET['id'];
-        $v->load();
+        $v->load($_GET['id']);
         $v->status = ProductVariantStatus::AVAILABLE;
-        $v->save(Model::getTable('ProductVariant'), array(), 2);
+        $v->save();
         $this->c->redirect('storeadmin/product/'.$v->product_id);
     }
 
@@ -272,34 +277,33 @@ class Store
         $price = $p->getMinPrice($product_id);
         if ($price > 0) {
             $p->id = $product_id;
-            $p->load();
+            $p->load($p->id);
             $p->min_price = $price;
-            $p->save(Model::getTable('ProductItem'), array(), 2);
+            $p->save();
         }
     }
 
     public function productAutoHide($product_id)
     {
         $v = Model::load('ProductVariant');
-        $sql = ' WHERE status = '.ProductVariantStatus::AVAILABLE
-            .' AND product_id = '.$product_id;
-        $variants = $v->getAllCustom(Model::getTable('ProductVariant'), $sql);
+        $sql = ' WHERE status = ?'
+            .' AND product_id = ?';
+        $variants = $v->getAllCustom($sql, [ProductVariantStatus::AVAILABLE, $product_id]);
         if (sizeof($variants) < 1) {
-            $p = Model::load('ProductItem');
+            $p = Model::load(ProductItem::class);
             $p->id = $product_id;
-            $p->load();
+            $p->load($p->id);
             $p->status = ProductItemStatus::CREATED;
-            $p->save(Model::getTable('ProductItem'), array(), 2);
+            $p->save();
         }
     }
 
     public function setVariantUnavailable()
     {
-        $v = Model::load('ProductVariant');
-        $v->id = $_GET['id'];
-        $v->load();
+        $v = Model::load(ProductVariant::class);
+        $v->load($_GET['id']);
         $v->status = ProductVariantStatus::CREATED;
-        $v->save(Model::getTable('ProductVariant'), array(), 2);
+        $v->save();
 
         $this->productAutoHide($v->product_id);
 
@@ -310,45 +314,41 @@ class Store
     {
         $this->productAutoGetMinPrice($_GET['id']);
 
-        $p = Model::load('ProductItem');
-        $p->id = $_GET['id'];
-        $p->load();
+        $p = Model::load(ProductItem::class);
+        $p->load($_GET['id']);
         $p->status = ProductItemStatus::AVAILABLE;
-        $p->save(Model::getTable('ProductItem'), array(), 2);
+        $p->save();
         $this->c->redirect('storeadmin/product/'.$p->id);
     }
 
     public function setProductUnAvailable()
     {
-        $p = Model::load('ProductItem');
-        $p->id = $_GET['id'];
-        $p->load();
+        $p = Model::load(ProductItem::class);
+        $p->load($_GET['id']);
         $p->status = ProductItemStatus::CREATED;
-        $p->save(Model::getTable('ProductItem'), array(), 2);
+        $p->save();
         $this->c->redirect('storeadmin/product/'.$p->id);
     }
 
     public function setProductSoldOut()
     {
-        $p = Model::load('ProductItem');
-        $p->id = $_GET['id'];
-        $p->load();
+        $p = Model::load(ProductItem::class);
+        $p->load($_GET['id']);
         $p->status = ProductItemStatus::SOLD_OUT;
-        $p->save(Model::getTable('ProductItem'), array(), 2);
+        $p->save();
         $this->c->redirect('storeadmin/product/'.$p->id);
     }
 
     public function clearVariantImage()
     {
-        $v = Model::load('ProductVariant');
-        $v->id = $_GET['id'];
-        $v->load();
+        $v = Model::load(ProductVariant::class);
+        $v->load($_GET['id']);
 
         $i = new ImageUpload(null, false, array());
         if ($v->image != '') {
             $i->remove(array($v->image));
             unset($v->image);
-            $v->save(Model::getTable('ProductVariant'), array(), 2);
+            $v->save();
         }
         $this->c->redirect('storeadmin/product/'.$v->product_id);
     }
@@ -356,14 +356,12 @@ class Store
     public function editProduct()
     {
         //$this->setTemplate('elib://admin/product.tpl');
-        $p = Model::load('ProductItem');
+        $p = Model::load(ProductItem::class);
         //$pr = new ProductRange($this);
 
         if (isset($_POST['cancel'])) {
             $this->c->redirect('storeadmin/product/'.$_POST['id']);
         } elseif (isset($_POST['submit_product'])) {
-            $p->id = $_POST['id'];
-
             /*
               if (!isset($_POST['range'])) {
               $_POST['range'] = array();
@@ -372,7 +370,7 @@ class Store
               $pr->updateForProduct($p->id, $range);
             */
 
-            $p->load();
+            $p->load($_POST['id']);
             $old_product_name = $p->name;
             $p->name = $_POST['name'];
             $p->description = $_POST['description'];
@@ -395,7 +393,7 @@ class Store
                 $this->c->assign('errors', $p->getValErrors());
             } else {
                 //$p->price = $_POST['price'];
-                $p->save(Model::getTable('ProductItem'), array('description'), 1);
+                $p->save();
                 $this->c->redirect('storeadmin/product/'.$p->id);
             }
         } else {
@@ -412,7 +410,7 @@ class Store
             //$r = new RangeItem($this);
             //$ranges = $r->loadAllIndexed();
 
-            $c = Model::load('CategoryItem');
+            $c = Model::load(CategoryItem::class);
             $category = $c->loadIndexed($c->category_id);
 
             //$this->presenter->assign("product_ranges", $product_ranges);
@@ -426,7 +424,7 @@ class Store
             $sold[1] = 'Yes';
             $this->c->assign('sold_in_store', $sold);
 
-            $b = Model::load('BrandItem');
+            $b = Model::load(BrandItem::class);
             $brands = $b->getBrands();
             $this->c->assign('brands', $brands);
         }
@@ -441,9 +439,8 @@ class Store
             $_GET['id'] = $_POST['id'];
         }
 
-        $p = Model::load('ProductItem');
-        $p->id = $_GET['id'];
-        $p->load();
+        $p = Model::load(ProductItem::class);
+        $p->load($_GET['id']);
 
         $this->c->assign("product", $p);
 
@@ -464,7 +461,7 @@ class Store
                 // update db
                 $p->image = $u->file;
                 $p->status = ProductItemStatus::CREATED;
-                $p->save(Model::getTable('ProductItem'), array(), 2);
+                $p->save();
 
                 //$this->redirect_cgi('archive.cgi?id='.$p->id);
                 //$this->execScript('archive', array($p->id));
@@ -476,22 +473,20 @@ class Store
     // new function (using status codes)
     public function deleteProduct()
     {
-        $p = Model::load('ProductItem');
-        $p->id = $_GET['id'];
-        $p->load();
+        $p = Model::load(ProductItem::class);
+        $p->load($_GET['id']);
         $p->status = ProductItemStatus::DELETED;
-        $p->save(Model::getTable('ProductItem'), array(), 2);
+        $p->save();
         $this->c->redirect('storeadmin/products');
     }
 
     // new function
     public function deleteVariant()
     {
-        $v = Model::load('ProductVariant');
-        $v->id = $_GET['id'];
-        $v->load();
+        $v = Model::load(ProductVariant::class);
+        $v->load($_GET['id']);
         $v->status = ProductVariantStatus::DELETED;
-        $v->save(Model::getTable('ProductVariant'), array(), 2);
+        $v->save();
 
         $this->productAutoHide($v->product_id);
 
@@ -502,14 +497,12 @@ class Store
     {
         //$this->setTemplate('elib://admin/product.tpl');
         if (isset($_POST['cancel'])) {
-            $v = Model::load('ProductVariant');
-            $v->id = $_POST['id'];
-            $v->load();
+            $v = Model::load(ProductVariant::class);
+            $v->load($_POST['id']);
             $this->c->redirect('storeadmin/product/'.$v->product_id);
         } elseif (isset($_POST['save'])) {
-            $v = Model::load('ProductVariant');
-            $v->id = $_POST['id'];
-            $v->load();
+            $v = Model::load(ProductVariant::class);
+            $v->load($_POST['id']);
             $v->weight_g = (isset($_POST['weight_g']))? $_POST['weight_g']: NULL;
             $v->weight_lb = (isset($_POST['weight_lb']))? $_POST['weight_lb']: NULL;
             $v->weight_oz = (isset($_POST['weight_oz']))? $_POST['weight_oz']: NULL;
@@ -519,20 +512,19 @@ class Store
                 $this->c->assign('variant', $v);
                 $this->c->assign('errors', $v->getValErrors());
             } else {
-                $v->save(Model::getTable('ProductVariant'), array(), 1);
+                $v->save();
                 $this->c->redirect('storeadmin/product/'.$v->product_id);
             }
         } else {
             //$this->assertID();
-            $v = Model::load('ProductVariant');
-            $v->id = $_GET['id'];
-            $v->load();
+            $v = Model::load(ProductVariant::class);
+            $v->load($_GET['id']);
             $this->c->assign('variant', $v);
         }
 
-        $p = Model::load('ProductItem');
+        $p = Model::load(ProductItem::class);
         $p->id = $v->product_id;
-        $p->load();
+        $p->load($p->id);
         $this->c->assign('product', $p);
     }
 
@@ -540,14 +532,13 @@ class Store
     {
         //$this->setTemplate('elib://admin/product.tpl');
         //$this->assertID();
-        $v = Model::load('ProductVariant');
-        $v->id = $_GET['id'];
-        $v->load();
+        $v = Model::load(ProductVariant::class);
+        $v->load($_GET['id']);
         $this->c->assign('variant', $v);
 
-        $p = Model::load('ProductItem');
+        $p = Model::load(ProductItem::class);
         $p->id = $v->product_id;
-        $p->load();
+        $p->load($p->id);
         $this->c->assign("product", $p);
 
         if (isset($_POST['cancel'])) {
@@ -563,7 +554,7 @@ class Store
                     $u->remove(array($v->image));
                 }
                 $v->image = $u->file;
-                $v->save(Model::getTable('ProductVariant'), array(), 0);
+                $v->save();
 
                 //$this->redirect_cgi('archive.cgi?id='.$p->id);
                 //$this->execScript('archive', array($p->id));
@@ -578,41 +569,38 @@ class Store
         //$this->assertID();
 
         if (isset($_POST['cancel'])) {
-            $v = Model::load('ProductVariant');
-            $v->id = $_GET['id'];
-            $v->load();
+            $v = Model::load(ProductVariant::class);
+            $v->load($_GET['id']);
             $this->c->redirect('storeadmin/product/'.$v->product_id);
         } elseif (isset($_POST['save'])) {
-            $p = Model::load('ProductVariantPropertyOption');
+            $p = Model::load(ProductVariantPropertyOption::class);
             $p->emptyByVariant($_GET['id']);
             $p->product_variant_id = $_GET['id'];
             //if(isset($_POST['property']))
             // {
             foreach ($_POST['property'] as $index => $item) {
-        if ($item > 0 && is_numeric($item)) {
-            $p->property_option_id = $item;
-            $p->insert(Model::getTable('ProductVariantPropertyOption'), 1, array(), 0);
+                if ($item > 0 && is_numeric($item)) {
+                    $p->property_option_id = $item;
+                    $p->insert();
                 }
             }
         // }
-            $v = Model::load('ProductVariant');
-            $v->id = $_GET['id'];
-            $v->load();
+            $v = Model::load(ProductVariant::class);
+            $v->load($_GET['id']);
             $this->c->redirect('storeadmin/product/'.$v->product_id);
         }
 
-        $v = Model::load('ProductVariant');
-        $v->id = $_GET['id'];
-        $v->load();
+        $v = Model::load(ProductVariant::class);
+        $v->load($_GET['id']);
 
-        $p = Model::load('ProductItem');
+        $p = Model::load(ProductItem::class);
         $p->id = $v->product_id;
-        $p->load();
+        $p->load($p->id);
 
-        $c = Model::load('CategoryItem');
+        $c = Model::load(CategoryItem::class);
         $cats = $c->getAncestorIds($p->category_id, array());
 
-        $cp = Model::load('CategoryProperty');
+        $cp = Model::load(CategoryProperty::class);
 
         array_push($cats, $p->category_id);
         $props = $cp->getPropertiesByCategory($cats);
@@ -623,13 +611,13 @@ class Store
         $this->c->assign('variant', $v);
 
         if (sizeof($props) > 0) {
-            $property = Model::load('Property');
+            $property = Model::load(Property::class);
             $properties = $property->getAllWithOptions($props);
             $this->c->assign('properties', $properties);
 
-            $pv = Model::load('ProductVariantPropertyOption');
-            $sql = ' WHERE product_variant_id = '.$_GET['id'];
-            $options = $pv->getAllCustom(Model::getTable('ProductVariantPropertyOption'), $sql);
+            $pv = Model::load(ProductVariantPropertyOption::class);
+            $sql = ' WHERE product_variant_id = ?';
+            $options = $pv->getAllCustom($sql, [$_GET['id']]);
             $o = array();
             foreach ($options as $index => $value) {
                 array_push($o, $value['property_option_id']);

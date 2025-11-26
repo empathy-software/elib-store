@@ -2,10 +2,9 @@
 
 namespace Empathy\ELib\Storage;
 
-use Empathy\ELib\Model,
-    Empathy\MVC\Entity,
-    Empathy\MVC\Validate;
-
+use Empathy\MVC\Model;
+use Empathy\MVC\Entity;
+use Empathy\MVC\Validate;
 
 
 class ShippingAddress extends Entity
@@ -38,9 +37,9 @@ class ShippingAddress extends Entity
 
     public function setDefault($user_id, $address_id)
     {
-        $sql = 'SELECT id FROM '.Model::getTable('ShippingAddress').' WHERE user_id = '.$user_id;
+        $sql = 'SELECT id FROM '.Model::getTable(ShippingAddress::class).' WHERE user_id = ?';
         $error = 'Could not get all shipping addresses for user.';
-        $result = $this->query($sql, $error);
+        $result = $this->query($sql, $error, [$user_id]);
 
         $addresses = array();
         foreach ($result as $row) {
@@ -48,14 +47,12 @@ class ShippingAddress extends Entity
         }
 
         if (in_array($address_id, $addresses)) {
-            $sql = 'UPDATE '.Model::getTable('ShippingAddress').' SET default_address = 0 WHERE user_id = '.$user_id;
+            $sql = 'UPDATE '.Model::getTable('ShippingAddress').' SET default_address = 0 WHERE user_id = ?';
             $error = 'Could not wipe defaults.';
-            $this->query($sql, $error);
-            $sql = 'UPDATE '.Model::getTable('ShippingAddress').' SET default_address = 1 WHERE id = '.$address_id;
+            $this->query($sql, $error, [$user_id]);
+            $sql = 'UPDATE '.Model::getTable('ShippingAddress').' SET default_address = 1 WHERE id = ?';
             $error = 'Could not set new default';
-            $this->query($sql, $error);
+            $this->query($sql, $error, [$address_id]);
         }
-
     }
-
 }

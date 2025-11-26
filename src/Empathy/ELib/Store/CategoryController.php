@@ -3,6 +3,10 @@
 namespace Empathy\ELib\Store;
 
 use Empathy\ELib\Model;
+use Empathy\ELib\Storage\ProductItem;
+use Empathy\ELib\Storage\CategoryItem;
+use Empathy\ELib\Storage\CategoryProperty;
+use Empathy\ELib\Storage\Property;
 
 define('REQUESTS_PER_PAGE', 12);
 
@@ -32,7 +36,8 @@ class CategoryController extends AdminController
 
         $this->buildNav();
 
-        $p = Model::load('ProductItem');
+        $params = [];
+        $p = Model::load(ProductItem::class);
         if (isset($_GET['id']) && is_numeric($_GET['id'])) {
             $showCat = $_GET['id'];
         } else {
@@ -40,18 +45,21 @@ class CategoryController extends AdminController
         }
 
         $sql = '';
-        $sql .= 'WHERE category_id = '.$_GET['id'].' ';
+        $params[] = $_GET['id'];
+        $sql .= 'WHERE category_id = ?';
 
         if ($_GET['brand_id'] > 0) {
-            $sql .= ' AND brand_id = '.$_GET['brand_id'].' ';
+            $sql .= ' AND brand_id = ?';
+            $params[] = $_GET['brand_id'];
         }
 
-        $sql .= 'ORDER BY '.$_GET['order_by'];
+        $sql .= ' ORDER BY ?';
+        $params[] = $_GET['order_by'];
 
-        $p_nav = $p->getPaginatePages(Model::getTable('ProductItem'), $sql, $_GET['page'], REQUESTS_PER_PAGE);
+        $p_nav = $p->getPaginatePages($sql, $_GET['page'], REQUESTS_PER_PAGE, $params);
         $this->presenter->assign('p_nav', $p_nav);
         $this->assign('page', $_GET['page']);
-        $product = $p->getAllCustomPaginate(Model::getTable('ProductItem'), $sql, $_GET['page'], REQUESTS_PER_PAGE);
+        $product = $p->getAllCustomPaginate($sql, $_GET['page'], REQUESTS_PER_PAGE, $params);
 
         foreach ($product as &$product_item) {
             if ($product_item['status'] > 0) {
@@ -61,7 +69,7 @@ class CategoryController extends AdminController
             }
         }
 
-        $c = Model::load('CategoryItem');
+        $c = Model::load(CategoryItem::class);
         $c->id = $_GET['id'];
         $category = $c->loadIndexed($c->category_id);
 
@@ -87,9 +95,8 @@ class CategoryController extends AdminController
             $_GET['collapsed'] = 0;
         }
 
-        $c = Model::load('CategoryItem');
-        $c->id = $_GET['id'];
-        $c->load();
+        $c = Model::load(CategoryItem::class);
+        $c->load($_GET['id']);
 
         $ct = new CategoriesTree($c, $_GET['collapsed']);
 
@@ -98,7 +105,7 @@ class CategoryController extends AdminController
 
         $this->presenter->assign('nav', $ct->getMarkup());
 
-        $b = Model::load('BrandItem');
+        $b = Model::load(BrandItem::class);
         $this->presenter->assign('brands', $b->getBrands());
     }
 
@@ -112,11 +119,11 @@ class CategoryController extends AdminController
     public function add_category()
     {
         if (isset($_GET['id']) && is_numeric($_GET['id'])) {
-            $c = Model::load('CategoryItem');
+            $c = Model::load(CategoryItem::class);
             $c->category_id = $_GET['id'];
             $c->name = 'New Category';
             $c->hidden = 'DEFAULT';
-            $c->insert(Model::getTable('CategoryItem'), 1, array(), 0);
+            $c->insert();
         }
         $this->redirect('admin/category/'.$_GET['id']);
     }
@@ -125,9 +132,8 @@ class CategoryController extends AdminController
     {
         $this->buildNav();
         if (isset($_POST['save'])) {
-            $c = Model::load('CategoryItem');
-            $c->id = $_POST['id'];
-            $c->load();
+            $c = Model::load(CategoryItem::class);
+            $c->load($_POST['id']);
             $c->name = $_POST['name'];
             $c->validates();
             if ($c->hasValErrors()) {
@@ -140,9 +146,8 @@ class CategoryController extends AdminController
         } elseif (isset($_POST['cancel'])) {
             $this->redirect('admin/category/'.$_POST['id']);
         } else {
-            $c = Model::load('CategoryItem');
-            $c->id = $_GET['id'];
-            $c->load();
+            $c = Model::load(CategoryItem::class);
+            $c->load($_GET['id']);
             $this->presenter->assign('category', $c);
         }
     }
@@ -150,9 +155,8 @@ class CategoryController extends AdminController
     public function delete()
     {
         $this->assertID();
-        $c = Model::load('CategoryItem');
-        $c->id = $_GET['id'];
-        $c->load();
+        $c = Model::load(CategoryItem::class);
+        $c->load($_GET['id']);
         if ($c->hasCategoriesOrProducts($c->id)) {
             $this->redirect('admin/category/'.$c->id);
         } else {
@@ -167,27 +171,27 @@ class CategoryController extends AdminController
         $this->buildNav();
 
         if (isset($_POST['save'])) {
-            $c = Model::load('CategoryProperty');
+            $c = Model::load(CategoryProperty::class);
             $c->emptyByCategory($_GET['id']);
             if (isset($_POST['property']) && sizeof($_POST['property'] > 0)) {
                 foreach ($_POST['property'] as $index => $item) {
                     $c->category_id = $_GET['id'];
                     $c->property_id = $index;
-                    $c->insert(Model::getTable('CategoryProperty'), 1, array(), 0);
+                    $c->insert();
                 }
             }
             $this->redirect('admin/category/' . $_GET['id']);
         } elseif (isset($_POST['cancel'])) {
             $this->redirecT('admin/category/' . $_GET['id']);
         } else {
-            $p = Model::load('Property');
+            $p = Model::load(Property::class);
             $properties = $p->getAllWithOptions(array());
             $this->presenter->assign('properties', $properties);
 
-            $c = Model::load('CategoryItem');
+            $c = Model::load(CategoryItem::class);
             $ancestors = $c->getAncestorIds($_GET['id'], array());
 
-            $cp = Model::load('CategoryProperty');
+            $cp = Model::load(CategoryProperty::class);
 
             $inherited = array();
             if (sizeof($ancestors) > 0) {

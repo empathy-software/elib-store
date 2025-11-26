@@ -2,7 +2,9 @@
 
 namespace Empathy\ELib\Store;
 
-use Empathy\ELib\Model;
+use Empathy\MVC\Model;
+use Empathy\ELib\Storage\CategoryItem;
+use Empathy\ELib\Storage\PromoItem;
 
 define('REQUESTS_PER_PAGE', 12);
 
@@ -23,11 +25,9 @@ class PromoCategoryController extends AdminController
             $_GET['collapsed'] = 0;
         }
 
-        $c = Model::load('CategoryItem');
-        $c->id = $_GET['id'];
-        $c->load();
+        $c = Model::load(CategoryItem::class);
+        $c->load($_GET['id']);
 
- 
         $ct = new PromosTree($c, $_GET['collapsed']);
 
  
@@ -72,17 +72,17 @@ class PromoCategoryController extends AdminController
         }
 
         $sql = '';
-        $sql .= 'WHERE category_id = '.$_GET['id'].' ';
+        $sql .= 'WHERE category_id = ?';
 
-        $sql .= 'ORDER BY '.$_GET['order_by'];
+        $sql .= 'ORDER BY ?';
 
-        $p = Model::load('PromoItem');
+        $p = Model::load(PromoItem::class);
 
-        $p_nav = $p->getPaginatePages(Model::getTable('PromoItem'), $sql, $_GET['page'], REQUESTS_PER_PAGE);
+        $p_nav = $p->getPaginatePages($sql, $_GET['page'], REQUESTS_PER_PAGE, [$_GET['id'], $_GET['order_by']]);
         $this->presenter->assign('p_nav', $p_nav);
-        $promo = $p->getAllCustomPaginate(Model::getTable('PromoItem'), $sql, $_GET['page'], REQUESTS_PER_PAGE);
+        $promo = $p->getAllCustomPaginate($sql, $_GET['page'], REQUESTS_PER_PAGE, [$_GET['id'], $_GET['order_by']]);
 
-        $c = Model::load('CategoryItem');
+        $c = Model::load(CategoryItem::class);
         $c->id = $_GET['id'];
         $category = $c->loadIndexed($c->category_id);
 
@@ -104,11 +104,11 @@ class PromoCategoryController extends AdminController
     public function add()
     {
         if (isset($_GET['id']) && is_numeric($_GET['id'])) {
-            $p = Model::load('PromoItem');
+            $p = Model::load(PromoItem::class);
             $p->category_id = $_GET['id'];
             $p->name = 'New Promo';
             $p->hidden = 'DEFAULT';
-            $id = $p->insert(Model::getTable('PromoItem'), 1, array(), 0);
+            $id = $p->insert();
         }
         $this->redirect('admin/promo_category/'.$_GET['id']);
     }

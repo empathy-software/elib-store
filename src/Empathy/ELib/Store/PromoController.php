@@ -2,7 +2,8 @@
 
 namespace Empathy\ELib\Store;
 
-use Empathy\ELib\Model;
+use Empathy\MVC\Model;
+use Empathy\ELib\Storage\PromoItem;
 
 class PromoController extends AdminController
 {
@@ -16,12 +17,10 @@ class PromoController extends AdminController
     public function edit()
     {
         $this->setTemplate('elib://admin/promo.tpl');
-        $p = Model::load('PromoItem');
+        $p = Model::load(PromoItem::class);
         //$pr = new ProductRange($this);
 
         if (isset($_POST['save'])) {
-            $p->id = $_POST['id'];
-
             /*
               if (!isset($_POST['range'])) {
               $_POST['range'] = array();
@@ -30,7 +29,7 @@ class PromoController extends AdminController
               $pr->updateForProduct($p->id, $range);
             */
 
-            $p->load();
+            $p->load($_POST['id']);
             $old_promo = $p->name;
             $p->name = $_POST['name'];
             $p->url = $_POST['url'];
@@ -44,7 +43,7 @@ class PromoController extends AdminController
                 $this->presenter->assign('errors', $p->getValErrors());
             } else {
                 //$p->price = $_POST['price'];
-                $p->save(Model::getTable('PromoItem'), array(), 1);
+                $p->save();
                 $this->redirect('admin/promo/'.$p->id);
             }
         } else {
@@ -61,9 +60,8 @@ class PromoController extends AdminController
     public function default_event()
     {
         $this->setTemplate('elib://admin/promo.tpl');
-        $p = Model::load('PromoItem');
-        $p->id = $_GET['id'];
-        $p->load();
+        $p = Model::load(PromoItem::class);
+        $p->load($_GET['id']);
 
         $this->presenter->assign("promo", $p);
     }
@@ -75,9 +73,8 @@ class PromoController extends AdminController
             $_GET['id'] = $_POST['id'];
         }
 
-        $p = Model::load('PromoItem');
-        $p->id = $_GET['id'];
-        $p->load();
+        $p = Model::load(PromoItem::class);
+        $p->load($_GET['id']);
 
         $this->presenter->assign("promo", $p);
 
@@ -104,9 +101,8 @@ class PromoController extends AdminController
 
     public function delete()
     {
-        $p = Model::load('PromoItem');
-        $p->id = $_GET['id'];
-        $p->load();
+        $p = Model::load(PromoItem::class);
+        $p->load($_GET['id']);
 
         $images_removed = false;
         if ($p->image != '') {

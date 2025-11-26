@@ -2,8 +2,8 @@
 
 namespace Empathy\ELib\Storage;
 
-use Empathy\ELib\Model,
-    Empathy\MVC\Entity;
+use Empathy\MVC\Model;
+use Empathy\MVC\Entity;
 
 class CategoryItem extends Entity
 {
@@ -19,9 +19,9 @@ class CategoryItem extends Entity
     public function buildDescendantIDs($id, &$ids)
     {
         array_push($ids, $id);
-        $sql = 'SELECT id FROM '.Model::getTable('CategoryItem').' WHERE category_id = '.$id;
+        $sql = 'SELECT id FROM '.Model::getTable(self::class).' WHERE category_id = ?';
         $error = 'Could not check for descendants.';
-        $result = $this->query($sql, $error);
+        $result = $this->query($sql, $error, [$id]);
         if ($result->rowCount() > 0) {
             foreach ($result as $row) {
                 $this->buildDescendantIDs($row['id'], $ids);
@@ -32,11 +32,11 @@ class CategoryItem extends Entity
     public function getChildren($id)
     {
         $c = array();
-        $sql = 'SELECT id FROM '.Model::getTable('CategoryItem').' WHERE category_id = '.$id
+        $sql = 'SELECT id FROM '.Model::getTable(self::class).' WHERE category_id = ?'
             .' AND hidden != 1'
             .' ORDER BY name';
         $error = 'Could not get child catgories.';
-        $result = $this->query($sql, $error);
+        $result = $this->query($sql, $error, [$id]);
         if ($result->rowCount() > 0) {
             foreach ($result as $row) {
                 array_push($c, $row['id']);
@@ -49,9 +49,9 @@ class CategoryItem extends Entity
     public function hasChildren()
     {
         $c = 0;
-        $sql = 'SELECT id FROM '.Model::getTable('CategoryItem').' WHERE category_id = '.$this->id;
+        $sql = 'SELECT id FROM '.Model::getTable(self::class).' WHERE category_id = ?';
         $error = 'Could not check for child categories.';
-        $result = $this->query($sql, $error);
+        $result = $this->query($sql, $error, [$this->id]);
         if ($result->rowCount() > 0) {
             $c = 1;
         }
@@ -73,9 +73,9 @@ class CategoryItem extends Entity
     public function getAncestorIDs($id, $ancestors)
     {
         $section_id = 0;
-        $sql = 'SELECT category_id FROM '.Model::getTable('CategoryItem').' WHERE id = '.$id;
+        $sql = 'SELECT category_id FROM '.Model::getTable(self::class).' WHERE id = ?';
         $error = 'Could not get parent id.';
-        $result = $this->query($sql, $error);
+        $result = $this->query($sql, $error, [$id]);
         if ($result->rowCount() > 0) {
             $row = $result->fetch();
             $category_id = $row['category_id'];
@@ -92,9 +92,9 @@ class CategoryItem extends Entity
     {
         $i = 0;
         $nodes = array();
-        $sql = 'SELECT id,name AS label FROM '.Model::getTable('CategoryItem').' WHERE category_id = '.$current.' ORDER BY name';
+        $sql = 'SELECT id,name AS label FROM '.Model::getTable(self::class).' WHERE category_id = ? ORDER BY name';
         $error = 'Could not get child sections.';
-        $result = $this->query($sql, $error);
+        $result = $this->query($sql, $error, [$current]);
         if ($result->rowCount() > 0) {
             foreach ($result as $row) {
                 $id = $row['id'];
@@ -111,15 +111,15 @@ class CategoryItem extends Entity
     public function hasCategoriesOrProducts($id)
     {
         $data = 0;
-        $sql = 'SELECT id FROM '.Model::getTable('CategoryItem').' WHERE category_id = '.$id;
+        $sql = 'SELECT id FROM '.Model::getTable(self::class).' WHERE category_id = ?';
         $error = 'Could not check for existing child categories.';
-        $result = $this->query($sql, $error);
+        $result = $this->query($sql, $error, [$id]);
         if ($result->rowCount() > 0) {
             $data = 1;
         }
-        $sql = 'SELECT id FROM '.Model::getTable('ProductItem').' WHERE category_id = '.$id;
+        $sql = 'SELECT id FROM '.Model::getTable(ProductItem::class).' WHERE category_id = ?';
         $error = 'Could not check for existing products.';
-        $result = $this->query($sql, $error);
+        $result = $this->query($sql, $error, [$id]);
         if ($result->rowCount() > 0) {
             $data = 1;
         }
@@ -130,9 +130,9 @@ class CategoryItem extends Entity
     public function buildBreadCrumb($id, &$ancestors)
     {
         $category = array();
-        $sql = 'SELECT id,category_id,name FROM '.Model::getTable('CategoryItem').' WHERE id = '.$id;
+        $sql = 'SELECT id,category_id,name FROM '.Model::getTable(self::class).' WHERE id = ?';
         $error = 'Could not get parent id.';
-        $result = $this->query($sql, $error);
+        $result = $this->query($sql, $error, [$id]);
         if ($result->rowCount() > 0) {
             $row = $result->fetch();
             $category['id'] = $row['id'];
@@ -149,7 +149,7 @@ class CategoryItem extends Entity
     //public function loadIndexed()
     public function loadIndexed($parent_id)
     {
-        $sql = "SELECT * FROM ".Model::getTable('CategoryItem');
+        $sql = "SELECT * FROM ".Model::getTable(self::class);
         //$sql .= ' WHERE parent_id = '.$parent_id;
         $error = "Could not fetch categories.";
         $result = $this->query($sql, $error);
@@ -164,12 +164,13 @@ class CategoryItem extends Entity
 
     public function getShipping($ids)
     {
+        $idsString = $this->buildUnionString($ids);
         $shipping = array();
-        $sql = 'SELECT shipping FROM '.Model::getTable('CategoryItem')
-            .' WHERE id IN'.$this->buildUnionString($ids)
+        $sql = 'SELECT shipping FROM '.Model::getTable(self::class)
+            .' WHERE id IN ' . $idsString[0]
             .' AND shipping IS NOT NULL';
         $error = 'Could not get shipping info from categories.';
-        $result = $this->query($sql, $error);
+        $result = $this->query($sql, $error, $idsString[1]);
         if ($result->rowCount() > 0) {
             foreach ($result as $row) {
                 array_push($shipping, $row['shipping']);
@@ -181,12 +182,13 @@ class CategoryItem extends Entity
 
     public function getShippingIntl($ids)
     {
+        $idsString = $this->buildUnionString($ids);
         $shipping = 0;
-        $sql = 'SELECT MAX(intl_shipping) AS intl_shipping FROM '.Model::getTable('CategoryItem')
-            .' WHERE id IN'.$this->buildUnionString($ids)
+        $sql = 'SELECT MAX(intl_shipping) AS intl_shipping FROM '.Model::getTable(self::class)
+            .' WHERE id IN '. $idsString[0]
             .' AND intl_shipping IS NOT NULL GROUP BY id';
         $error = 'Could not get international shipping info from categories.';
-        $result = $this->query($sql, $error);
+        $result = $this->query($sql, $error, $idsString[1]);
         if ($result->rowCount() == 1) {
             $row = $result->fetch();
             $shipping = $row['intl_shipping'];
@@ -198,10 +200,10 @@ class CategoryItem extends Entity
     public function loadIDByName($name)
     {
         $id = 0;
-        $sql = 'SELECT id FROM '.Model::getTable('CategoryItem')
-            .' WHERE name LIKE \''.str_replace('-', ' ', $name).'\'';
+        $sql = 'SELECT id FROM '.Model::getTable(self::class)
+            .' WHERE name LIKE ?';
         $error = 'Could not get category id by name.';
-        $result = $this->query($sql, $error);
+        $result = $this->query($sql, $error, ['\'' . str_replace('-', ' ', $name) . '\'']);
         if ($result->rowCount() == 1) {
             $row = $result->fetch();
             $id = $row['id'];

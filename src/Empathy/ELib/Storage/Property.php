@@ -2,9 +2,9 @@
 
 namespace Empathy\ELib\Storage;
 
-use Empathy\ELib\Model,
-    Empathy\MVC\Entity,
-    Empathy\MVC\Validate;
+use Empathy\MVC\Model;
+use Empathy\MVC\Entity;
+use Empathy\MVC\Validate;
 
 
 
@@ -19,11 +19,11 @@ class Property extends Entity
     {
         $p = array();
         $sql = 'SELECT t1.name as property_name, t2.option_val '
-            .' FROM '.Model::getTable('ProductVariantPropertyOption').', '.Model::getTable('Property').' t1 LEFT JOIN '
-            .' '.Model::getTable('PropertyOption').' t2 ON t1.id = t2.property_id WHERE '
-            .' t2.id = property_option_id AND product_variant_id = '.$variant_id;
+            .' FROM '.Model::getTable('ProductVariantPropertyOption').', '.Model::getTable(Property::class).' t1 LEFT JOIN '
+            .' '.Model::getTable(PropertyOption::class).' t2 ON t1.id = t2.property_id WHERE '
+            .' t2.id = property_option_id AND product_variant_id = ?';
         $error = 'Could not find variant properties.';
-        $result = $this->query($sql, $error);
+        $result = $this->query($sql, $error, [$variant_id]);
         foreach ($result as $row) {
             array_push($p, $row);
         }
@@ -33,21 +33,19 @@ class Property extends Entity
 
     public function getAllWithOptions($props)
     {
-        if (sizeof($props) > 0) {
-            $props_string = '('.implode(',', $props).')';
-        }
+        $propsString = $this->buildUnionString($props);
 
         $property = array();
         $sql = 'SELECT t1.id, t1.name, t2.id AS option_id, t2.option_val FROM '
-            .Model::getTable('Property').' t1 '
-            .'LEFT JOIN '.Model::getTable('PropertyOption').' t2 ON t2.property_id = t1.id';
-        if (isset($props_string)) {
-            $sql .= ' WHERE t1.id IN'.$props_string;
+            .Model::getTable(Property::class).' t1 '
+            .'LEFT JOIN '.Model::getTable(PropertyOption::class).' t2 ON t2.property_id = t1.id';
+        if (sizeof($propsString[1])) {
+            $sql .= ' WHERE t1.id IN '.$propsString[0];
         }
         $sql .= ' ORDER BY t1.name, t2.option_val';
 
         $error = 'Could not get all properties and options.';
-        $result = $this->query($sql, $error);
+        $result = $this->query($sql, $error. $propsString[1]);
         if ($result->rowCount() > 0) {
             foreach ($result as $row) {
                 $id = $row['id'];
@@ -88,24 +86,27 @@ class Property extends Entity
 
     public function getAllWithOptionsForProduct($props, $opts)
     {
-        if (sizeof($props) > 0) {
-            $props_string = '('.implode(',', $props).')';
-        }
+        $propsString = $this->buildUnionString($props);
 
         $property = array();
         $sql = 'SELECT t1.id, t1.name, t2.id AS option_id, t2.option_val FROM '
-            .Model::getTable('Property').' t1 '
-            .'LEFT JOIN '.Model::getTable('PropertyOption').' t2 ON t2.property_id = t1.id';
-        if (isset($props_string)) {
-            $sql .= ' WHERE t1.id IN'.$props_string;
+            .Model::getTable(Property::class).' t1 '
+            .'LEFT JOIN '.Model::getTable(PropertyOption::class).' t2 ON t2.property_id = t1.id';
+
+        $params = [];
+        if (sizeof($propsString[1]) > 1) {
+            $sql .= ' WHERE t1.id IN '. $propsString[0];
+            $params = array_merge($params, $propsString[1]);
         }
-        if ($opts != '(0,)') {
-            $sql .= ' AND t2.id IN'.$opts;
+
+        if (count($opts[1]) > 1) {
+            $sql .= ' AND t2.id IN'.$opts[0];
+            $params = array_merge($params, $opts[1]);
         }
         $sql .= ' ORDER BY t1.name, t2.option_val';
 
         $error = 'Could not get all properties and options.';
-        $result = $this->query($sql, $error);
+        $result = $this->query($sql, $error, $params);
         if ($result->rowCount() > 0) {
             foreach ($result as $row) {
                 $id = $row['id'];

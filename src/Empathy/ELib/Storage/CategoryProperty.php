@@ -2,8 +2,8 @@
 
 namespace Empathy\ELib\Storage;
 
-use Empathy\ELib\Model,
-    Empathy\MVC\Entity;
+use Empathy\MVC\Model;
+use Empathy\MVC\Entity;
 
 class CategoryProperty extends Entity
 {
@@ -15,20 +15,20 @@ class CategoryProperty extends Entity
 
     public function emptyByCategory($category_id)
     {
-        $sql = 'DELETE FROM '.Model::getTable('CategoryProperty').' WHERE category_id = '.$category_id;
+        $sql = 'DELETE FROM '.Model::getTable(self::class).' WHERE category_id = ?';
         $error = 'Could not clear properties associated with categories.';
-        $this->query($sql, $error);
+        $this->query($sql, $error, [$category_id]);
     }
 
     // this function has replaced old 'loadForCategory' function
     public function getPropertiesByCategory($cat)
     {
-        $categories = '('.implode(',', $cat).')';
+        $catString = $this->buildUnionString($cat);
         $properties = array();
-        $sql = 'SELECT property_id FROM '.Model::getTable('CategoryProperty')
-            .' WHERE category_id IN'.$categories;
-        $error = "Could not find cactive category properties.";
-        $result = $this->query($sql, $error);
+        $sql = 'SELECT property_id FROM '.Model::getTable(self::class)
+            .' WHERE category_id IN ' . $catString[0];
+        $error = "Could not find active category properties.";
+        $result = $this->query($sql, $error, $catString[1]);
 
         $i = 0;
         foreach ($result as $row) {
