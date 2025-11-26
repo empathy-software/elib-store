@@ -1,13 +1,7 @@
 
 
 
-{if sizeof($errors) > 0}
-<ul id="error">
-{foreach from=$errors item=error}
-<li>{$error}</li>
-{/foreach}
-</ul>
-{/if}
+{include file="elib://comp_errors.tpl"}
 
 
 <form action="" method="post">
@@ -26,7 +20,7 @@
 <p>&nbsp;</p>
 <p>&nbsp;</p>
 
-{if sizeof($colours) > 0}
+{if isset($colours) and sizeof($colours) > 0}
 <p>
 {foreach from=$colours item=colour}
 <input type="hidden" name="property[2][]" value="{$colour}" />

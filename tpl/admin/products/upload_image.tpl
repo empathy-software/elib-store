@@ -1,14 +1,21 @@
 
 
-
-<form action="" method="post" enctype="multipart/form-data">
-<p><label>File</label>
-<input type="file" name="file" /></p>
-<p>
-<input type="hidden" name="id" value="{$product->id}" />
-<button type="submit" name="upload">Upload</button>
-</p>
-</form>
 {if $error neq ''}
-<p>{$error}</p>
+    <p>{$error}</p>
 {/if}
+
+
+<h2>Upload Image</h2>
+
+<form method="post" enctype="multipart/form-data">
+    <div class="form-group custom-file">
+        <input type="file" class="custom-file-input" id="file" name="file">
+        <label class="custom-file-label" for="file">Choose file</label>
+    </div>
+    <input type="hidden" name="id" value="{$product->id}" />
+    <button type="submit" class="btn btn-primary" name="upload">Upload</button>
+    <button type="submit" class="btn btn-primary" name="cancel">Cancel</button>
+</form>
+
+
+

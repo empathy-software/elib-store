@@ -1,16 +1,14 @@
 
 
-<form action="" method="post">
-<fieldset>
-<legend>Edit Biography</legend>
-<p>
-<label>Biography</label>
-<textarea name="bio" rows="" cols="">{$brand->about|replace:'</p><p>':"\r\n"|replace:'<p>':""|replace:'</p>':""}</textarea>
-</p>
-<p>
-<label>&nbsp;</label>
-<input type="hidden" name="id" value="{$brand->id}" />
-<button type="submit" name="save">Save</button>
-</p>
-</fieldset>
+<h2>Edit Biography</h2>
+
+<form method="post">
+    <div class="form-group">
+        <label for="bio">Biography</label>
+        <textarea class="form-control" id="bio" rows="10" name="bio">{$brand->about|escape}</textarea>
+    </div>
+    <input type="hidden" name="id" value="{$brand->id}" />
+    <button type="submit" class="btn btn-primary" name="save">Save</button>
+    <button type="submit" class="btn btn-primary" name="cancel">Cancel</button>
 </form>
+

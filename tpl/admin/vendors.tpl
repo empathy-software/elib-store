@@ -22,7 +22,7 @@
 
 </tr>
 {section name=vendor loop=$vendors}
-<tr class="{cycle values="alt, }">
+<tr class="{cycle values="alt," }">
 
 <td class="id">{$vendors[vendor].user_id}</td>
 <td>{$vendors[vendor].username}</td>

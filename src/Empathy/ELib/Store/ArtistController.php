@@ -178,6 +178,8 @@ class ArtistController extends AdminController
                 $a->save(Model::getTable('ArtistItem'), array(), 2);
                 $this->redirect('admin/artist/'.$a->id);
             }
+        } else {
+            $this->buildNav();
         }
     }
 

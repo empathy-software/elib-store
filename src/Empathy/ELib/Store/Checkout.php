@@ -2,9 +2,9 @@
 
 namespace Empathy\ELib\Store;
 
-use Empathy\ELib\Model,
-    Empathy\ELib\User\CurrentUser;
-
+use Empathy\ELib\Model;
+use Empathy\ELib\User\CurrentUser;
+use Empathy\MVC\Session;
 
 
 class Checkout
@@ -14,7 +14,7 @@ class Checkout
     public function __construct($items, $c)
     {
         $s = Model::load('ShippingAddress');
-        $s->id = \Empathy\Session::get('shipping_address_id');
+        $s->id = Session::get('shipping_address_id');
         $s->load();
 
         $o = Model::load('OrderItem');

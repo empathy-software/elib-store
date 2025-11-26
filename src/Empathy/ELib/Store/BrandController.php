@@ -31,14 +31,10 @@ class BrandController extends AdminController
 
     public function add()
     {
-        if (isset($_GET['add'])) {
-            $_GET['id'] = 0;
-            $b = Model::load('BrandItem');
-            $b->name = 'New Brand';
-            $id = $b->insert(Model::getTable('BrandItem'), 1, array(), 1);
-            $this->redirect('admin/brand/'.$id);
-        }
-        $this->redirect('admin/brand');
+        $b = Model::load('BrandItem');
+        $b->name = 'New Brand';
+        $id = $b->insert(Model::getTable('BrandItem'), 1, array(), 1);
+        $this->redirect('admin/brand/'.$id);
     }
 
     public function rename()
@@ -55,8 +51,10 @@ class BrandController extends AdminController
                 $this->presenter->assign('errors', $b->getValErrors());
             } else {
                 $b->save(Model::getTable('BrandItem'), array(), 1);
-                $this->redirect('admin/brand/'.$b->id);
+                $this->redirect('admin/brand/' . $b->id);
             }
+        } elseif (isset($_POST['cancel'])) {
+            $this->redirect('admin/brand/' . $_POST['id']);
         } else {
             $b = Model::load('BrandItem');
             $b->id = $_GET['id'];
@@ -97,6 +95,8 @@ class BrandController extends AdminController
                 $b->save(Model::getTable('BrandItem'), array('bio'), 1);
                 $this->redirect('admin/brand/'.$_GET['id']);
             }
+        } elseif (isset($_POST['cancel'])) {
+            $this->redirect('admin/brand/'.$_GET['id']);
         }
 
         $this->buildNav();

@@ -67,9 +67,29 @@ class StoreControllerLite extends EController
             $_GET['vendor_id'] = $this->vendor_lock;
         }
 
-     
+        $cats = ProductsLayout::getTopCats();
 
-        $this->assign('top_cats', ProductsLayout::getTopCats());
+
+        $top_cat = array(
+            'id' => 0,
+            'name' => 'All',
+            'hidden' => false
+        );
+        array_unshift($cats, $top_cat);
+    
+        foreach ($cats as $c) {
+            if ($c['id'] == $category_id) {
+
+                $this->assign('current_category', $c['name']);
+            }
+        }
+        $this->assign('top_cats', $cats);
+
+        $c = Model::load('CategoryItem');
+        $descendants = array();
+        $c->buildDescendantIDs($category_id, $descendants);
+
+
         if (!isset($_GET['vendor_id'])) {
             $_GET['vendor_id'] = 0;
         } else {
@@ -91,22 +111,8 @@ class StoreControllerLite extends EController
             $sql .= ' AND vendor_id = '.$_GET['vendor_id'];
         }
 
-
-
-        if (isset($_GET['id']) && $_GET['id'] > 0) {
-            $cats = array();
-            switch ($_GET['id']) {
-            case 1:
-                $cats = array(3,7,4,5,6);
-                break;
-            case 2:
-                $cats = array(8);
-                break;
-            default:
-                break;
-            }
-
-            $sql .= ' AND category_id IN'.$p->buildUnionString($cats);
+        if ($category_id != 0) {
+            $sql .= ' AND category_id IN'.$p->buildUnionString($descendants);
         }
 
         $sql .= ' AND vendor_verified = 1';
@@ -126,6 +132,7 @@ class StoreControllerLite extends EController
 
         $this->assign('products', $products);
         $this->assign('p_nav', $p_nav);
+        $this->assign('page', $_GET['page']);
 
         $this->assign('vendor_id', $_GET['vendor_id']);
         if (isset($_GET['id'])) {
@@ -200,7 +207,7 @@ class StoreControllerLite extends EController
         $this->assign('vendor_id', $p->vendor_id);
         $this->assign('product', $p);
         $this->assign('vendor', $v);
-
+        $this->assign('colours', array());
     }
 
     public function cart()

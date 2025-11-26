@@ -141,15 +141,12 @@ class Store
                 $p->status = 'DEFAULT';
 
                 if(defined('ELIB_MULTIPLE_VENDORS') &&
-                   ELIB_MULTIPLE_VENDORS == true)
-                {
+                   ELIB_MULTIPLE_VENDORS == true) {
                     $user_id = CurrentUser::getUserID();
                     $v = Model::load('Vendor');
-                    $v->id = $v->getIDByUserID($user_id);
+                    $v->id = $v->getIDByUserID($user_id);                    
                     if ($v->id > 0) {
                         $v->load();
-
-
 
                         if ($v->verified !== null) {
                             $p->vendor_verified = 1;
@@ -158,8 +155,9 @@ class Store
                         }
                         $p->vendor_id = $v->id;
                     }
+                } else {
+                    $p->vendor_verified = 1;
                 }
-
                 $p->id = $p->insert(Model::getTable('ProductItem'), 1, array(), 0);
                 $this->addProductVariantInternal($p->id); // create first variant
                 $this->c->redirect('storeadmin/edit_product/'.$p->id);
@@ -379,13 +377,14 @@ class Store
             $p->name = $_POST['name'];
             $p->description = $_POST['description'];
 
-            if ($_POST['sold_in_store'] == 1) {
+            if (isset($_POST['sold_in_store']) &&
+                $_POST['sold_in_store'] == 1) {
                 $p->status = 1;
             } else {
                 $p->status = 0;
             }
 
-            $p->brand_id = $_POST['brand_id'];
+            $p->brand_id = (isset($_POST['brand_id']))? $_POST['brand_id']: NULL;
 
             $p->validates();
             if ($p->hasValErrors()) {
@@ -511,9 +510,9 @@ class Store
             $v = Model::load('ProductVariant');
             $v->id = $_POST['id'];
             $v->load();
-            $v->weight_g = $_POST['weight_g'];
-            $v->weight_lb = $_POST['weight_lb'];
-            $v->weight_oz = $_POST['weight_oz'];
+            $v->weight_g = (isset($_POST['weight_g']))? $_POST['weight_g']: NULL;
+            $v->weight_lb = (isset($_POST['weight_lb']))? $_POST['weight_lb']: NULL;
+            $v->weight_oz = (isset($_POST['weight_oz']))? $_POST['weight_oz']: NULL;
             $v->price = $_POST['price'];
             $v->validates();
             if ($v->hasValErrors()) {

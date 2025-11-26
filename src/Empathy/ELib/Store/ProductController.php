@@ -9,7 +9,7 @@ class ProductController extends AdminController
 {
     public function assertID()
     {
-        if (!isset($_GET['id'] ) || !is_numeric($_GET['id'])) {
+        if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
             $this->redirect('admin/category');
         }
     }
@@ -54,8 +54,10 @@ class ProductController extends AdminController
             } else {
                 //$p->price = $_POST['price'];
                 $p->save(Model::getTable('ProductItem'), array('description'), 1);
-                $this->redirect('admin/product/'.$p->id);
+                $this->redirect('admin/product/' . $p->id);
             }
+        } else if (isset($_POST['cancel'])) {
+            $this->redirect('admin/product/' . $_GET['id']);
         } else {
             $p->id = $_GET['id'];
             $p->load();
@@ -124,13 +126,13 @@ class ProductController extends AdminController
                 }
             }
 
-            $sql = ' WHERE product_id = '.$p->id;
+            $sql = ' WHERE product_id = ' . $p->id;
             if (sizeof($ids) > 0) {
-                $sql .= ' AND id NOT IN '.$v->buildUnionString($ids);
+                $sql .= ' AND id NOT IN ' . $v->buildUnionString($ids);
             }
             $variants = array_merge($variants, $v->getAllCustom(Model::getTable('ProductVariant'), $sql));
         } else {
-            $sql = ' WHERE product_id = '.$p->id;
+            $sql = ' WHERE product_id = ' . $p->id;
             $variants = $v->getAllCustom(Model::getTable('ProductVariant'), $sql);
         }
 
@@ -172,11 +174,10 @@ class ProductController extends AdminController
                 // update db
                 $p->image = $u->file;
                 $p->save(Model::getTable('ProductItem'), array(), 2);
-
-                //$this->redirect_cgi('archive.cgi?id='.$p->id);
-                $this->execScript('archive', array($p->id));
-                $this->redirect('admin/product/'.$p->id);
+                $this->redirect('admin/product/' . $p->id);
             }
+        } elseif (isset($_POST['cancel'])) {
+            $this->redirect('admin/product/' . $_POST['id']);
         }
     }
 
@@ -185,15 +186,14 @@ class ProductController extends AdminController
         $this->setTemplate('elib://admin/product.tpl');
         if (isset($_POST['submit'])) {
             set_time_limit(300);
-            if(isset($_POST['tn_width']) && is_numeric($_POST['tn_width'])
-               && isset($_POST['tn_height']) && is_numeric($_POST['tn_height'])
-               && isset($_POST['mid_width']) && is_numeric($_POST['mid_height']))
-            {
+            if (isset($_POST['tn_width']) && is_numeric($_POST['tn_width'])
+                && isset($_POST['tn_height']) && is_numeric($_POST['tn_height'])
+                && isset($_POST['mid_width']) && is_numeric($_POST['mid_height'])) {
                 $p = Model::load('ProductItem');
                 $images = $p->getAllImages();
 
                 $d = array(array('tn_', $_POST['tn_width'], $_POST['tn_height']),
-                           array('mid_', $_POST['mid_width'], $_POST['mid_height']));
+                    array('mid_', $_POST['mid_width'], $_POST['mid_height']));
                 $u = new ImageUpload('', false, $d);
                 $u->resize($images);
             }
@@ -215,10 +215,10 @@ class ProductController extends AdminController
             }
             if ($p->image == '' || $images_removed) {
                 $p->delete();
-                $this->redirect('admin/category/'.$p->category_id);
+                $this->redirect('admin/category/' . $p->category_id);
             }
         } else {
-            $this->redirect('admin/product/'.$p->id);
+            $this->redirect('admin/product/' . $p->id);
         }
     }
 
@@ -242,7 +242,7 @@ class ProductController extends AdminController
             $o->emptyByVariant($v->id);
             $v->delete();
         }
-        $this->redirect('admin/product/'.$v->product_id);
+        $this->redirect('admin/product/' . $v->product_id);
     }
 
     public function add_variant()
@@ -256,7 +256,7 @@ class ProductController extends AdminController
         $v->price = 'DEFAULT';
         $v->status = 'DEFAULT';
         $v->insert(Model::getTable('ProductVariant'), 1, array(), 0);
-        $this->redirect('admin/product/'.$_GET['id']);
+        $this->redirect('admin/product/' . $_GET['id']);
     }
 
     public function add()
@@ -267,13 +267,29 @@ class ProductController extends AdminController
         $p->name = 'New Product';
         $p->description = 'No description.';
         $p->status = 'DEFAULT';
+        $p->vendor_verified = 'DEFAULT';
         $p->insert(Model::getTable('ProductItem'), 1, array(), 0);
-        $this->redirect('admin/category/'.$_GET['id']);
+        $this->redirect('admin/category/' . $_GET['id']);
     }
 
     public function edit_variant()
     {
+        $this->assertID();
         $this->setTemplate('elib://admin/product.tpl');
+        $v = Model::load('ProductVariant');
+        $v->id = $_GET['id'];
+        $v->load();
+        $this->assign('variant', $v);
+        $p = Model::load('ProductItem');
+        $p->id = $v->product_id;
+        $p->load();
+        $this->presenter->assign('product', $p);
+        // get variant data
+        $v_array = json_decode(json_encode($v), JSON_OBJECT_AS_ARRAY);
+        $props = Model::load('Property');
+        $v_array['properties'] = $props->loadForVariant($v_array['id']);
+        $this->assign('v', $v_array);
+
         if (isset($_POST['save'])) {
             $v = Model::load('ProductVariant');
             $v->id = $_POST['id'];
@@ -288,21 +304,11 @@ class ProductController extends AdminController
                 $this->presenter->assign('errors', $v->getValErrors());
             } else {
                 $v->save(Model::getTable('ProductVariant'), array(), 1);
-                $this->redirect('admin/product/'.$v->product_id);
+                $this->redirect('admin/product/' . $v->product_id);
             }
-
-        } else {
-            $this->assertID();
-            $v = Model::load('ProductVariant');
-            $v->id = $_GET['id'];
-            $v->load();
-            $this->presenter->assign('variant', $v);
+        } elseif (isset($_POST['cancel'])) {
+            $this->redirect('admin/product/' . $v->product_id);
         }
-
-        $p = Model::load('ProductItem');
-        $p->id = $v->product_id;
-        $p->load();
-        $this->presenter->assign('product', $p);
     }
 
     public function upload_variant_image()
@@ -312,12 +318,20 @@ class ProductController extends AdminController
         $v = Model::load('ProductVariant');
         $v->id = $_GET['id'];
         $v->load();
+
         $this->presenter->assign('variant', $v);
+
+        // get variant data
+        $v_array = json_decode(json_encode($v), JSON_OBJECT_AS_ARRAY);
+        $props = Model::load('Property');
+        $v_array['properties'] = $props->loadForVariant($v_array['id']);
+        $this->assign('v', $v_array);
 
         $p = Model::load('ProductItem');
         $p->id = $v->product_id;
         $p->load();
         $this->presenter->assign("product", $p);
+
 
         if (isset($_POST['upload'])) {
             $d = array(array('tn_', 100, 100), array('mid_', 400, 276));
@@ -331,11 +345,10 @@ class ProductController extends AdminController
                 }
                 $v->image = $u->file;
                 $v->save(Model::getTable('ProductVariant'), array(), 0);
-
-                //$this->redirect_cgi('archive.cgi?id='.$p->id);
-                $this->execScript('archive', array($p->id));
-                $this->redirect('admin/product/'.$p->id);
+                $this->redirect('admin/product/' . $p->id);
             }
+        } elseif (isset($_POST['cancel'])) {
+            $this->redirect('admin/product/' . $p->id);
         }
     }
 
@@ -351,21 +364,31 @@ class ProductController extends AdminController
             //if(isset($_POST['property']))
             // {
             foreach ($_POST['property'] as $index => $item) {
-        if ($item > 0 && is_numeric($item)) {
-            $p->property_option_id = $item;
-            $p->insert(Model::getTable('ProductVariantPropertyOption'), 1, array(), 0);
+                if ($item > 0 && is_numeric($item)) {
+                    $p->property_option_id = $item;
+                    $p->insert(Model::getTable('ProductVariantPropertyOption'), 1, array(), 0);
                 }
             }
-        // }
+            // }
             $v = Model::load('ProductVariant');
             $v->id = $_GET['id'];
             $v->load();
-            $this->redirect('admin/product/'.$v->product_id);
+            $this->redirect('admin/product/' . $v->product_id);
+        } elseif (isset($_POST['cancel'])) {
+            $this->redirect('admin/product/' . $_GET['id']);
         }
+
 
         $v = Model::load('ProductVariant');
         $v->id = $_GET['id'];
         $v->load();
+
+        // get variant data
+        $v_array = json_decode(json_encode($v), JSON_OBJECT_AS_ARRAY);
+        $property = Model::load('Property');
+        $v_array['properties'] = $property->loadForVariant($v_array['id']);
+        $this->assign('v', $v_array);
+
 
         $p = Model::load('ProductItem');
         $p->id = $v->product_id;
@@ -385,12 +408,11 @@ class ProductController extends AdminController
         $this->presenter->assign('variant', $v);
 
         if (sizeof($props) > 0) {
-            $property = Model::load('Property');
             $properties = $property->getAllWithOptions($props);
             $this->presenter->assign('properties', $properties);
 
             $pv = Model::load('ProductVariantPropertyOption');
-            $sql = ' WHERE product_variant_id = '.$_GET['id'];
+            $sql = ' WHERE product_variant_id = ' . $_GET['id'];
             $options = $pv->getAllCustom(Model::getTable('ProductVariantPropertyOption'), $sql);
             $o = array();
             foreach ($options as $index => $value) {
@@ -408,7 +430,7 @@ class ProductController extends AdminController
         $p->load();
 
         $c = Model::load('ProductColour');
-        $sql = ' WHERE t1.property_option_id = t2.id AND t1.product_id = '.$p->id;
+        $sql = ' WHERE t1.property_option_id = t2.id AND t1.product_id = ' . $p->id;
         $select = 't1.id AS id,t1.image,t2.option_val';
         $colours = $c->getAllCustomPaginateSimpleJoin($select, Model::getTable('ProductColour'), Model::getTable('PropertyOption'), $sql, 1, 100);
 
@@ -442,7 +464,7 @@ class ProductController extends AdminController
                 $c->image = $u->file;
                 $c->insert(Model::getTable('ProductColour'), true, array(), 2);
 
-                $this->redirect('admin/product/edit_colours/'.$_POST['id']);
+                $this->redirect('admin/product/edit_colours/' . $_POST['id']);
             }
 
         }
@@ -464,7 +486,7 @@ class ProductController extends AdminController
         if ($p->image == '' || $images_removed) {
             $p->delete();
         }
-        $this->redirect('admin/product/edit_colours/'.$p->product_id);
+        $this->redirect('admin/product/edit_colours/' . $p->product_id);
     }
 
     public function edit_colour()
@@ -495,7 +517,7 @@ class ProductController extends AdminController
             }
 
             $c->save(Model::getTable('ProductColour'), array(), 0);
-            $this->redirect('admin/product/edit_colours/'.$c->product_id);
+            $this->redirect('admin/product/edit_colours/' . $c->product_id);
         }
 
         $c = Model::load('ProductColour');
@@ -535,6 +557,7 @@ class ProductController extends AdminController
             $v->weight_lb = $_POST['weight_lb'];
             $v->weight_oz = $_POST['weight_oz'];
             $v->price = $_POST['price'];
+            $v->status = 1;
 
             $v->validates();
             if ($v->hasValErrors()) {
@@ -551,7 +574,7 @@ class ProductController extends AdminController
                     }
                 }
             }
-            $this->redirect('admin/product/'.$v->product_id);
+            $this->redirect('admin/product/' . $v->product_id);
         }
 
         $p = Model::load('ProductItem');

@@ -1,27 +1,18 @@
 
-<div id="right">
 
-{if sizeof($errors) > 0}
-<ul id="error">
-{foreach from=$errors item=error}
-<li>{$error}</li>
-{/foreach}
-</ul>
-{/if}
+<h2>Rename Category</h2>
 
-<form action="" method="post">
-<fieldset>
-<legend>Rename Category</legend>
-<p>
-<label>Name</label>
-<input type="text" name="name" value="{$category->name}" />
-</p>
-<p>
-<label>&nbsp;</label>
-<input type="hidden" name="id" value="{$category->id}" />
-<button type="submit" name="save">Save</button>
-<button type="submit" name="cancel">Cancel</button>
-</p>
-</fieldset>
+
+{include file="elib://comp_errors.tpl"}
+
+
+<form method="post" enctype="multipart/form-data">
+    <div class="form-group">
+        <label for="name">Name</label>
+        <input type="text" value="{$category->name}" class="form-control" name="name" id="name">
+    </div>
+    <input type="hidden" name="id" value="{$category->id}" />
+    <button type="submit" class="btn btn-primary" name="save">Save</button>
+    <button type="submit" class="btn btn-primary" name="cancel">Cancel</button>
 </form>
-</div>
+

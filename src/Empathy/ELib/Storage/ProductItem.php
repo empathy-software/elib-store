@@ -21,6 +21,7 @@ class ProductItem extends Entity
     public $status;
     public $vendor_id;
     public $min_price;
+    public $vendor_verified;
 
     public function validates()
     {

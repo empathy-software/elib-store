@@ -50,6 +50,7 @@ class CategoryController extends AdminController
 
         $p_nav = $p->getPaginatePages(Model::getTable('ProductItem'), $sql, $_GET['page'], REQUESTS_PER_PAGE);
         $this->presenter->assign('p_nav', $p_nav);
+        $this->assign('page', $_GET['page']);
         $product = $p->getAllCustomPaginate(Model::getTable('ProductItem'), $sql, $_GET['page'], REQUESTS_PER_PAGE);
 
         foreach ($product as &$product_item) {
@@ -175,7 +176,9 @@ class CategoryController extends AdminController
                     $c->insert(Model::getTable('CategoryProperty'), 1, array(), 0);
                 }
             }
-            $this->redirect('admin/category/'.$_GET['id']);
+            $this->redirect('admin/category/' . $_GET['id']);
+        } elseif (isset($_POST['cancel'])) {
+            $this->redirecT('admin/category/' . $_GET['id']);
         } else {
             $p = Model::load('Property');
             $properties = $p->getAllWithOptions(array());

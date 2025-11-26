@@ -2,10 +2,10 @@
 
 namespace Empathy\ELib\Store;
 
-use Empathy\ELib\Model,
-    Empathy\ELib\EController,
-    Empathy\ELib\ThirdParty\PaypalClass;
-
+use Empathy\ELib\Model;
+use Empathy\ELib\EController;
+use Empathy\ELib\ThirdParty\PaypalClass;
+use Empathy\MVC\Config;
 
 
 class PaypalController extends EController
@@ -94,7 +94,7 @@ class PaypalController extends EController
         //$product[0]['price'] = 1.99;
         //$product[0]['code'] = 23;
 
-        $interface = 'http://'.WEB_ROOT.PUBLIC_DIR.'/paypal/';
+        $interface = 'http://'.Config::get('WEB_ROOT').Config::get('PUBLIC_DIR').'/paypal/';
         $message = '';
         $p = new PaypalClass();
         $p->ipn_log = false;
@@ -157,10 +157,7 @@ class PaypalController extends EController
         $p->add_field('invoice', $this->getInvoiceNumber($invoice_no));
         $p->add_field('no_shipping', 1);
         $p->add_field('currency_code', 'GBP');
-
-        $p->add_field('business', 'dev_1238707777_biz@mikejw.co.uk');
-        //$p->add_field('business', 'rbhughes63@yahoo.co.uk');
-        //$p->add_field('business', $this->getBusiness());
+        $p->add_field('business', $this->getBusiness());
 
         $p->add_field('return', $interface.'success');
         $p->add_field('notify_url', $interface.'ipn');
@@ -176,7 +173,7 @@ class PaypalController extends EController
 
     protected function getBusiness()
     {
-        return '';
+        return ELIB_PAYPAL_BUSINESS_EMAIL;
     }
 
     protected function getItemNumber($id)

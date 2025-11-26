@@ -1,6 +1,7 @@
 <?php
 
 namespace Empathy\ELib\Store;
+use Empathy\MVC\Config;
 
 class ImageUpload
 {
@@ -20,9 +21,9 @@ class ImageUpload
         $this->gallery = $gallery;
         if ($this->gallery != '') {
             //$this->target_dir = DOC_ROOT."/public_html/img/$this->gallery/";
-            $this->target_dir = DOC_ROOT."/public_html/uploads/";
+            $this->target_dir = Config::get('DOC_ROOT')."/public_html/uploads/";
         } else {
-            $this->target_dir = DOC_ROOT."/public_html/uploads/";
+            $this->target_dir = Config::get('DOC_ROOT')."/public_html/uploads/";
         }
 
         if (sizeof($deriv) < 1) {
@@ -65,6 +66,7 @@ class ImageUpload
         $this->origX = imagesx($this->orig);
         $this->origY = imagesy($this->orig);
 
+        /*
         if($this->origX != $this->origY
            || $this->origX < 450)
         {
@@ -72,6 +74,7 @@ class ImageUpload
             $this->remove(array($this->file));
             $error = true;
         }
+        */
 
         return $error;
     }

@@ -1,16 +1,17 @@
 
 
-<form action="" method="post">
-<fieldset>
-<legend>Rename Brand</legend>
-<p>
-<label>Name</label>
-<input type="text" name="artist_alias" value="{$brand->name}" />
-</p>
-<p>
-<label>&nbsp;</label>
-<input type="hidden" name="id" value="{$brand->id}" />
-<button type="submit" name="save">Save</button>
-</p>
-</fieldset>
+{include file="elib://comp_errors.tpl"}
+
+
+<h2>Rename</h2>
+
+<form method="post">
+    <div class="form-group">
+        <label for="name">Name</label>
+        <input type="text" value="{$brand->name}" class="form-control" name="artist_alias" id="name">
+    </div>
+    <input type="hidden" name="id" value="{$brand->id}" />
+    <button type="submit" class="btn btn-primary" name="save">Save</button>
+    <button type="submit" class="btn btn-primary" name="cancel">Cancel</button>
 </form>
+
