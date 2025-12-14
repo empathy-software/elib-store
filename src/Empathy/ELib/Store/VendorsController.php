@@ -4,17 +4,20 @@ namespace Empathy\ELib\Store;
 
 use Empathy\MVC\Model;
 use Empathy\ELib\Storage\ProductItem;
-use Empathy\ELib\Storage\Vendor;
 use Empathy\ELib\Storage\UserItem;
 use Empathy\ELib\Storage\ShippingAddress;
+use Empathy\MVC\DI;
 
 class VendorsController extends AdminController
 {
 
     public function default_event()
     {
+        $vendorModel = DI::getContainer()->get('VendorModel');
+
+
         if (isset($_POST['verify'])) {
-            $v = Model::load(Vendor::class);
+            $v = Model::load($vendorModel);
             $v->id = $_POST['vendor_id'];
             $v->load($v->id);
 
@@ -34,17 +37,17 @@ class VendorsController extends AdminController
             }
             $this->redirect('admin/vendors');
         } else {
-            $v = Model::load(Vendor::class);
-            $select = '*,UNIX_TIMESTAMP(registered) AS registered, t2.id as vendor_id';
+            $u = Model::load(UserItem::class);
+            $select = '*,UNIX_TIMESTAMP(t1.registered) AS registered, t2.id as vendor_id';
             $t1 = Model::getTable(UserItem::class);
-            $t2 = Model::getTable(Vendor::class);
+            $t2 = Model::getTable($vendorModel);
             $t3 = Model::getTable(ShippingAddress::class);
             $sql = ' WHERE t1.id = t2.user_id AND t1.id = t3.user_id AND t3.default_address = 1';
             $page = 1;
             $per_page = 10;
 
-            $vendors = $v->getAllCustomPaginateMultiJoin($select, $t2, $t3, $sql, $page, $per_page);
-            $paginate = $v->getPaginatePagesMultiJoin($select, $t2, $t3, $sql, $page, $per_page);
+            $vendors = $u->getAllCustomPaginateMultiJoin($select, $t2, $t3, $sql, $page, $per_page);
+            $paginate = $u->getPaginatePagesMultiJoin($select, $t2, $t3, $sql, $page, $per_page);
 
             $this->assign('vendors', $vendors);
             $this->assign('paginate', $paginate);

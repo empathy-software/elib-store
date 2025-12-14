@@ -2,13 +2,16 @@
 
 namespace Empathy\ELib\Store;
 
-use Empathy\ELib\Model;
-use Empathy\MVC\Storage\ProductItem;
-use Empathy\MVC\Storage\CategoryItem;
-use Empathy\MVC\Storage\ProductVariant;
-use Empathy\MVC\Storage\ProductColour;
-use Empathy\MVC\Storage\BrandItem;
-use Empathy\MVC\Storage\ProductVariantPropertyOption;
+use Empathy\MVC\Model;
+use Empathy\ELib\Storage\ProductItem;
+use Empathy\ELib\Storage\Property;
+use Empathy\ELib\Storage\CategoryItem;
+use Empathy\ELib\Storage\ProductVariant;
+use Empathy\ELib\Storage\ProductColour;
+use Empathy\ELib\Storage\BrandItem;
+use Empathy\ELib\Storage\CategoryProperty;
+use Empathy\ELib\Storage\PropertyOption;
+use Empathy\ELib\Storage\ProductVariantPropertyOption;
 
 
 class ProductController extends AdminController
@@ -145,7 +148,7 @@ class ProductController extends AdminController
             $variants = $v->getAllCustom($sql, $params);
         }
 
-        $property = Model::load('Property');
+        $property = Model::load(Property::class);
 
         foreach ($variants as $index => $item) {
             $props = $property->loadForVariant($item['id']);
@@ -429,7 +432,7 @@ class ProductController extends AdminController
         $c = Model::load(ProductColour::class);
         $sql = ' WHERE t1.property_option_id = t2.id AND t1.product_id = ?';
         $select = 't1.id AS id,t1.image,t2.option_val';
-        $colours = $c->getAllCustomPaginateSimpleJoin($select, Model::getTable('PropertyOption'), $sql, 1, 100, '', [$p->id]);
+        $colours = $c->getAllCustomPaginateSimpleJoin($select, Model::getTable(PropertyOption::class), $sql, 1, 100, '', [$p->id]);
         $this->presenter->assign('colours', $colours);
         $this->presenter->assign('product', $p);
     }
@@ -441,8 +444,14 @@ class ProductController extends AdminController
         $p->load($_GET['id']);
         $this->presenter->assign('product', $p);
 
-        $o = Model::load(PropertyOption::class);
-        $colours = $o->getColoursIndexed(2);
+        $pr = Model::load(Property::class);
+        $colour_id = $pr->findColourId();
+
+        $colours = [];
+        if ($colour_id > 0) {
+            $o = Model::load(PropertyOption::class);
+            $colours = $o->getColoursIndexed(2);
+        }
         $this->presenter->assign('colours', $colours);
 
         if (isset($_POST['submit_colour'])) {

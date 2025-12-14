@@ -9,7 +9,7 @@
 
 </div>
 
-{if sizeof($variants) > 0}
+{if isset($variants) and sizeof($variants) > 0}
 <div id="variants">
 
 

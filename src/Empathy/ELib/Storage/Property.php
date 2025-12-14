@@ -19,7 +19,7 @@ class Property extends Entity
     {
         $p = array();
         $sql = 'SELECT t1.name as property_name, t2.option_val '
-            .' FROM '.Model::getTable('ProductVariantPropertyOption').', '.Model::getTable(Property::class).' t1 LEFT JOIN '
+            .' FROM '.Model::getTable(ProductVariantPropertyOption::class).', '.Model::getTable(Property::class).' t1 LEFT JOIN '
             .' '.Model::getTable(PropertyOption::class).' t2 ON t1.id = t2.property_id WHERE '
             .' t2.id = property_option_id AND product_variant_id = ?';
         $error = 'Could not find variant properties.';
@@ -31,21 +31,36 @@ class Property extends Entity
         return ($p);
     }
 
+    public function findColourId()
+    {
+        $id = 0;
+        $sql = 'select t1.id from '.Model::getTable(Property::class).' t1 '
+            .' where t1.name like ? limit 0, 1';
+        $params = ['%colour%'];
+        $result = $this->query($sql, 'Could not find colour property', $params)->fetchAll();
+        if (isset($result[0]['id'])) {
+            $id = $result[0]['id'];
+        }
+        return $id;
+    }
+
     public function getAllWithOptions($props)
     {
         $propsString = $this->buildUnionString($props);
 
+        $params = [];
         $property = array();
         $sql = 'SELECT t1.id, t1.name, t2.id AS option_id, t2.option_val FROM '
             .Model::getTable(Property::class).' t1 '
             .'LEFT JOIN '.Model::getTable(PropertyOption::class).' t2 ON t2.property_id = t1.id';
-        if (sizeof($propsString[1])) {
+        if (sizeof($props)) {
             $sql .= ' WHERE t1.id IN '.$propsString[0];
+            $params = $propsString[1];
         }
         $sql .= ' ORDER BY t1.name, t2.option_val';
 
         $error = 'Could not get all properties and options.';
-        $result = $this->query($sql, $error. $propsString[1]);
+        $result = $this->query($sql, $error, $params);
         if ($result->rowCount() > 0) {
             foreach ($result as $row) {
                 $id = $row['id'];

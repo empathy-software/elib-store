@@ -66,7 +66,7 @@ class PropertiesController extends AdminController
         if (isset($_GET['id']) && is_numeric($_GET['id'])) {
             if (isset($_POST['save'])) {
                 $p = Model::load(Property::class);
-                $p->load(_GET['id']);
+                $p->load($_GET['id']);
                 $p->name = $_POST['name'];
                 $p->validates();
                 if ($p->hasValErrors()) {

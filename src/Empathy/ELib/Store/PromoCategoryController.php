@@ -5,6 +5,7 @@ namespace Empathy\ELib\Store;
 use Empathy\MVC\Model;
 use Empathy\ELib\Storage\CategoryItem;
 use Empathy\ELib\Storage\PromoItem;
+use Empathy\ELib\Storage\BrandItem;
 
 define('REQUESTS_PER_PAGE', 12);
 
@@ -36,7 +37,7 @@ class PromoCategoryController extends AdminController
 
         $this->presenter->assign('nav', $ct->getMarkup());
 
-        $b = Model::load('BrandItem');
+        $b = Model::load(BrandItem::class);
         $this->presenter->assign('brands', $b->getBrands());
     }
 

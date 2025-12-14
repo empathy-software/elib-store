@@ -2,7 +2,7 @@
 
 namespace Empathy\ELib\Store;
 
-use Empathy\ELib\Model;
+use Empathy\MVC\Model;
 use Empathy\ELib\EController;
 use Empathy\ELib\ThirdParty\PaypalClass;
 use Empathy\MVC\Config;

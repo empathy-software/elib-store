@@ -2,11 +2,11 @@
 
 namespace Empathy\ELib\Store;
 
-use Empathy\ELib\Model;
+use Empathy\MVC\Model;
 use Empathy\ELib\User\CurrentUser;
 use Empathy\MVC\Session;
-use Empathy\MVC\Storage\ShippingAddress;
-use Empathy\MVC\Storage\OrderItem;
+use Empathy\ELib\Storage\ShippingAddress;
+use Empathy\ELib\Storage\OrderItem;
 
 
 class Checkout

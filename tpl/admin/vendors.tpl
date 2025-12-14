@@ -3,7 +3,7 @@
 
 <div class="grey">
 
-{if sizeof($vendors) < 1}
+{if isset($vendors) and sizeof($vendors) < 1}
 <p>Nothing to display.</p>
 {else}
 <table>
@@ -46,7 +46,7 @@
 </table>
 {/if}
 
-{if sizeof($p_nav) > 1}
+{if isset($p_nav) and sizeof($p_nav) > 1}
 <div id="p_nav">
 <p>
 {foreach from=$p_nav key=k item=v}

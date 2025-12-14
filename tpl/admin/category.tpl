@@ -5,7 +5,7 @@
     <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/properties" class="btn btn-sm btn-primary">
         Manage Properties
     </a>
-    <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/category/add_category/{$category->id}" class="btn btn-sm btn-primary {if sizeof($products) > 0}disabled{/if}">
+    <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/category/add_category/{$category->id}" class="btn btn-sm btn-primary {if isset($products) and sizeof($products) > 0}disabled{/if}">
         Add Category
     </a>
     <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/category/rename/{$category->id}" class="btn btn-sm btn-primary {if $category->id eq 0 || $event eq 'rename'} disabled{/if}">

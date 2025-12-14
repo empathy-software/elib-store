@@ -26,6 +26,6 @@
 </div>
 
 {else}
-<p>No specific colour options created for this product.</p>
+<p>No colour property found.</p>
 
 {/if}

@@ -2,7 +2,7 @@
 
 namespace Empathy\ELib\Store;
 
-use Empathy\ELib\Model;
+use Empathy\MVC\Model;
 use Empathy\MVC\Session;
 use Empathy\ELib\Storage\ProductItemStatus;
 use Empathy\ELib\Storage\ProductVariantStatus;

@@ -29,15 +29,17 @@
 <th>&nbsp;</th>
 </tr>
 {section name=promo_item loop=$promos}
-<tr class="{cycle values="alt, }">
+<tr class="{cycle values="alt, "}">
 <td class="id">{$promos[promo_item].id}</td>
 <td><a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/promo/{$promos[promo_item].id}/">{$promos[promo_item].name}</a></td>
 <td>{$promos[promo_item].description|strip_tags|truncate:50:"..."}</td>
 <td>{if $promos[promo_item].sold_in_store eq 1}Yes{else}&nbsp;{/if}</td>
-{*<td>
-<img src="http://{$WEB_ROOT}{$PUBLIC_DIR}/img/{if $products[product_item].image eq ''}blank.gif{else}uploads/{$products[product_item].image}{/if}" alt="" width="66" /></td>*}
+{*
+<td>
+<img src="http://{$WEB_ROOT}{$PUBLIC_DIR}/img/{if $products[product_item].image eq ''}blank.gif{else}uploads/{$products[product_item].image}{/if}" alt="" width="66" /></td>
 <!--<td>&pound;{$products[product_item].price}</td>-->
 <!--<td>{$products[product_item].stock}</td>-->
+*}
 <td>&nbsp;
 <!--
 <a class="action" href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/product/edit/{$products[product_item].id}/">Edit</a><br />

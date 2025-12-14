@@ -90,7 +90,7 @@ class PromoController extends AdminController
                 }
                 // update db
                 $p->image = $u->file;
-                $p->save(Model::getTable('PromoItem'), array(), 2);
+                $p->save();
 
                 //$this->redirect_cgi('archive.cgi?id='.$p->id);
                 //$this->execScript('archive', array($p->id));

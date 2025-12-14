@@ -2,8 +2,9 @@
 
 namespace Empathy\ELib\Store;
 
-use Empathy\ELib\Model;
+use Empathy\MVC\Model;
 use Empathy\ELib\Storage\ProductItem;
+use Empathy\ELib\Storage\BrandItem;
 use Empathy\ELib\Storage\CategoryItem;
 use Empathy\ELib\Storage\CategoryProperty;
 use Empathy\ELib\Storage\Property;
@@ -140,7 +141,7 @@ class CategoryController extends AdminController
                 $this->presenter->assign('category', $c);
                 $this->presenter->assign('errors', $c->getValErrors());
             } else {
-                $c->save(Model::getTable('CategoryItem'), array(), 1);
+                $c->save();
                 $this->redirect('admin/category/'.$c->id);
             }
         } elseif (isset($_POST['cancel'])) {
@@ -173,7 +174,7 @@ class CategoryController extends AdminController
         if (isset($_POST['save'])) {
             $c = Model::load(CategoryProperty::class);
             $c->emptyByCategory($_GET['id']);
-            if (isset($_POST['property']) && sizeof($_POST['property'] > 0)) {
+            if (isset($_POST['property']) && sizeof($_POST['property']) > 0) {
                 foreach ($_POST['property'] as $index => $item) {
                     $c->category_id = $_GET['id'];
                     $c->property_id = $index;

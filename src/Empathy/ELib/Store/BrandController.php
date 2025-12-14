@@ -2,8 +2,8 @@
 
 namespace Empathy\ELib\Store;
 
-use Empathy\ELib\Model;
-use Empathy\MVC\Storage\BrandItem;
+use Empathy\MVC\Model;
+use Empathy\ELib\Storage\BrandItem;
 
 class BrandController extends AdminController
 {

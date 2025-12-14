@@ -2,8 +2,8 @@
 
 namespace Empathy\ELib\Store;
 
-use Empathy\ELib\Model;
-use Empathy\MVC\Storage\OrderItem;
+use Empathy\MVC\Model;
+use Empathy\ELib\Storage\OrderItem;
 
 
 class OrdersController extends AdminController
