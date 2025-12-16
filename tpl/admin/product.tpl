@@ -2,7 +2,7 @@
 
 
 {if in_array($event, array('default_event', 'edit', 'edit_colours', 'upload_image', 'upload_variant_image')) }
-    <div class="form-group cms-actions">
+    <div class="cms-actions mt-4 mb-4">
         {if $event eq 'edit_colours'}
         <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/product/add_colour/{$product->id}" class="btn btn-sm btn-primary">
             Add Colour
@@ -31,8 +31,7 @@
 {/if}
 
 
-
-<div class="row justify-content-between">
+<div class="row justify-content-between mt-5">
     <div class="col-md-3">
         {if in_array($event, array('default_event', 'edit', 'upload_image'))}
             {include file="elib://admin/products/product.tpl"}

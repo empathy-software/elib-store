@@ -8,13 +8,16 @@
 <h2>Upload Image</h2>
 
 <form method="post" enctype="multipart/form-data">
-    <div class="form-group custom-file">
-        <input type="file" class="custom-file-input" id="file" name="file">
-        <label class="custom-file-label" for="file">Choose file</label>
+    <div class="mb-4">
+        <label class="form-label" for="file">Choose file</label>
+        <input type="file" class="form-control" id="file" name="file">
     </div>
-    <input type="hidden" name="id" value="{$product->id}" />
-    <button type="submit" class="btn btn-primary" name="upload">Upload</button>
-    <button type="submit" class="btn btn-primary" name="cancel">Cancel</button>
+    <div class="mb-4">
+        <input type="hidden" name="id" value="{$product->id}" />
+        <button type="submit" class="btn btn-sm btn-primary" name="upload">Upload</button>
+        <button type="submit" class="btn btn-sm btn-primary" name="cancel">Cancel</button>
+    </div>
+
 </form>
 
 

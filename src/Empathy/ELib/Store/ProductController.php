@@ -551,7 +551,6 @@ class ProductController extends AdminController
 
             $g = new CombGen($sets);
             $results = $g->getResults();
-
             $v = Model::load(ProductVariant::class);
             $v->product_id = $_POST['product_id'];
             $v->weight_g = $_POST['weight_g'];
@@ -564,9 +563,11 @@ class ProductController extends AdminController
             if ($v->hasValErrors()) {
                 //die('errors');
             } else {
+
                 foreach ($results as $item) {
                     $v->id = $v->insert();
-                    $options = explode('-', $item);
+                    // filter out empty values
+                    $options = array_values(array_filter(explode('-', (string) $item)));
                     foreach ($options as $o) {
                         $p = Model::load(ProductVariantPropertyOption::class);
                         $p->product_variant_id = $v->id;

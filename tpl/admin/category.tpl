@@ -1,7 +1,7 @@
 {include file="elib://admin/admin_header.tpl"}
 
 
-<div class="form-group cms-actions">
+<div class="mt-4 mb-4 cms-actions">
     <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/properties" class="btn btn-sm btn-primary">
         Manage Properties
     </a>
