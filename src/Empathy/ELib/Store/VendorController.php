@@ -4,7 +4,7 @@ namespace Empathy\ELib\Store;
 
 use Empathy\ELib\EController;
 use Empathy\ELib\User\CurrentUser;
-use Empathy\DI;
+use Empathy\MVC\DI;
 
 
 class VendorController extends EController

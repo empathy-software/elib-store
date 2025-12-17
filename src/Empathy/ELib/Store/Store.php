@@ -6,10 +6,12 @@ use Empathy\MVC\Model;
 use Empathy\MVC\Session;
 use Empathy\ELib\Storage\ProductItemStatus;
 use Empathy\ELib\Storage\ProductVariantStatus;
-use Empathy\ELib\Storage\Vendor;
 use Empathy\ELib\Storage\ProductItem;
+use Empathy\ELib\Storage\ProductVariant;
+use Empathy\ELib\Storage\ProductColour;
 use Empathy\ELib\Storage\CategoryItem;
 use Empathy\ELib\Storage\BrandItem;
+use Empathy\ELib\Storage\Property;
 use Empathy\ELib\Storage\ProductVariantPropertyOption;
 use Empathy\MVC\DI;
 
@@ -18,10 +20,12 @@ define('REQUESTS_PER_PAGE', 12);
 class Store
 {
     private $c;
+    private $vendorModel;
 
     public function __construct($c)
     {
         $this->c = $c;
+        $this->vendorModel = DI::getContainer()->get('VendorModel');
     }
 
     // from category controller
@@ -71,15 +75,15 @@ class Store
         $sql .= ' AND status != '.ProductItemStatus::DELETED;
 
         // vendor
-        $v = Model::load(Vendor::class);
-        $vendor_id = $v->getIDByUserID(DI::getContainer()->get('CurrentUser'));
+        $v = Model::load($this->vendorModel);
+        $vendor_id = $v->getIDByUserID(DI::getContainer()->get('CurrentUser')->getUserID());
         $sql .= ' AND vendor_id = ?';
         $params[] = $vendor_id;
 
         $sql .= ' ORDER BY ?';
         $params[] = $_GET['order_by'];
 
-        $p_nav = $p->getPaginatePages(Model::getTable('ProductItem'), $sql, $_GET['page'], REQUESTS_PER_PAGE, $params);
+        $p_nav = $p->getPaginatePages($sql, $_GET['page'], REQUESTS_PER_PAGE, $params);
 
         $this->c->assign('p_nav', $p_nav);
 
@@ -90,7 +94,7 @@ class Store
             // min price is now stored in products table
         }
 
-        $c = Model::load('CategoryItem');
+        $c = Model::load(CategoryItem::class);
         $c->id = $_GET['id'];
         $category = $c->loadIndexed($c->category_id);
         $this->c->assign("products", $product);
@@ -112,7 +116,7 @@ class Store
 
         $this->c->assign('nav', $ct->getMarkup());
 
-        $b = Model::load('BrandItem');
+        $b = Model::load(BrandItem::class);
         $this->c->assign('brands', $b->getBrands());
     }
 
@@ -151,7 +155,7 @@ class Store
                 if(defined('ELIB_MULTIPLE_VENDORS') &&
                    ELIB_MULTIPLE_VENDORS == true) {
                     $user_id = DI::getContainer()->get('CurrentUser');
-                    $v = Model::load(Vendor::class);
+                    $v = Model::load($this->vendorModel);
                     $v->id = $v->getIDByUserID($user_id);                    
                     if ($v->id > 0) {
                         $v->load($v->id);
@@ -183,8 +187,8 @@ class Store
 
         $this->c->assign("product", $p);
 
-        $v = Model::load('ProductVariant');
-        $c = Model::load('ProductColour');
+        $v = Model::load(ProductVariant::class);
+        $c = Model::load(ProductColour::class);
 
         $has_colours = $c->hasColours($p->id);
         if ($has_colours) {
@@ -209,7 +213,7 @@ class Store
             $variants = $v->getAllCustom($sql, [$p->id, ProductVariantStatus::DELETED]);
         }
 
-        $property = Model::load('Property');
+        $property = Model::load(Property::class);
 
         $available_variant = false;
 
