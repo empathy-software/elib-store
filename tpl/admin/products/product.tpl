@@ -5,6 +5,7 @@
          src="http://{$WEB_ROOT}{$PUBLIC_DIR}/uploads/{$image.image}"
          alt="{$product->name}"
          data-image-id="{$image.id}"
+         data-default="{$image.default_image}"
          style="object-fit: cover; height: 220px;"
     >
     {/foreach}

@@ -218,9 +218,15 @@ class ProductController extends AdminController
 
     public function delete_image()
     {
+        $productId = $_GET['product_id'];
         $imageId = $_GET['image_id'];
         $i = Model::load(ProductImage::class);
         $i->load($imageId);
+
+        if ($i->id === 0) {
+            $this->redirect('admin/product/' . $productId);
+            return;
+        }
         $i->delete();
         $this->redirect('admin/product/' . $i->product_id);
     }
