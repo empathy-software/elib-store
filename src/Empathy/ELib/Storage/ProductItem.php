@@ -22,6 +22,7 @@ class ProductItem extends Entity
     public $vendor_id;
     public $min_price;
     public $vendor_verified;
+    private $images = [];
 
     public function validates()
     {
@@ -31,6 +32,23 @@ class ProductItem extends Entity
         if ($this->description == '') {
             $this->addValError('Invalid product description');
         }
+    }
+
+    public function load($id = null)
+    {
+        $i = Model::load(ProductImage::class);
+        parent::load($id);
+        $this->images = $i->loadByProductItem($this);
+    }
+
+    public function getImages()
+    {
+        return $this->images;
+    }
+
+    public function getDefaultImage()
+    {
+        return $this->images[0];
     }
 
     public function hasOneVariant()

@@ -1,10 +1,12 @@
 
-<div class="card">
+<div class="card js-image-card">
+    {foreach item=image from=$product->getImages()}
     <img class="card-img-top img-fluid"
-         src="http://{$WEB_ROOT}{$PUBLIC_DIR}/{if $product->image eq ''}img/blank.gif{else}uploads/{$product->image}{/if}"
+         src="http://{$WEB_ROOT}{$PUBLIC_DIR}/uploads/{$image.image}"
          alt="{$product->name}"
          style="object-fit: cover; height: 220px;"
     >
+    {/foreach}
 
     <div class="card-body">
         <h5 class="card-title">

@@ -97,8 +97,11 @@ class ImageUpload
         } else {
             $factor = 1;
         }
-        $newX = $this->origX * $factor;
-        $newY = $this->origY * $factor;
+
+        // chatgpt fix
+        $newX = (int) max(1, round($this->origX * $factor));
+        $newY = (int) max(1, round($this->origY * $factor));
+
         $img = imagecreatetruecolor($newX, $newY);
         imagecopyresampled($img, $this->orig, 0, 0, 0, 0, $newX, $newY, $this->origX, $this->origY);
         $newTarget = $this->target_dir.$prefix.$this->file;

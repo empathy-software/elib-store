@@ -2,6 +2,7 @@
 
 namespace Empathy\ELib\Store;
 
+use Empathy\ELib\Storage\ProductImage;
 use Empathy\MVC\Model;
 use Empathy\ELib\Storage\ProductItem;
 use Empathy\ELib\Storage\Property;
@@ -168,6 +169,7 @@ class ProductController extends AdminController
         }
 
         $p = Model::load(ProductItem::class);
+        $i = Model::load(ProductImage::class);
         $p->load($_GET['id']);
 
         $this->presenter->assign("product", $p);
@@ -182,9 +184,12 @@ class ProductController extends AdminController
                 if ($p->image != "") {
                     $u->remove(array($p->image));
                 }
+
                 // update db
-                $p->image = $u->file;
-                $p->save();
+                $i->image = $u->file;
+                $i->product_id = $_GET['id'];
+                $i->default_image = sizeof($p->getImages()) === 0 ? 1 : 0;
+                $i->insert();
                 $this->redirect('admin/product/' . $p->id);
             }
         } elseif (isset($_POST['cancel'])) {

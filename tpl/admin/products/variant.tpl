@@ -1,10 +1,9 @@
 
 {if $v.image neq ''}
     {assign var="image" value="uploads/`$v.image`"}
-{elseif $product->image neq ''}
-    {assign var="image" value="uploads/`$product->image`"}
 {else}
-    {assign var="image" value="img/blank.gif"}
+    {assign var=defaultImage value=$product->getDefaultImage()}
+    {assign var="image" value="uploads/`$defaultImage.image`"}
 {/if}
 
 <div class="variant card {$class}">
