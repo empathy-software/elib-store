@@ -216,6 +216,24 @@ class ProductController extends AdminController
         }
     }
 
+    public function delete_image()
+    {
+        $imageId = $_GET['image_id'];
+        $i = Model::load(ProductImage::class);
+        $i->load($imageId);
+        $i->delete();
+        $this->redirect('admin/product/' . $i->product_id);
+    }
+
+    public function make_default_image()
+    {
+        $imageId = $_GET['image_id'];
+        $i = Model::load(ProductImage::class);
+        $i->load($imageId);
+        $i->makeDefault();
+        $this->redirect('admin/product/' . $i->product_id);
+    }
+
     public function delete()
     {
         $p = Model::load(ProductItem::class);

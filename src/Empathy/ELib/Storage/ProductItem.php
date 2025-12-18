@@ -38,7 +38,10 @@ class ProductItem extends Entity
     {
         $i = Model::load(ProductImage::class);
         parent::load($id);
-        $this->images = $i->loadByProductItem($this);
+        $this->images = $i->loadByProductItemDisplayed($this);
+
+        print_r($this);
+
     }
 
     public function getImages()

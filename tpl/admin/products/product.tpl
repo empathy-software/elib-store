@@ -1,9 +1,10 @@
 
-<div class="card js-image-card">
+<div class="card js-image-card" data-product-id="{$product->id}">
     {foreach item=image from=$product->getImages()}
     <img class="card-img-top img-fluid"
          src="http://{$WEB_ROOT}{$PUBLIC_DIR}/uploads/{$image.image}"
          alt="{$product->name}"
+         data-image-id="{$image.id}"
          style="object-fit: cover; height: 220px;"
     >
     {/foreach}
