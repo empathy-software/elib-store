@@ -131,6 +131,13 @@ class StoreControllerLite extends EController
         $per_page = 8;
 
         $products = $p->getAllCustomPaginate($sql, $_GET['page'], $per_page, $params);
+
+        foreach ($products as &$product) {
+            $p->load($product['id']);
+            $images = $p->getImages();
+            $product['image'] = $images[0]['image'];
+        }
+
         $p_nav = $p->getPaginatePages($sql, $_GET['page'], $per_page, $params);
 
         $this->pages = $p_nav;
@@ -214,6 +221,8 @@ class StoreControllerLite extends EController
 
         $this->assign('vendor_id', $p->vendor_id);
         $this->assign('product', $p);
+
+
         $this->assign('colours', array());
     }
 

@@ -277,7 +277,7 @@ class Store
 
     public function productAutoGetMinPrice($product_id)
     {
-        $p = Model::load('ProductItem');
+        $p = Model::load(ProductItem::class);
         $price = $p->getMinPrice($product_id);
         if ($price > 0) {
             $p->id = $product_id;
