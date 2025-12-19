@@ -23,6 +23,7 @@ class ProductItem extends Entity
     public $min_price;
     public $vendor_verified;
     private $images = [];
+    private $noImageFound = false;
 
     public function validates()
     {
@@ -38,12 +39,17 @@ class ProductItem extends Entity
     {
         $i = Model::load(ProductImage::class);
         parent::load($id);
-        $this->images = $i->loadByProductItemDisplayed($this);
+        list($this->images, $this->noImageFound) = $i->loadByProductItemDisplayed($this);
     }
 
     public function getImages()
     {
         return $this->images;
+    }
+
+    public function getNoImageFound()
+    {
+        return $this->noImageFound;
     }
 
     public function getDefaultImage()

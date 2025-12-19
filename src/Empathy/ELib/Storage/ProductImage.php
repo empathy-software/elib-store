@@ -37,8 +37,10 @@ class ProductImage extends Entity
 
     public function loadByProductItemDisplayed($product)
     {
+        $noneFound = false;
         $images = $this->loadByProductItem($product);
         if (count($images) < 1) {
+            $noneFound = true;
             $images = [
                 [
                     'id' => 0,
@@ -48,7 +50,7 @@ class ProductImage extends Entity
                 ]
             ];
         }
-        return $images;
+        return [ $images, $noneFound ];
     }
 
     public function delete()

@@ -181,14 +181,10 @@ class ProductController extends AdminController
             if ($u->error != '') {
                 $this->presenter->assign("error", $u->error);
             } else {
-                if ($p->image != "") {
-                    $u->remove(array($p->image));
-                }
-
                 // update db
                 $i->image = $u->file;
                 $i->product_id = $_GET['id'];
-                $i->default_image = sizeof($p->getImages()) === 0 ? 1 : 0;
+                $i->default_image = $p->getNoImageFound() ? 1 : 0;
                 $i->insert();
                 $this->redirect('admin/product/' . $p->id);
             }
@@ -218,22 +214,23 @@ class ProductController extends AdminController
 
     public function delete_image()
     {
-        $productId = $_GET['product_id'];
-        $imageId = $_GET['image_id'];
-        $i = Model::load(ProductImage::class);
-        $i->load($imageId);
+        $productId = (int) $_GET['product_id'];
+        $imageId = (int) $_GET['image_id'];
 
-        if ($i->id === 0) {
+        if ($imageId === 0) {
             $this->redirect('admin/product/' . $productId);
             return;
         }
+
+        $i = Model::load(ProductImage::class);
+        $i->load($imageId);
         $i->delete();
         $this->redirect('admin/product/' . $i->product_id);
     }
 
     public function make_default_image()
     {
-        $imageId = $_GET['image_id'];
+        $imageId = (int) $_GET['image_id'];
         $i = Model::load(ProductImage::class);
         $i->load($imageId);
         $i->makeDefault();
