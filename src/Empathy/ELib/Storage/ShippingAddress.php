@@ -37,7 +37,7 @@ class ShippingAddress extends Entity
 
     public function setDefault($user_id, $address_id)
     {
-        $sql = 'SELECT id FROM '.Model::getTable(ShippingAddress::class).' WHERE user_id = ?';
+        $sql = 'SELECT id FROM '.Model::getTable(self::class).' WHERE user_id = ?';
         $error = 'Could not get all shipping addresses for user.';
         $result = $this->query($sql, $error, [$user_id]);
 
@@ -47,10 +47,10 @@ class ShippingAddress extends Entity
         }
 
         if (in_array($address_id, $addresses)) {
-            $sql = 'UPDATE '.Model::getTable('ShippingAddress').' SET default_address = 0 WHERE user_id = ?';
+            $sql = 'UPDATE '.Model::getTable(self::class).' SET default_address = 0 WHERE user_id = ?';
             $error = 'Could not wipe defaults.';
             $this->query($sql, $error, [$user_id]);
-            $sql = 'UPDATE '.Model::getTable('ShippingAddress').' SET default_address = 1 WHERE id = ?';
+            $sql = 'UPDATE '.Model::getTable(self::class).' SET default_address = 1 WHERE id = ?';
             $error = 'Could not set new default';
             $this->query($sql, $error, [$address_id]);
         }

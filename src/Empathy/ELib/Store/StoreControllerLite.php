@@ -280,7 +280,7 @@ class StoreControllerLite extends EController
         $this->setTemplate('checkout.tpl');
         $s = Model::load(ShippingAddress::class);
 
-        $sql = ' WHERE user_id = ? ORDER BY id DESC';
+        $sql = ' WHERE user_id = ? ORDER BY default_address DESC';
         $addresses = $s->getAllCustom($sql, [DI::getContainer()->get('CurrentUser')->getUserID()]);
 
         $this->assign('addresses', $addresses);
