@@ -54,7 +54,7 @@
                     {if !empty($property.option)}
                         {foreach from=$property.option item=option key=option_id}
                             <div class="mb-2">
-                                <span class="option" id="option_{$id}_{$option_id}">{$option|escape}</span>
+                                <span class="option" id="option_{$option_id}">{$option|escape}</span>
                             </div>
                         {/foreach}
                     {/if}
