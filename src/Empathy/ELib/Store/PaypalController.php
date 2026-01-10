@@ -6,6 +6,9 @@ use Empathy\MVC\Model;
 use Empathy\ELib\EController;
 use Empathy\ELib\ThirdParty\PaypalClass;
 use Empathy\MVC\Config;
+use Empathy\ELib\Storage\OrderItem;
+use Empathy\ELib\Storage\ProductVariant;
+use Empathy\ELib\Storage\CategoryItem;
 
 
 class PaypalController extends EController
@@ -56,11 +59,11 @@ class PaypalController extends EController
             if(isset($p->ipn_data['invoice']) && is_numeric($p->ipn_data['invoice'])
                && 'Completed' == $p->ipn_data['payment_status'])
             {
-                $o = Model::load('OrderItem');
+                $o = Model::load(OrderItem::class);
                 $o->id = $p->ipn_data['invoice'];
                 $o->load();
                 $o->status = 2;
-                $o->save(Model::getTable('OrderItem'), array(), 0);
+                $o->save();
             }
             $this->writeLog($p->ipn_data);
         }
@@ -84,9 +87,9 @@ class PaypalController extends EController
         $co = new Checkout($items, $this);
         $invoice_no = $co->getInvoiceNo();
 
-        $o = Model::load('OrderItem');
+        $o = Model::load(OrderItem::class);
         $o->id = $invoice_no;
-        $o->load();
+        $o->load($o->id);
 
         $products = array();
 
@@ -118,9 +121,9 @@ class PaypalController extends EController
         foreach ($items as $item) {
             array_push($ids, $item['id']);
         }
-        $v = Model::load('ProductVariant');
+        $v = Model::load(ProductVariant::class);
         $cat_ids = $v->getCategories($ids);
-        $cat = Model::load('CategoryItem');
+        $cat = Model::load(CategoryItem::class);
 
         if ($o->country != 'GB') {
             $intl = true;
@@ -134,7 +137,7 @@ class PaypalController extends EController
 
         $p->add_field('shipping_1', $shipping);
         $o->shipping = $shipping;
-        $o->save(Model::getTable('OrderItem'), array(), 1);
+        $o->save();
 
         $i = 1;
         foreach ($items as $index => $item) {

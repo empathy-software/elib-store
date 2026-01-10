@@ -3,10 +3,11 @@
 namespace Empathy\ELib\Store;
 
 use Empathy\MVC\Model;
-use Empathy\ELib\User\CurrentUser;
+use Empathy\MVC\DI;
 use Empathy\MVC\Session;
 use Empathy\ELib\Storage\ShippingAddress;
 use Empathy\ELib\Storage\OrderItem;
+use Empathy\ELib\Storage\LineItem;
 
 
 class Checkout
@@ -20,7 +21,7 @@ class Checkout
         $s->load();
 
         $o = Model::load(OrderItem::class);
-        $o->user_id = CurrentUser::getUserID();
+        $o->user_id = DI::getContainer()->get('CurrentUser')->getUserId();
         $o->status = 'DEFAULT';
         $o->stamp = 'MYSQLTIME';
         $o->first_name = $s->first_name;
@@ -40,7 +41,7 @@ class Checkout
             $this->invoice_no = time().'/'.$this->invoice_no;
         }
 
-        $l = Model::load('LineItem');
+        $l = Model::load(LineItem::class);
 
         foreach ($items as $item) {
             if (is_numeric($item['qty']) && $item['qty'] > 0) {
@@ -48,7 +49,7 @@ class Checkout
                 $l->variant_id = $item['id'];
                 $l->price = $item['price'];
                 $l->quantity = $item['qty'];
-                $l->insert(Model::getTable('LineItem'), 1, array(), 0);
+                $l->insert();
             }
         }
     }
