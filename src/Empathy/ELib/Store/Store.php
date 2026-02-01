@@ -97,6 +97,7 @@ class Store
         $c = Model::load(CategoryItem::class);
         $c->id = $_GET['id'];
         $category = $c->loadIndexed($c->category_id);
+
         $this->c->assign("products", $product);
     }
 
@@ -233,7 +234,7 @@ class Store
         if($available_variant == true
            && $p->name != 'New Product'
            && !($p->description == 'No description.' || $p->description == '<p>No description.</p>')
-           && $p->image != '')
+           && count($p->getImages()))
         {
             if ($p->status != ProductItemStatus::AVAILABLE) {
                 $this->c->assign('product_available_link', true);
@@ -268,7 +269,7 @@ class Store
 
     public function setVariantAvailable()
     {
-        $v = Model::load('ProductVariant');
+        $v = Model::load(ProductVariant::class);
         $v->load($_GET['id']);
         $v->status = ProductVariantStatus::AVAILABLE;
         $v->save();
@@ -289,7 +290,7 @@ class Store
 
     public function productAutoHide($product_id)
     {
-        $v = Model::load('ProductVariant');
+        $v = Model::load(ProductVariant::class);
         $sql = ' WHERE status = ?'
             .' AND product_id = ?';
         $variants = $v->getAllCustom($sql, [ProductVariantStatus::AVAILABLE, $product_id]);
@@ -401,12 +402,11 @@ class Store
                 $this->c->redirect('storeadmin/product/'.$p->id);
             }
         } else {
-            $p->id = $_GET['id'];
-            $p->load();
+            $p->load($_GET['id']);
 
-            $p->sold_in_store = 0;
+            $p->setSoldInStore(0);
             if ($p->status > 0) {
-                $p->sold_in_store = 1;
+                $p->setSoldInStore(1);
             }
 
             //$product_ranges = $pr->loadForProduct($p->id);

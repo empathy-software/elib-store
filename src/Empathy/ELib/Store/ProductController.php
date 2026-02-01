@@ -31,7 +31,6 @@ class ProductController extends AdminController
         //$pr = new ProductRange($this);
 
         if (isset($_POST['submit_product'])) {
-            $p->id = $_POST['id'];
 
             /*
               if (!isset($_POST['range'])) {
@@ -41,7 +40,7 @@ class ProductController extends AdminController
               $pr->updateForProduct($p->id, $range);
             */
 
-            $p->load();
+            $p->load($_POST['id']);
             $old_product_name = $p->name;
             $p->name = $_POST['name'];
             $p->description = $_POST['description'];
@@ -69,12 +68,11 @@ class ProductController extends AdminController
         } else if (isset($_POST['cancel'])) {
             $this->redirect('admin/product/' . $_GET['id']);
         } else {
-            $p->id = $_GET['id'];
-            $p->load();
+            $p->load($_GET['id']);
 
-            $p->sold_in_store = 0;
+            $p->setSoldInStore(0);
             if ($p->status > 0) {
-                $p->sold_in_store = 1;
+                $p->setSoldInStore(1);
             }
 
             //$product_ranges = $pr->loadForProduct($p->id);
@@ -96,7 +94,7 @@ class ProductController extends AdminController
             $sold[1] = 'Yes';
             $this->presenter->assign('sold_in_store', $sold);
 
-            $b = Model::load('BrandItem');
+            $b = Model::load(BrandItem::class);
             $brands = $b->getBrands();
             $this->presenter->assign('brands', $brands);
 

@@ -10,7 +10,7 @@
 <p>
 <label>Colour</label>
 <select name="colour">
-{html_options options=$colours selected=$product->sold_in_store}
+{html_options options=$colours selected=$product->getSoldInStore()}
 </select>
 </p>
 

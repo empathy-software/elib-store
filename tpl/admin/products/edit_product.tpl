@@ -17,7 +17,7 @@
     <div class="form-group">
         <label for="sold-in-store">Sold in store</label>
         <select class="form-control" id="sold-in-store" name="sold_in_store">
-            {html_options options=$sold_in_store selected=$product->sold_in_store}
+            {html_options options=$sold_in_store selected=$product->getSoldInStore()}
         </select>
     </div>
     <div class="form-group">

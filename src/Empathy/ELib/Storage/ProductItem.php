@@ -24,6 +24,7 @@ class ProductItem extends Entity
     public $vendor_verified;
     private $images = [];
     private $noImageFound = false;
+    private $soldInStore = 0;
 
     public function validates()
     {
@@ -184,4 +185,13 @@ class ProductItem extends Entity
         return $id;
     }
 
+    public function setSoldInStore($soldInStore)
+    {
+        $this->soldInStore = $soldInStore;
+    }
+
+    public function getSoldInStore()
+    {
+        return $this->soldInStore;
+    }
 }
