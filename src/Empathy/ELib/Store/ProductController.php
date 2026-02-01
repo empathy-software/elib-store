@@ -300,7 +300,8 @@ class ProductController extends AdminController
         $p->name = 'New Product';
         $p->description = 'No description.';
         $p->status = 'DEFAULT';
-        $p->vendor_verified = 'DEFAULT';
+        $p->vendor_verified = 1;
+        $p->vendor_id = 1;
         $p->insert();
         $this->redirect('admin/category/' . $_GET['id']);
     }
