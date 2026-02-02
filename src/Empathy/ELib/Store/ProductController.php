@@ -13,6 +13,7 @@ use Empathy\ELib\Storage\BrandItem;
 use Empathy\ELib\Storage\CategoryProperty;
 use Empathy\ELib\Storage\PropertyOption;
 use Empathy\ELib\Storage\ProductVariantPropertyOption;
+use Empathy\ELib\File\Image as EImageUpload;
 
 
 class ProductController extends AdminController
@@ -173,19 +174,39 @@ class ProductController extends AdminController
         $this->presenter->assign("product", $p);
 
         if (isset($_POST['upload'])) {
-            $d = array(array('tn_', 100, 100), array('mid_', 400, 276));
-            $u = new ImageUpload('products', true, $d);
+            $images = array();
+            if (!is_array($_FILES['file']['name'])) {
 
-            if ($u->error != '') {
-                $this->presenter->assign("error", $u->error);
+                $images[0] = $_FILES['file'];
             } else {
-                // update db
-                $i->image = $u->file;
-                $i->product_id = $_GET['id'];
-                $i->default_image = $p->getNoImageFound() ? 1 : 0;
-                $i->insert();
+                $images = EImageUpload::reArrayFiles($_FILES['file']);
+            }
+
+            $error = '';
+            foreach ($images as $index => $image) {
+                $_FILES['file'] = $image;
+
+                $d = array(array('tn_', 100, 100), array('mid_', 400, 276));
+                $u = new ImageUpload('products', true, $d);
+
+                if ($u->error != '') {
+                    $error = $u->error;
+                    break;
+                } else {
+                    // update db
+                    $i->image = $u->file;
+                    $i->product_id = $_GET['id'];
+                    $i->default_image = $p->getNoImageFound() ? 1 : 0;
+                    $i->insert();
+                }
+            }
+
+            if ($error != '') {
+                $this->presenter->assign("error", $error);
+            } else {
                 $this->redirect('admin/product/' . $p->id);
             }
+
         } elseif (isset($_POST['cancel'])) {
             $this->redirect('admin/product/' . $_POST['id']);
         }
