@@ -63,7 +63,7 @@ class ProductController extends AdminController
                 $this->presenter->assign('errors', $p->getValErrors());
             } else {
                 //$p->price = $_POST['price'];
-                $p->save(['description']);
+                $p->save();
                 $this->redirect('admin/product/' . $p->id);
             }
         } else if (isset($_POST['cancel'])) {
