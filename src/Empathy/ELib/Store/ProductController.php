@@ -183,6 +183,7 @@ class ProductController extends AdminController
             }
 
             $error = '';
+            $j = 0;
             foreach ($images as $index => $image) {
                 $_FILES['file'] = $image;
 
@@ -196,9 +197,10 @@ class ProductController extends AdminController
                     // update db
                     $i->image = $u->file;
                     $i->product_id = $_GET['id'];
-                    $i->default_image = $p->getNoImageFound() ? 1 : 0;
+                    $i->default_image = $j === 0 ? $p->getNoImageFound() ? 1 : 0 : 0;
                     $i->insert();
                 }
+                $j++;
             }
 
             if ($error != '') {
