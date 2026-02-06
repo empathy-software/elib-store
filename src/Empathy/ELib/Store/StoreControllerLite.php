@@ -61,7 +61,6 @@ class StoreControllerLite extends EController
 //        }
 
         $category_id = $_GET['category_id'] ?? 0;
-        $page = $this->filterInt('page');
 
         if (isset($_GET['order_by_price'])) {
             $uiVars = Session::get('ui_store');
@@ -77,7 +76,9 @@ class StoreControllerLite extends EController
                 Session::set('ui_store', $uiVars);
             }
         }
-        $this->loadUIVars('ui_store', ['order_by_recent', 'order_by_price']);
+        $this->loadUIVars('ui_store', ['order_by_recent', 'order_by_price', 'page']);
+
+        $page = $this->filterInt('page');
 
         if (
             isset($_GET['order_by_price']) &&
