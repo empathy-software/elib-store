@@ -59,29 +59,22 @@ class StoreControllerLite extends EController
 //            $vendor_id = $this->filterInt('vendor_id');
 //            $category_id = $this->filterInt('id');
 //        }
-
+        
         $category_id = $_GET['category_id'] ?? 0;
 
         if (isset($_GET['order_by_price'])) {
-            $uiVars = Session::get('ui_store');
-            if ($uiVars && is_array($uiVars) && isset($uiVars['order_by_recent'])) {
-                unset($uiVars['order_by_recent']);
-                Session::set('ui_store', $uiVars);
-            }
+            Session::setUISetting('ui_store', 'order_by_recent', false);
         }
         if (isset($_GET['order_by_recent'])) {
-            $uiVars = Session::get('ui_store');
-            if ($uiVars && is_array($uiVars) && isset($uiVars['order_by_price'])) {
-                unset($uiVars['order_by_price']);
-                Session::set('ui_store', $uiVars);
-            }
+            Session::setUISetting('ui_store', 'order_by_price', false);
         }
+
         $this->loadUIVars('ui_store', ['order_by_recent', 'order_by_price', 'page', 'brands']);
+
 
         if (!isset($_GET['brands'])) {
             $_GET['brands'] = [1];
         }
-
 
         $brands_available = [
             1 => ['name' => 'A.CE', 'set' =>  isset($_GET['brands']) && is_array($_GET['brands']) ? in_array(1,  $_GET['brands']): 0],
