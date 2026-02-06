@@ -21,9 +21,8 @@ class BrandController extends AdminController
     public function buildNav()
     {
         $this->setTemplate('elib://admin/brand.tpl');
-        $b = Model::load('BrandItem');
-        $b->id = $_GET['id'];
-        $b->load();
+        $b = Model::load(BrandItem::class);
+        $b->load($_GET['id']);
 
         $bt = new BrandsTree($b);
         $this->presenter->assign('banners', $bt->getMarkup());
@@ -43,8 +42,7 @@ class BrandController extends AdminController
         $this->buildNav();
         if (isset($_POST['save'])) {
             $b = Model::load(BrandItem::class);
-            $b->id = $_POST['id'];
-            $b->load();
+            $b->load($_POST['id']);
             $b->name = $_POST['artist_alias'];
             $b->validates();
             if ($b->hasValErrors()) {
@@ -73,7 +71,7 @@ class BrandController extends AdminController
     public function delete()
     {
         $this->assertID();
-        $b = Model::load('BrandItem');
+        $b = Model::load(BrandItem::class);
         $b->load( $_GET['id']);
         $b->delete();
         $this->redirect('admin/brand/');

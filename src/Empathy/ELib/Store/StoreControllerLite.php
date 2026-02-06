@@ -76,7 +76,13 @@ class StoreControllerLite extends EController
                 Session::set('ui_store', $uiVars);
             }
         }
-        $this->loadUIVars('ui_store', ['order_by_recent', 'order_by_price', 'page']);
+        $this->loadUIVars('ui_store', ['order_by_recent', 'order_by_price', 'page', 'brands']);
+
+        $brands_available = [
+            1 => ['name' => 'A.CE', 'set' => !isset($_GET['brands']) ? 1 : (is_array($_GET['brands']) ? in_array(1,  $_GET['brands']): 0)],
+            2 => ['name' => 'VEIL', 'set' => isset($_GET['brands']) && is_array($_GET['brands']) ? in_array(2,  $_GET['brands']): 0],
+        ];
+        $this->assign('brands_available', $brands_available);
 
         $page = $this->filterInt('page');
 
@@ -158,6 +164,12 @@ class StoreControllerLite extends EController
             $descendantsString = $p->buildUnionString($descendants);
             $sql .= ' AND category_id IN ' . $descendantsString[0];
             $params = array_merge($params, $descendantsString[1]);
+        }
+
+        if (isset($_GET['brands']) && count($_GET['brands']) > 0) {
+            $brands = $p->buildUnionString($_GET['brands']);
+            $sql .= ' AND brand_id IN ' . $brands[0];
+            $params = array_merge($params, $brands[1]);
         }
 
         $sql .= ' AND vendor_verified = 1';

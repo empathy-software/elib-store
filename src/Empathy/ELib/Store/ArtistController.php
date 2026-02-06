@@ -3,6 +3,7 @@
 namespace Empathy\ELib\Store;
 
 use Empathy\MVC\Model;
+use Empathy\ELib\Storage\ArtistItem;
 
 class ArtistController extends AdminController
 {
@@ -19,11 +20,10 @@ class ArtistController extends AdminController
 
     public function toggle_active()
     {
-        $a = Model::load('ArtistItem');
-        $a->id = $_GET['id'];
-        $a->load();
+        $a = Model::load(ArtistItem::class);
+        $a->load($_GET['id']);
         $a->active = ($a->active) ? 0 : 1;
-        $a->save(Model::getTable('ArtistItem'), array(), 0);
+        $a->save();
         $this->redirect('admin/artist/'.$a->id);
     }
 
@@ -32,9 +32,8 @@ class ArtistController extends AdminController
         $this->setTemplate('elib://admin/artist.tpl');
         //$this->assertID();
 
-        $a = Model::load('ArtistItem');
-        $a->id = $_GET['id'];
-        $a->load();
+        $a = Model::load(ArtistItem::class);
+        $a->load($_GET['id']);
 
         $at = new ArtistsTree($a);
         $this->presenter->assign('banners', $at->getMarkup());
@@ -44,7 +43,7 @@ class ArtistController extends AdminController
     public function add()
     {
         if (isset($_POST['save'])) {
-            $a = Model::load('ArtistItem');
+            $a = Model::load(ArtistItem::class);
             //$a->artist_alias = $_POST['artist_alias'];
             $a->forename = $_POST['forename'];
             $a->surname = $_POST['surname'];
@@ -55,7 +54,7 @@ class ArtistController extends AdminController
             } else {
                 $a->artist_alias = '';
                 $a->active = 0;
-                $a->insert(Model::getTable('ArtistItem'), true, array(), 1);
+                $a->insert();
                 $this->redirect('admin/artist/'.$a->id);
             }
         } elseif (isset($_POST['cancel'])) {
@@ -69,9 +68,8 @@ class ArtistController extends AdminController
     {
         $this->buildNav();
         if (isset($_POST['save'])) {
-            $a = Model::load('ArtistItem');
-            $a->id = $_POST['id'];
-            $a->load();
+            $a = Model::load(ArtistItem::class);
+            $a->load($_POST['id']);
             //$a->artist_alias = $_POST['artist_alias'];
             $a->forename = $_POST['forename'];
             $a->surname = $_POST['surname'];
@@ -81,15 +79,14 @@ class ArtistController extends AdminController
                 $this->presenter->assign('errors', $a->getValErrors());
             } else {
                 $a->artist_alias = '';
-                $a->save(Model::getTable('ArtistItem'), array(), 1);
+                $a->save();
                 $this->redirect('admin/artist/'.$a->id);
             }
         } elseif (isset($_POST['cancel'])) {
             $this->redirect('admin/artist/'.$_POST['id']);
         } else {
-            $a = Model::load('ArtistItem');
-            $a->id = $_GET['id'];
-            $a->load();
+            $a = Model::load(ArtistItem::class);
+            $a->load($_GET['id']);
             $this->presenter->assign('artist', $a);
         }
     }
@@ -104,9 +101,8 @@ class ArtistController extends AdminController
     public function delete()
     {
         $this->assertID();
-        $a = Model::load('ArtistItem');
-        $a->id = $_GET['id'];
-        $a->load();
+        $a = Model::load(ArtistItem::class);
+        $a->load($_GET['id']);
         $images_removed = false;
         if ($a->image != '') {
             $u = new ImageUpload('', false, array());
@@ -125,16 +121,15 @@ class ArtistController extends AdminController
     public function edit_bio()
     {
         if (isset($_POST['save'])) {
-            $a = Model::load('ArtistItem');
-            $a->id = $_POST['id'];
-            $a->load();
+            $a = Model::load(ArtistItem::class);
+            $a->load($_POST['id']);
             $a->bio = $_POST['bio'];
             $a->validates();
             if ($a->hasValErrors()) {
                 $this->presenter->assign('artist', $a);
                 $this->presenter->assign('errors', $a->getValErrors());
             } else {
-                $a->save(Model::getTable('ArtistItem'), array(), 1);
+                $a->save();
                 $this->redirect('admin/artist/'.$_GET['id']);
             }
         } elseif (isset($_POST['cancel'])) {
@@ -142,9 +137,8 @@ class ArtistController extends AdminController
         }
 
         $this->buildNav();
-        $a = Model::load('ArtistItem');
-        $a->id = $_GET['id'];
-        $a->load();
+        $a = Model::load(ArtistItem::class);
+        $a->load($_GET['id']);
         $this->presenter->assign('artist', $a);
     }
 
@@ -157,9 +151,8 @@ class ArtistController extends AdminController
             $this->redirect('admin/artist/'.$_POST['id']);
         }
 
-        $a = Model::load('ArtistItem');
-        $a->id = $_GET['id'];
-        $a->load();
+        $a = Model::load(ArtistItem::class);
+        $a->load($_GET['id']);
 
         $this->presenter->assign("artist", $a);
 
@@ -175,7 +168,7 @@ class ArtistController extends AdminController
                 }
                 // update db
                 $a->image = $u->file;
-                $a->save(Model::getTable('ArtistItem'), array(), 2);
+                $a->save();
                 $this->redirect('admin/artist/'.$a->id);
             }
         } else {
