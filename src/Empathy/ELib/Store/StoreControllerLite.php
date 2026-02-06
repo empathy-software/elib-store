@@ -51,16 +51,56 @@ class StoreControllerLite extends EController
 
     public function minimalLayout()
     {
-        if (0 && CurrentUser::loggedIn()) {
-            $ui_array = array('page', 'vendor_id', 'id');
-            $this->loadUIVars('ui_blog', $ui_array);
-        } else {
-            $page = $this->filterInt('page');
-            $vendor_id = $this->filterInt('vendor_id');
-            $category_id = $this->filterInt('id');
+//        if (0 && CurrentUser::loggedIn()) {
+//            $ui_array = array('page', 'vendor_id', 'id');
+//            $this->loadUIVars('ui_blog', $ui_array);
+//        } else {
+//            $page = $this->filterInt('page');
+//            $vendor_id = $this->filterInt('vendor_id');
+//            $category_id = $this->filterInt('id');
+//        }
+
+        $category_id = $_GET['category_id'] ?? 0;
+        $page = $this->filterInt('page');
+
+        if (isset($_GET['order_by_price'])) {
+            $uiVars = Session::get('ui_store');
+            if ($uiVars && is_array($uiVars) && isset($uiVars['order_by_recent'])) {
+                unset($uiVars['order_by_recent']);
+                Session::set('ui_store', $uiVars);
+            }
+        }
+        if (isset($_GET['order_by_recent'])) {
+            $uiVars = Session::get('ui_store');
+            if ($uiVars && is_array($uiVars) && isset($uiVars['order_by_price'])) {
+                unset($uiVars['order_by_price']);
+                Session::set('ui_store', $uiVars);
+            }
+        }
+        $this->loadUIVars('ui_store', ['order_by_recent', 'order_by_price']);
+
+        if (
+            isset($_GET['order_by_price']) &&
+            (
+                $_GET['order_by_price'] === 'asc' ||
+                $_GET['order_by_price'] === 'desc'
+            )
+        ) {
+            $orderByPrice = $_GET['order_by_price'];
+        }
+        if (
+            isset($_GET['order_by_recent']) &&
+            (
+                $_GET['order_by_recent'] === 'asc' ||
+                $_GET['order_by_recent'] === 'desc'
+            )
+        ) {
+            $orderByRecent = $_GET['order_by_recent'];
         }
 
-    
+        $this->assign('order_by_price', $orderByPrice ?? 'desc');
+        $this->assign('order_by_recent', $orderByRecent ?? 'desc');
+
 
         if (!isset($_GET['page']) || $_GET['page'] == '') {
             $_GET['page'] = 1;
@@ -121,15 +161,26 @@ class StoreControllerLite extends EController
 
         $sql .= ' AND vendor_verified = 1';
 
-        $sql .= ' ORDER BY id DESC';
+        $order = [];
+        if (isset($orderByRecent)) {
+            $order[] = 'id ' .  ($orderByRecent === 'desc' ? 'desc': 'asc');
+        }
+
+        if (isset($orderByPrice)) {
+            $order[] = 'min_price ' . ($orderByPrice === 'asc' ? 'asc': 'desc');
+        }
+
+        if (count($order) > 0) {
+            $sql .= ' ORDER BY ' . implode(', ', $order);
+        } else {
+            $sql .= ' ORDER BY id DESC';
+        }
 
         if ($_GET['page'] < 1) {
             $_GET['page'] = 1;
         }
 
-
-        $per_page = 8;
-
+        $per_page = 12;
         $products = $p->getAllCustomPaginate($sql, $_GET['page'], $per_page, $params);
 
         foreach ($products as &$product) {
