@@ -78,8 +78,13 @@ class StoreControllerLite extends EController
         }
         $this->loadUIVars('ui_store', ['order_by_recent', 'order_by_price', 'page', 'brands']);
 
+        if (!isset($_GET['brands'])) {
+            $_GET['brands'] = [1];
+        }
+
+
         $brands_available = [
-            1 => ['name' => 'A.CE', 'set' => !isset($_GET['brands']) ? 1 : (is_array($_GET['brands']) ? in_array(1,  $_GET['brands']): 0)],
+            1 => ['name' => 'A.CE', 'set' =>  isset($_GET['brands']) && is_array($_GET['brands']) ? in_array(1,  $_GET['brands']): 0],
             2 => ['name' => 'VEIL', 'set' => isset($_GET['brands']) && is_array($_GET['brands']) ? in_array(2,  $_GET['brands']): 0],
         ];
         $this->assign('brands_available', $brands_available);
