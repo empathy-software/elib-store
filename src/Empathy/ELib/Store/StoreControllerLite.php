@@ -290,6 +290,24 @@ class StoreControllerLite extends EController
 
     public function cart()
     {
+        $countries = \Empathy\ELib\Country\Country::build();
+
+        if (isset($_GET['shipping_country']) && in_array($_GET['shipping_country'], array_keys($countries))) {
+
+            $shippingCountry = Session::get('shipping_country') ?? 'GB';
+
+            if ($shippingCountry !== $_GET['shipping_country']) {
+                Session::set('shipping_country', $_GET['shipping_country']);
+                $this->redirect('store/cart');
+                return;
+            }
+
+            if (isset($_GET['checkout']) && $_GET['checkout'] == '1') {
+                $this->redirect('store/checkout');
+                return;
+            }
+        }
+
         $this->setTemplate('cart.tpl');
         $c = new ShoppingCart();
 
@@ -307,24 +325,26 @@ class StoreControllerLite extends EController
                 }
             }
             $this->redirect('store/cart');
-        } elseif (isset($_POST['checkout'])) {
-            $this->redirect('store/checkout');
         }
 
         $items = $c->loadFromCart($this);
-
         if (sizeof($items) > 0) {
+
+            $shipping = 0;
+
             $ids = array();
             foreach ($items as $item) {
                 array_push($ids, $item['id']);
+                $shipping += $item['qty'] * $item['shipping'];
             }
 
             $v = Model::load(ProductVariant::class);
             $cat_ids = $v->getCategories($ids);
             $cat = Model::load(CategoryItem::class);
-            $calc = new ShippingCalculator($c->calcTotal($items), $cat_ids, $cat, sizeof($items), false);
-            $shipping = $calc->getFee();
-            $shipping = 0;
+
+            //$calc = new ShippingCalculator($c->calcTotal($items), $cat_ids, $cat, sizeof($items), false);
+            //$shipping = $calc->getFee();
+
             $this->assign('shipping', $shipping);
             $this->assign('total', $c->calcTotal($items) + $shipping);
             $this->assign('items', $items);
@@ -335,6 +355,9 @@ class StoreControllerLite extends EController
         }
 
         $this->assign('last_cat', Session::get('last_cat'));
+        $shipping_country = Session::get('shipping_country') ?? 'GB';
+        $this->assign('shipping_country', $shipping_country);
+        $this->assign('countries', $countries);
     }
 
     public function checkout()

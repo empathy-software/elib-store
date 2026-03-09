@@ -22,6 +22,8 @@ class ProductItem extends Entity
     public $vendor_id;
     public $min_price;
     public $vendor_verified;
+    public $shipping_uk;
+    public $shipping_other;
     private $images = [];
     private $noImageFound = false;
     private $soldInStore = 0;

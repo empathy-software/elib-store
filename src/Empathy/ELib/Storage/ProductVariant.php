@@ -5,6 +5,7 @@ namespace Empathy\ELib\Storage;
 use Empathy\MVC\Model;
 use Empathy\MVC\Entity;
 use Empathy\MVC\Validate;
+use Empathy\MVC\Session;
 
 class ProductVariant extends Entity
 {
@@ -120,8 +121,12 @@ class ProductVariant extends Entity
     public function getCartData($ids)
     {
         $products = array();
+        $shippingCountry = Session::get('shipping_country') ?? 'GB';
 
-        $sql = 'SELECT t5.name, t1.product_id, t1.price, t1.id, t4.name AS p_name, t3.option_val, t1.weight_g, t1.weight_lb'
+        // @todo: override shipping amounts
+        // with variant values if they exist
+
+        $sql = 'SELECT t5.name, t5.shipping_uk, t5.shipping_other, t1.product_id, t1.price, t1.id, t4.name AS p_name, t3.option_val, t1.weight_g, t1.weight_lb'
             .' FROM '.Model::getTable(ProductItem::class).' t5, '.Model::getTable(ProductVariant::class).' t1'
             .' LEFT JOIN '.Model::getTable(ProductVariantPropertyOption::class).' t2'
             .' ON t2.product_variant_id = t1.id'
@@ -146,6 +151,11 @@ class ProductVariant extends Entity
 
         $error = 'Could not load data for shopping cart.';
         $result = $this->query($sql, $error, $ids[1]);
+
+//        $rows = $result->fetchAll();
+//        print_r($rows);
+//        exit();
+
         if ($result->rowCount() > 0) {
             $name = '';
             $options = array();
@@ -164,6 +174,7 @@ class ProductVariant extends Entity
                         $item['id'] = $id;
                         $item['price'] = $price;
                         $item['product_id'] = $product_id;
+                        $item['shipping'] = $shippingCountry === 'GB' ? $shipping_uk : $shipping_other;
                         array_push($products, $item);
                     }
                     $options = array();
@@ -173,6 +184,10 @@ class ProductVariant extends Entity
                 $id = $row['id'];
                 $price = $row['price'];
                 $product_id = $row['product_id'];
+
+                $shipping_uk = $row['shipping_uk'];
+                $shipping_other = $row['shipping_other'];
+
                 array_push($options, $row['option_val']);
                 array_push($properties, $row['p_name']);
             }
@@ -182,6 +197,9 @@ class ProductVariant extends Entity
             $item['id'] = $id;
             $item['price'] = $price;
             $item['product_id'] = $product_id;
+            $item['shipping_uk'] = $shipping_uk;
+            $item['shipping_other'] = $shipping_other;
+            $item['shipping'] = $shippingCountry === 'GB' ? $shipping_uk : $shipping_other;
             array_push($products, $item);
         }
 

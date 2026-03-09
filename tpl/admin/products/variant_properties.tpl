@@ -5,7 +5,7 @@
 
 <h2>Variant Properties</h2>
 
-{if sizeof($properties) > 0}
+{if isset($properties) and sizeof($properties) > 0}
 <form method="post">
     {foreach from=$properties key=id item=property}
         <div class="mb-3">

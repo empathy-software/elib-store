@@ -38,6 +38,7 @@ class ShoppingCart
                 $product_data[$index]['qty'] = $qty;
                 $product_data[$index]['line'] = $qty * $price;
                 $product_data[$index]['stamp'] = $cart[$id]['stamp'];
+                $product_data[$index]['shipping'] = $value['shipping'];
             }
 
             // sort

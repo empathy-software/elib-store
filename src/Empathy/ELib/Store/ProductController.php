@@ -45,6 +45,8 @@ class ProductController extends AdminController
             $old_product_name = $p->name;
             $p->name = $_POST['name'];
             $p->description = $_POST['description'];
+            $p->shipping_uk = $_POST['shipping_uk'];
+            $p->shipping_other = $_POST['shipping_other'];
 
             if ($_POST['sold_in_store'] == 1) {
                 $p->status = 1;
