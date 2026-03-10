@@ -198,6 +198,7 @@ class StoreControllerLite extends EController
             $p->load($product['id']);
             $images = $p->getImages();
             $product['image'] = $images[0]['image'];
+            $product['stock'] = $p->getStock();
         }
 
         $p_nav = $p->getPaginatePages($sql, $_GET['page'], $per_page, $params);

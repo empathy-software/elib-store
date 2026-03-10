@@ -24,6 +24,10 @@
         <input type="text" class="form-control" id="price" name="price" value="{$variant->price}" />
     </div>
     <div class="mb-3">
+        <label class="form-label" for="stock">Stock</label>
+        <input type="number" class="form-control" id="stock" name="stock" value="{$variant->stock}" />
+    </div>
+    <div class="mb-3">
         <input type="hidden" name="id" value="{$variant->id}" />
         <button type="submit" class="btn btn-sm btn-primary" name="save">Save</button>
         <button type="submit" class="btn btn-sm btn-primary" name="cancel">Cancel</button>

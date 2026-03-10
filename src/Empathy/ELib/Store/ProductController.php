@@ -354,6 +354,7 @@ class ProductController extends AdminController
             $v->weight_lb = $_POST['weight_lb'];
             $v->weight_oz = $_POST['weight_oz'];
             $v->price = $_POST['price'];
+            $v->stock = $_POST['stock'];
             $v->validates();
             if ($v->hasValErrors()) {
                 $this->presenter->assign('variant', $v);

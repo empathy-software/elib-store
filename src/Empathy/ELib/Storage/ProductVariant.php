@@ -20,6 +20,7 @@ class ProductVariant extends Entity
     public $weight_oz;
     public $price;
     public $status;
+    public $stock;
 
     public function validates()
     {
@@ -287,4 +288,19 @@ class ProductVariant extends Entity
         return $cat_ids;
     }
 
+    public function getStockLevels($id)
+    {
+        $stock = 0;
+        $sql = 'SELECT SUM(v.stock) as stock FROM ' . Model::getTable(ProductVariant::class)
+            .' v, '.Model::getTable(ProductItem::class).' p WHERE p.id = v.product_id'
+            .' and p.id = ?'
+            .' and v.status = '.ProductVariantStatus::AVAILABLE;
+        $error = 'Could not get variant stock levels.';
+        $result = $this->query($sql, $error, [$id]);
+        if ($result->rowCount() > 0) {
+            $rows = $result->fetchAll();
+            $stock = $rows[0]['stock'];
+        }
+        return $stock;
+    }
 }

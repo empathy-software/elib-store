@@ -27,6 +27,7 @@ class ProductItem extends Entity
     private $images = [];
     private $noImageFound = false;
     private $soldInStore = 0;
+    private $stock;
 
     public function validates()
     {
@@ -43,6 +44,13 @@ class ProductItem extends Entity
         $i = Model::load(ProductImage::class);
         parent::load($id);
         list($this->images, $this->noImageFound) = $i->loadByProductItemDisplayed($this);
+
+        $v = Model::load(ProductVariant::class);
+        $this->stock = $v->getStockLevels($id);
+    }
+
+    public function getStock() {
+        return $this->stock;
     }
 
     public function getImages()
