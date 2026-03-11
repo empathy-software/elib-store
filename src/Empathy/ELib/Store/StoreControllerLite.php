@@ -292,10 +292,9 @@ class StoreControllerLite extends EController
     public function cart()
     {
         $countries = \Empathy\ELib\Country\Country::build();
+        $shippingCountry = Session::get('shipping_country') ?? 'GB';
 
         if (isset($_GET['shipping_country']) && in_array($_GET['shipping_country'], array_keys($countries))) {
-
-            $shippingCountry = Session::get('shipping_country') ?? 'GB';
 
             if ($shippingCountry !== $_GET['shipping_country']) {
                 Session::set('shipping_country', $_GET['shipping_country']);
@@ -336,7 +335,7 @@ class StoreControllerLite extends EController
             $ids = array();
             foreach ($items as $item) {
                 array_push($ids, $item['id']);
-                $shipping += $item['qty'] * $item['shipping'];
+                //$shipping += $item['qty'] * $item['shipping'];
             }
 
             $v = Model::load(ProductVariant::class);
@@ -345,6 +344,14 @@ class StoreControllerLite extends EController
 
             //$calc = new ShippingCalculator($c->calcTotal($items), $cat_ids, $cat, sizeof($items), false);
             //$shipping = $calc->getFee();
+
+            // simple world wide shipping rules
+            echo $shippingCountry;
+            $shipping = $shippingCountry === 'GB' ? 0
+                : (\Empathy\ELib\Country\Country::isEurope($shippingCountry)
+                    ? 5
+                    : 10);
+
 
             $this->assign('shipping', $shipping);
             $this->assign('total', $c->calcTotal($items) + $shipping);
