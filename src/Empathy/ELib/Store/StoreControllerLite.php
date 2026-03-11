@@ -346,7 +346,6 @@ class StoreControllerLite extends EController
             //$shipping = $calc->getFee();
 
             // simple world wide shipping rules
-            echo $shippingCountry;
             $shipping = $shippingCountry === 'GB' ? 0
                 : (\Empathy\ELib\Country\Country::isEurope($shippingCountry)
                     ? 5
