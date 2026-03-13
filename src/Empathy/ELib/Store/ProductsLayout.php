@@ -252,11 +252,17 @@ class ProductsLayout
     public static function getTopCats()
     {
         $categories = array();
+        $c = Model::load(CategoryItem::class);
         if ($_GET['module'] == 'store') {
-            $c = Model::load(CategoryItem::class);
             $sql = ' WHERE category_id = 0 AND hidden = 0 ORDER BY name';
             $categories = $c->getAllCustom($sql);
         }
+
+        foreach ($categories as &$cat) {
+            $sql = ' WHERE category_id = ? AND hidden = 0 ORDER BY name';
+            $cat['sub_cats'] = $c->getAllCustom($sql, [$cat['id']]);
+        }
+
         return $categories;
     }
 }

@@ -118,20 +118,29 @@ class StoreControllerLite extends EController
 
         $cats = ProductsLayout::getTopCats();
 
+//        $top_cat = array(
+//            'id' => 0,
+//            'name' => 'All',
+//            'hidden' => false
+//        );
+//        array_unshift($cats, $top_cat);
 
-        $top_cat = array(
-            'id' => 0,
-            'name' => 'All',
-            'hidden' => false
-        );
-        array_unshift($cats, $top_cat);
-    
+        $current_cat_id = 0;
         foreach ($cats as $c) {
+            if (isset($c['sub_cats'])) {
+                foreach ($c['sub_cats'] as $sub) {
+                    if ($sub['id'] === $category_id) {
+                        $current_cat_id = $sub['id'];
+                    }
+                }
+            }
             if ($c['id'] == $category_id) {
-
-                $this->assign('current_category', $c['name']);
+                //$this->assign('current_category', $c['name']);
+                $current_cat_id = $c['id'];
             }
         }
+
+        $this->assign('current_cat_id', $current_cat_id);
         $this->assign('top_cats', $cats);
 
         $c = Model::load(CategoryItem::class);
