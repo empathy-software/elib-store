@@ -9,7 +9,7 @@ class ArtistItem extends Entity
 {
     const TABLE = 'artist_item';
 
-    public $id;
+    public int $id;
     public $artist_alias;
     public $forename;
     public $surname;

@@ -11,7 +11,7 @@ class ProductItem extends Entity
 {
     const TABLE = 'product';
 
-    public $id;
+    public int $id;
     public $category_id;
     public $brand_id;
     public $name;
@@ -39,7 +39,7 @@ class ProductItem extends Entity
         }
     }
 
-    public function load($id = null)
+    public function load(mixed $id = null): bool
     {
         $i = Model::load(ProductImage::class);
         parent::load($id);
@@ -47,6 +47,7 @@ class ProductItem extends Entity
 
         $v = Model::load(ProductVariant::class);
         $this->stock = $v->getStockLevels($id);
+        return true;
     }
 
     public function getStock() {

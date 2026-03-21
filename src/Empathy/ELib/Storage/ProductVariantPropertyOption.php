@@ -10,7 +10,7 @@ class ProductVariantPropertyOption extends Entity
 {
     const TABLE = 'product_variant_property_option';
 
-    public $id;
+    public int $id;
     public $product_variant_id;
     public $property_option_id;
 

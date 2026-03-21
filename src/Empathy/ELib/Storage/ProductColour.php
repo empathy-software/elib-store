@@ -10,7 +10,7 @@ class ProductColour extends Entity
 {
     const TABLE = 'product_colour';
 
-    public $id;
+    public int $id;
     public $product_id;
     public $property_option_id;
     public $image;

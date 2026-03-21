@@ -10,7 +10,7 @@ class PropertyOption extends Entity
 {
     const TABLE = 'property_option';
 
-    public $id;
+    public int $id;
     public $property_id;
     public $option_val;
 

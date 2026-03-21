@@ -9,7 +9,7 @@ class OrderItem extends Entity
 {
     const TABLE = 'e_order';
 
-    public $id;
+    public int $id;
     public $user_id;
     public $status;
     public $stamp;

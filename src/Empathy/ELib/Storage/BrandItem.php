@@ -9,7 +9,7 @@ class BrandItem extends Entity
 {
     const TABLE = 'brand';
 
-    public $id;
+    public int $id;
     public $name;
     public $about;
 

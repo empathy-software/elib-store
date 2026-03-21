@@ -10,7 +10,7 @@ class ProductImage extends Entity
 {
     const TABLE = 'product_image';
 
-    public $id;
+    public int $id;
     public $image;
     public $product_id;
     public $default_image;
@@ -53,7 +53,7 @@ class ProductImage extends Entity
         return [ $images, $noneFound ];
     }
 
-    public function delete()
+    public function delete(): void
     {
         $images_removed = false;
         if ($this->image != '') {

@@ -9,7 +9,7 @@ class CategoryProperty extends Entity
 {
     const TABLE = 'category_property';
 
-    public $id;
+    public int $id;
     public $category_id;
     public $property_id;
 

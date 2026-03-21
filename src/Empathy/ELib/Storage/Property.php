@@ -12,7 +12,7 @@ class Property extends Entity
 {
     const TABLE = 'property';
 
-    public $id;
+    public int $id;
     public $name;
 
     public function loadForVariant($variant_id)

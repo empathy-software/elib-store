@@ -8,7 +8,7 @@ class LineItem extends Entity
 {
     const TABLE = 'line_item';
 
-    public $id;
+    public int $id;
     public $order_id;
     public $variant_id;
     public $price;

@@ -11,7 +11,7 @@ class ShippingAddress extends Entity
 {
     const TABLE = 'shipping_address';
 
-    public $id;
+    public int $id;
     public $user_id;
     public $first_name;
     public $last_name;

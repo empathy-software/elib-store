@@ -11,7 +11,7 @@ class ProductVariant extends Entity
 {
     const TABLE = 'product_variant';
 
-    public $id;
+    public int $id;
     public $product_id;
     public $image;
     public $sku;

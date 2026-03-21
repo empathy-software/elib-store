@@ -8,7 +8,7 @@ class PromoItem extends Entity
 {
     const TABLE = 'promo';
 
-    public $id;
+    public int $id;
     public $category_id;
     public $name;
     public $alt;

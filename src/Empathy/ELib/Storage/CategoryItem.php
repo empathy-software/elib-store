@@ -9,7 +9,7 @@ class CategoryItem extends Entity
 {
     const TABLE = 'category';
 
-    public $id;
+    public int $id;
     public $category_id;
     public $hidden;
     public $name;
