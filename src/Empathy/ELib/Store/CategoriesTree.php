@@ -11,7 +11,7 @@ class CategoriesTree extends Tree
     private $data;
     private $category_ancestors;
 
-    public function __construct($category, $collapsed, $url = null)
+    public function __construct($category, $collapsed, $url = '')
     {
         $this->url = $url;
         $this->category = $category;
