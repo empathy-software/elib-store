@@ -44,7 +44,7 @@ class StoreControllerLite extends EController
         }
     }
 
-    public function default_event()
+    public function default_event(): void
     {
         $this->setTemplate('elib://store_category.tpl');
     }

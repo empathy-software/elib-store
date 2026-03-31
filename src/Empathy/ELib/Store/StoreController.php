@@ -13,7 +13,7 @@ use Empathy\MVC\DI;
 class StoreController extends StoreControllerLite
 {
 
-    public function default_event()
+    public function default_event(): void
     {
         $this->setTemplate('elib://store_category.tpl');
     }

@@ -76,7 +76,7 @@ class PaypalController extends EController
         }
     }
 
-    public function default_event()
+    public function default_event(): void
     {
         $c = new ShoppingCart();
         if ($c->isEmpty()) {

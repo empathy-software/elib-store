@@ -41,7 +41,7 @@ class PromoCategoryController extends AdminController
         $this->presenter->assign('brands', $b->getBrands());
     }
 
-    public function default_event()
+    public function default_event(): void
     {
 
         $this->setTemplate('elib://admin/promo_category.tpl');

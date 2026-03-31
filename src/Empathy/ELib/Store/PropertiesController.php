@@ -8,7 +8,7 @@ use Empathy\ELib\Storage\PropertyOption;
 
 class PropertiesController extends AdminController
 {
-    public function default_event()
+    public function default_event(): void
     {
         $this->setTemplate('elib://admin/properties.tpl');
         $p = Model::load(Property::class);

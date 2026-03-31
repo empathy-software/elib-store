@@ -57,7 +57,7 @@ class PromoController extends AdminController
         }
     }
 
-    public function default_event()
+    public function default_event(): void
     {
         $this->setTemplate('elib://admin/promo.tpl');
         $p = Model::load(PromoItem::class);

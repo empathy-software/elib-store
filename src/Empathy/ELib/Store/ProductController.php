@@ -104,7 +104,7 @@ class ProductController extends AdminController
         }
     }
 
-    public function default_event()
+    public function default_event(): void
     {
         $this->setTemplate('elib://admin/product.tpl');
         $p = Model::load(ProductItem::class);

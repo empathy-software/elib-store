@@ -8,7 +8,7 @@ use Empathy\ELib\Storage\ArtistItem;
 class ArtistController extends AdminController
 {
 
-    public function default_event()
+    public function default_event(): void
     {
         $ui_array = array('id');
         $this->loadUIVars('ui_banner', $ui_array);

@@ -11,7 +11,7 @@ use Empathy\MVC\DI;
 class VendorsController extends AdminController
 {
 
-    public function default_event()
+    public function default_event(): void
     {
         $vendorModel = DI::getContainer()->get('VendorModel');
 

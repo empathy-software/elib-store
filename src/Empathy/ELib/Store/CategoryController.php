@@ -14,7 +14,7 @@ define('REQUESTS_PER_PAGE', 12);
 class CategoryController extends AdminController
 {
 
-    public function default_event()
+    public function default_event(): void
     {
         $ui_array = array('order_by', 'page', 'id', 'brand_id');
         $this->loadUIVars('ui_catalogue', $ui_array);

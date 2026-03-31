@@ -8,7 +8,7 @@ use Empathy\ELib\Storage\OrderItem;
 
 class OrdersController extends AdminController
 {
-    public function default_event()
+    public function default_event(): void
     {
         $o = Model::load(OrderItem::class);
         $orders = $o->getOrders();
