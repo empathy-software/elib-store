@@ -2,6 +2,7 @@
 
 namespace Empathy\ELib\Store;
 
+use Empathy\ELib\Store\ShoppingCart;
 use Empathy\MVC\Model;
 use Empathy\ELib\AuthedController;
 use Empathy\ELib\EController;
@@ -290,12 +291,16 @@ class StoreControllerLite extends EController
         $c->buildBreadCrumb($p->category_id, $bc);
         $bc = array_reverse($bc);
         $this->assign('breadcrumb', $bc);
-
         $this->assign('vendor_id', $p->vendor_id);
         $this->assign('product', $p);
-
-
         $this->assign('colours', array());
+
+        $cart = new ShoppingCart();
+        $cartQty = $cart->getQtyByProductId($p->id);
+
+        if ($p->getStock() < 1 || $cartQty >= $p->getStock()) {
+            $this->assign('add_disabled', true);
+        }
     }
 
     public function cart()
@@ -336,7 +341,7 @@ class StoreControllerLite extends EController
             $this->redirect('store/cart');
         }
 
-        $items = $c->loadFromCart($this);
+        $items = $c->loadFromCart();
         if (sizeof($items) > 0) {
 
             $shipping = 0;

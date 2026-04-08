@@ -18,7 +18,7 @@ class ShoppingCart
         return $total;
     }
 
-    public function loadFromCart($c)
+    public function loadFromCart()
     {
         $ids = array();
         $product_data = array();
@@ -122,4 +122,14 @@ class ShoppingCart
         print_r($c);
     }
 
+    public function getQtyByProductId(int $productId): int {
+        $items = $this->loadFromCart();
+        $total = 0;
+        foreach ($items as $item) {
+            if ((int)$item['product_id'] === $productId) {
+                $total += (int)$item['qty'];
+            }
+        }
+        return $total;
+    }
 }

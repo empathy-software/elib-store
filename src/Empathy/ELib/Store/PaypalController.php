@@ -82,7 +82,7 @@ class PaypalController extends EController
         if ($c->isEmpty()) {
             $this->redirect('paypal/cancel');
         }
-        $items = $c->loadFromCart($this);
+        $items = $c->loadFromCart();
 
         $co = new Checkout($items, $this);
         $invoice_no = $co->getInvoiceNo();
