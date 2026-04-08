@@ -122,12 +122,12 @@ class ProductVariant extends Entity
     public function getCartData($ids)
     {
         $products = array();
-        $shippingCountry = Session::get('shipping_country') ?? 'GB';
+        $shippingCountry = Session::get('shipping_country') ? Session::get('shipping_country'): 'GB';
 
         // @todo: override shipping amounts
         // with variant values if they exist
 
-        $sql = 'SELECT t5.name, t5.shipping_uk, t5.shipping_other, t1.product_id, t1.price, t1.id, t4.name AS p_name, t3.option_val, t1.weight_g, t1.weight_lb'
+        $sql = 'SELECT t5.name, t5.shipping_uk, t5.shipping_eu, t5.shipping_other, t1.product_id, t1.price, t1.id, t4.name AS p_name, t3.option_val, t1.weight_g, t1.weight_lb'
             .' FROM '.Model::getTable(ProductItem::class).' t5, '.Model::getTable(ProductVariant::class).' t1'
             .' LEFT JOIN '.Model::getTable(ProductVariantPropertyOption::class).' t2'
             .' ON t2.product_variant_id = t1.id'
@@ -175,7 +175,8 @@ class ProductVariant extends Entity
                         $item['id'] = $id;
                         $item['price'] = $price;
                         $item['product_id'] = $product_id;
-                        $item['shipping'] = $shippingCountry === 'GB' ? $shipping_uk : $shipping_other;
+                        $item['shipping'] = $shippingCountry === 'GB' ? $shipping_uk :
+                            (\Empathy\ELib\Country\Country::isEurope($shippingCountry) ? $shipping_eu : $shipping_other);
                         array_push($products, $item);
                     }
                     $options = array();
@@ -187,6 +188,7 @@ class ProductVariant extends Entity
                 $product_id = $row['product_id'];
 
                 $shipping_uk = $row['shipping_uk'];
+                $shipping_eu = $row['shipping_eu'];
                 $shipping_other = $row['shipping_other'];
 
                 array_push($options, $row['option_val']);
@@ -199,8 +201,10 @@ class ProductVariant extends Entity
             $item['price'] = $price;
             $item['product_id'] = $product_id;
             $item['shipping_uk'] = $shipping_uk;
+            $item['shipping_eu'] = $shipping_eu;
             $item['shipping_other'] = $shipping_other;
-            $item['shipping'] = $shippingCountry === 'GB' ? $shipping_uk : $shipping_other;
+            $item['shipping'] = $shippingCountry === 'GB' ? $shipping_uk :
+                (\Empathy\ELib\Country\Country::isEurope($shippingCountry) ? $shipping_eu : $shipping_other);
             array_push($products, $item);
         }
 

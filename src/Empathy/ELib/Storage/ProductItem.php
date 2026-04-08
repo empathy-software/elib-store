@@ -23,6 +23,7 @@ class ProductItem extends Entity
     public $min_price;
     public $vendor_verified;
     public $shipping_uk;
+    public $shipping_eu;
     public $shipping_other;
     private $images = [];
     private $noImageFound = false;

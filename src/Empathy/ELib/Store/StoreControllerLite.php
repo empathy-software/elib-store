@@ -369,7 +369,13 @@ class StoreControllerLite extends EController
             $ids = array();
             foreach ($items as $item) {
                 array_push($ids, $item['id']);
+
                 //$shipping += $item['qty'] * $item['shipping'];
+
+                // new rules based on product item shipping values
+                if ($item['shipping'] > $shipping) {
+                    $shipping = $item['shipping'];
+                }
             }
 
             $cat_ids = $variant->getCategories($ids);
@@ -379,11 +385,10 @@ class StoreControllerLite extends EController
             //$shipping = $calc->getFee();
 
             // simple world wide shipping rules
-            $shipping = $shippingCountry === 'GB' ? 0
-                : (\Empathy\ELib\Country\Country::isEurope($shippingCountry)
-                    ? 5
-                    : 10);
-
+//            $shipping = $shippingCountry === 'GB' ? 0
+//                : (\Empathy\ELib\Country\Country::isEurope($shippingCountry)
+//                    ? 5
+//                    : 10);
 
             $this->assign('shipping', $shipping);
             $this->assign('total', $c->calcTotal($items) + $shipping);

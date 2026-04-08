@@ -32,6 +32,10 @@
         <input type="text" class="form-control" id="shipping_uk" name="shipping_uk" value="{$product->shipping_uk}" />
     </div>
     <div class="mb-3">
+        <label class="form-label" for="shipping_eu">Shipping (EU)</label>
+        <input type="text" class="form-control" id="shipping_eu" name="shipping_eu" value="{$product->shipping_eu}" />
+    </div>
+    <div class="mb-3">
         <label class="form-label" for="shipping_other">Shipping (Other)</label>
         <input type="text" class="form-control" id="shipping_other" name="shipping_other" value="{$product->shipping_other}" />
     </div>

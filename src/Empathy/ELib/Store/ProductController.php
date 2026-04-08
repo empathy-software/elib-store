@@ -46,6 +46,7 @@ class ProductController extends AdminController
             $p->name = $_POST['name'];
             $p->description = $_POST['description'];
             $p->shipping_uk = $_POST['shipping_uk'];
+            $p->shipping_eu = $_POST['shipping_eu'];
             $p->shipping_other = $_POST['shipping_other'];
 
             if ($_POST['sold_in_store'] == 1) {
