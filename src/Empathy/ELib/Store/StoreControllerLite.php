@@ -305,6 +305,9 @@ class StoreControllerLite extends EController
 
     public function cart()
     {
+        $variant = Model::load(ProductVariant::class);
+        $product = Model::load(ProductItem::class);
+
         $countries = \Empathy\ELib\Country\Country::build();
         $shippingCountry = Session::get('shipping_country') ?? 'GB';
 
@@ -326,19 +329,36 @@ class StoreControllerLite extends EController
         $c = new ShoppingCart();
 
         if (isset($_POST['update'])) {
+            $maxQuantitiesSet = false;
+            $autoRemoved = false;
+
             foreach ($_POST['qty'] as $v => $qty) {
                 if (is_numeric($qty) && $qty > 0) {
+                    $variant->load($v);
+                    $product->load($variant->product_id);
+                    $stock = (int) $product->getStock();
+                    if ($stock === 0) {
+                        $autoRemoved = true;
+                        $c->remove($v);
+                        break;
+                    } else if ($stock < $qty) {
+                        $maxQuantitiesSet = true;
+                        $qty = $stock;
+                    }
                     $c->update($v, $qty);
                 } elseif (is_numeric($qty) && $qty == 0) {
                     $c->remove($v);
 
                     // vendor locking
-                    if ($c->isEmpty()) {
-                        Session::clear('vendor_lock');
-                    }
+                    //if ($c->isEmpty()) {
+                    //    Session::clear('vendor_lock');
+                    //}
                 }
             }
+            Session::set('cart_max_quantities_set', $maxQuantitiesSet);
+            Session::set('cart_auto_removed', $autoRemoved);
             $this->redirect('store/cart');
+            return;
         }
 
         $items = $c->loadFromCart();
@@ -352,8 +372,7 @@ class StoreControllerLite extends EController
                 //$shipping += $item['qty'] * $item['shipping'];
             }
 
-            $v = Model::load(ProductVariant::class);
-            $cat_ids = $v->getCategories($ids);
+            $cat_ids = $variant->getCategories($ids);
             $cat = Model::load(CategoryItem::class);
 
             //$calc = new ShippingCalculator($c->calcTotal($items), $cat_ids, $cat, sizeof($items), false);
@@ -379,6 +398,17 @@ class StoreControllerLite extends EController
         $shipping_country = Session::get('shipping_country') ?? 'GB';
         $this->assign('shipping_country', $shipping_country);
         $this->assign('countries', $countries);
+
+        $max_quantities_set = Session::get('cart_max_quantities_set');
+        if ($max_quantities_set) {
+            $this->assign('max_quantities_set', $max_quantities_set);
+            Session::clear('cart_max_quantities_set');
+        }
+        $auto_removed = Session::get('cart_auto_removed');
+        if ($auto_removed) {
+            $this->assign('auto_removed', $auto_removed);
+            Session::clear('cart_auto_removed');
+        }
     }
 
     public function checkout()
