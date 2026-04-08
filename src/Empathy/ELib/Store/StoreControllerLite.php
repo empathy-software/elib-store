@@ -305,6 +305,23 @@ class StoreControllerLite extends EController
 
     public function cart()
     {
+        if (isset($_GET['get_shipping']) && $_GET['get_shipping']) {
+            $shipping = 0;
+            $c = new ShoppingCart();
+            $items = $c->loadFromCart();
+            if (sizeof($items) > 0) {
+                foreach ($items as $item) {
+
+                    // new rules based on product item shipping values
+                    if ($item['shipping'] > $shipping) {
+                        $shipping = $item['shipping'];
+                    }
+                }
+            }
+            header('Content-type: application/json');
+            echo json_encode($shipping);
+            exit();
+        }
         $variant = Model::load(ProductVariant::class);
         $product = Model::load(ProductItem::class);
 
@@ -481,5 +498,4 @@ class StoreControllerLite extends EController
 
         }
     }
-
 }
