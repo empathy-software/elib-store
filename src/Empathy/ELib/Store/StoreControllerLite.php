@@ -309,7 +309,7 @@ class StoreControllerLite extends EController
         $product = Model::load(ProductItem::class);
 
         $countries = \Empathy\ELib\Country\Country::build();
-        $shippingCountry = Session::get('shipping_country') ?? 'GB';
+        $shippingCountry = Session::get('shipping_country') ? Session::get('shipping_country'): 'GB';
 
         if (isset($_GET['shipping_country']) && in_array($_GET['shipping_country'], array_keys($countries))) {
 
@@ -395,8 +395,7 @@ class StoreControllerLite extends EController
         }
 
         $this->assign('last_cat', Session::get('last_cat'));
-        $shipping_country = Session::get('shipping_country') ?? 'GB';
-        $this->assign('shipping_country', $shipping_country);
+        $this->assign('shipping_country', $shippingCountry);
         $this->assign('countries', $countries);
 
         $max_quantities_set = Session::get('cart_max_quantities_set');
