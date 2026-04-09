@@ -235,6 +235,8 @@ class StoreControllerLite extends EController
         }
 
         $v = Model::load(ProductVariant::class);
+        $p = Model::load(ProductItem::class);
+
         if (sizeof($options) > 0) {
             $variant_id = $v->findVariant($options, $product_id);
         } else {
@@ -247,18 +249,28 @@ class StoreControllerLite extends EController
 
         if (is_numeric($variant_id) && $variant_id > 0) {
             $sc = new ShoppingCart();
-            $sc->add($variant_id, 1);
+            $cartData = $sc->loadFromCart();
+            $cartItem = array_find($cartData, fn($item) => $item['id'] === $variant_id);
 
-            // set vendor lock
-            if (Session::get('vendor_lock') == false) {
-                $v = Model::load(ProductVariant::class);
-                $v->load($variant_id);
-                $p = Model::load(ProductItem::class);
-                $p->id = $v->product_id;
-                $p->load($p->id);
-                Session::set('vendor_lock', $p->vendor_id);
+            $notAdded = false;
+            $v->load($variant_id);
+            $p->load($v->product_id);
+            $stock = (int) $p->getStock();
+            if ($stock === 0 || ($cartItem && $stock < $cartItem['qty'] + 1)) {
+                $notAdded = true;
+            } else {
+                $sc->add($variant_id, 1);
+                // set vendor lock
+//                if (Session::get('vendor_lock') == false) {
+//                    $v = Model::load(ProductVariant::class);
+//                    $v->load($variant_id);
+//                    $p = Model::load(ProductItem::class);
+//                    $p->id = $v->product_id;
+//                    $p->load($p->id);
+//                    Session::set('vendor_lock', $p->vendor_id);
+//                }
             }
-
+            Session::set('cart_not_added', $notAdded);
             $this->redirect('store/cart');
         }
     }
@@ -429,6 +441,11 @@ class StoreControllerLite extends EController
         if ($auto_removed) {
             $this->assign('auto_removed', $auto_removed);
             Session::clear('cart_auto_removed');
+        }
+        $not_added = Session::get('cart_not_added');
+        if ($not_added) {
+            $this->assign('not_added', $not_added);
+            Session::clear('cart_not_added');
         }
     }
 
