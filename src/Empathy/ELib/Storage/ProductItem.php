@@ -4,6 +4,7 @@ namespace Empathy\ELib\Storage;
 
 use Empathy\MVC\Model;
 use Empathy\MVC\Entity;
+use Empathy\ELib\Storage\BrandItem;
 
 
 
@@ -29,6 +30,7 @@ class ProductItem extends Entity
     private $noImageFound = false;
     private $soldInStore = 0;
     private $stock;
+    private $brand;
 
     public function validates()
     {
@@ -48,6 +50,13 @@ class ProductItem extends Entity
 
         $v = Model::load(ProductVariant::class);
         $this->stock = $v->getStockLevels($id);
+
+        if ($this->brand_id) {
+            $b = Model::load(BrandItem::class);
+            $b->load($this->brand_id);
+            $this->brand = $b->name;
+        }
+
         return true;
     }
 
@@ -205,5 +214,10 @@ class ProductItem extends Entity
     public function getSoldInStore()
     {
         return $this->soldInStore;
+    }
+
+    public function getBrand()
+    {
+        return $this->brand;
     }
 }
