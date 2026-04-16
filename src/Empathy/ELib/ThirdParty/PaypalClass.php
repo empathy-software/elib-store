@@ -112,7 +112,7 @@ class PaypalClass
 
         $this->last_error = '';
 
-        $this->ipn_log_file = '.ipn_results.log';
+        $this->ipn_log_file = Config::get('DOC_ROOT') . '/.ipn_results.log';
         $this->ipn_log = true;
         $this->ipn_response = '';
 
@@ -214,7 +214,7 @@ class PaypalClass
 
         }
 
-        if (eregi("VERIFIED", $this->ipn_response)) {
+        if (preg_match('/VERIFIED/', $this->ipn_response)) {
 
             // Valid IPN transaction.
             $this->log_ipn_results(true);
@@ -280,7 +280,7 @@ class PaypalClass
 
         echo "</table><br>";
     }
-}         
+}
 
 
  

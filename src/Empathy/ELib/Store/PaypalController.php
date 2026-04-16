@@ -46,7 +46,7 @@ class PaypalController extends EController
     public function ipn()
     {
         $p = new PaypalClass();
-        $p->ipn_log = false;
+        $p->ipn_log = true;
         $p->paypal_url = $this->getPayPalURL();
 
         $log = new LogItem(
@@ -171,8 +171,8 @@ class PaypalController extends EController
 
         //    $p->add_field('image_url', 'http://'.WEB_ROOT.PUBLIC_DIR.'/img/pier.png');
         $p->add_field('invoice', $this->getInvoiceNumber($invoice_no));
-        $p->add_field('no_shipping', false);
-        $p->add_field('currency_code', 'PH');
+        $p->add_field('no_shipping', 1);
+        $p->add_field('currency_code', 'PHP');
         $p->add_field('business', $this->getBusiness());
 
         $p->add_field('return', $interface.'success');
