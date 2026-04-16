@@ -42,7 +42,7 @@ class PaypalController extends EController
         $this->assignMessage('The order was canceled');
     }
 
-    
+
     public function ipn()
     {
         $p = new PaypalClass();
@@ -107,7 +107,7 @@ class PaypalController extends EController
         //$product[0]['price'] = 1.99;
         //$product[0]['code'] = 23;
 
-        $interface = 'http://'.Config::get('WEB_ROOT').Config::get('PUBLIC_DIR').'/paypal/';
+        $interface = 'https://'.Config::get('WEB_ROOT').Config::get('PUBLIC_DIR').'/paypal/';
         $message = '';
         $p = new PaypalClass();
         $p->ipn_log = false;
