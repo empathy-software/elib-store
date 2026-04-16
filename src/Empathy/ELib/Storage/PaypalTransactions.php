@@ -15,7 +15,7 @@ class PaypalTransactions extends Entity
     public function txnExists($txnId)
     {
         $sql = "SELECT COUNT(*) FROM paypal_transactions WHERE txn_id = ?";
-        $result = $this->query($sql, 'Could not check for existing transaction', [$txnId];
+        $result = $this->query($sql, 'Could not check for existing transaction', [$txnId]);
         return $result->fetchColumn() > 0;
     }
 

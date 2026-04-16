@@ -65,10 +65,11 @@ class PaypalController extends EController
 
         if ($p->validate_ipn()) {
 
+            $this->writeLog('Valid ipn data');
             $data = $p->ipn_data;
             $pt = Model::load(PaypalTransactions::class);
 
-            $this->writeLog('Valid ipn data');
+            $this->writeLog('Loaded transactions model');
 
             if (
                 !empty($data['invoice']) &&
