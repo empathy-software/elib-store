@@ -2,6 +2,7 @@
 
 namespace Empathy\ELib\Store;
 
+use Empathy\MVC\DI;
 use Empathy\MVC\Model;
 use Empathy\ELib\EController;
 use Empathy\ELib\ThirdParty\PaypalClass;
@@ -130,10 +131,8 @@ class PaypalController extends EController
         } else {
             $intl = false;
         }
-        $calc = new ShippingCalculator($c->calcTotal($items), $cat_ids, $cat, sizeof($items), $intl);
-        $shipping = $calc->getFee();
-
-        $shipping = $this->getShipping();
+        $sc = DI::getContainer()->get('ShippingCalculator');
+        $shipping = $sc->getFee();
 
         $p->add_field('shipping_1', $shipping);
         $o->shipping = $shipping;

@@ -13,5 +13,6 @@ class LineItem extends Entity
     public $variant_id;
     public $price;
     public $quantity;
+    public $notes;
 
 }

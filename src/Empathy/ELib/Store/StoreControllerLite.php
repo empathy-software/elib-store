@@ -317,21 +317,12 @@ class StoreControllerLite extends EController
 
     public function cart()
     {
-        if (isset($_GET['get_shipping']) && $_GET['get_shipping']) {
-            $shipping = 0;
-            $c = new ShoppingCart();
-            $items = $c->loadFromCart();
-            if (sizeof($items) > 0) {
-                foreach ($items as $item) {
+        $sc = DI::getContainer()->get('ShippingCalculator');
 
-                    // new rules based on product item shipping values
-                    if ($item['shipping'] > $shipping) {
-                        $shipping = $item['shipping'];
-                    }
-                }
-            }
+        if (isset($_GET['get_shipping']) && $_GET['get_shipping']) {
+            $sc = DI::getContainer()->get('ShippingCalculator');
             header('Content-type: application/json');
-            echo json_encode($shipping);
+            echo json_encode($sc->getFee());
             exit();
         }
         $variant = Model::load(ProductVariant::class);
@@ -392,33 +383,7 @@ class StoreControllerLite extends EController
 
         $items = $c->loadFromCart();
         if (sizeof($items) > 0) {
-
-            $shipping = 0;
-
-            $ids = array();
-            foreach ($items as $item) {
-                array_push($ids, $item['id']);
-
-                //$shipping += $item['qty'] * $item['shipping'];
-
-                // new rules based on product item shipping values
-                if ($item['shipping'] > $shipping) {
-                    $shipping = $item['shipping'];
-                }
-            }
-
-            $cat_ids = $variant->getCategories($ids);
-            $cat = Model::load(CategoryItem::class);
-
-            //$calc = new ShippingCalculator($c->calcTotal($items), $cat_ids, $cat, sizeof($items), false);
-            //$shipping = $calc->getFee();
-
-            // simple world wide shipping rules
-//            $shipping = $shippingCountry === 'GB' ? 0
-//                : (\Empathy\ELib\Country\Country::isEurope($shippingCountry)
-//                    ? 5
-//                    : 10);
-
+            $shipping = $sc->getFee();
             $this->assign('shipping', $shipping);
             $this->assign('total', $c->calcTotal($items) + $shipping);
             $this->assign('items', $items);
@@ -451,18 +416,22 @@ class StoreControllerLite extends EController
 
     public function checkout()
     {
-        $this->setTemplate('checkout.tpl');
-        $s = Model::load(ShippingAddress::class);
+//        $this->setTemplate('checkout.tpl');
+//        $s = Model::load(ShippingAddress::class);
+//
+//        $sql = ' WHERE user_id = ? ORDER BY default_address DESC';
+//        $addresses = $s->getAllCustom($sql, [DI::getContainer()->get('CurrentUser')->getUserID()]);
+//
+//        $this->assign('addresses', $addresses);
+//
+//        if (isset($_GET['checkout'])) {
+//            Session::set('shipping_address_id', $_GET['shipping_address_id']);
+//            $this->redirect('paypal/paypal');
+//        }
 
-        $sql = ' WHERE user_id = ? ORDER BY default_address DESC';
-        $addresses = $s->getAllCustom($sql, [DI::getContainer()->get('CurrentUser')->getUserID()]);
 
-        $this->assign('addresses', $addresses);
-
-        if (isset($_GET['checkout'])) {
-            Session::set('shipping_address_id', $_GET['shipping_address_id']);
-            $this->redirect('paypal/paypal');
-        }
+        Session::set('shipping_address_id', 0);
+        $this->redirect('paypal/paypal');
     }
 
     // taken from product admin (variant properties)

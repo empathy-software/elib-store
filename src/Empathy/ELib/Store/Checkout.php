@@ -52,6 +52,16 @@ class Checkout
                 $l->insert();
             }
         }
+
+        // add shipping
+        $l = Model::load(LineItem::class);
+        $l->order_id = $this->invoice_no;
+        $l->variant_id = 0;
+        $sc = DI::getContainer()->get('ShippingCalculator');
+        $l->price = $sc->getFee();
+        $l->quantity = 1;
+        $l->notes = 'Shipping'; // add country
+        $l->insert();
     }
 
     public function getInvoiceNo()
