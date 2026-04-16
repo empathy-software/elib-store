@@ -22,7 +22,7 @@ class PaypalTransactions extends Entity
     public function storeTxn($txnId)
     {
         $sql = "INSERT INTO paypal_transactions (txn_id) VALUES (?)";
-        $this->query($sql, 'Could not insert transaction', [$txnId];
+        $this->query($sql, 'Could not insert transaction', [$txnId]);
     }
 }
 
