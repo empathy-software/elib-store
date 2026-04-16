@@ -73,6 +73,9 @@ class PaypalController extends EController
                 $data['payment_status'] === 'Completed' &&
                 $data['receiver_email'] === $this->getBusiness()
             ) {
+
+                $this->writeLog('Completed');
+
                 $o = Model::load(OrderItem::class);
                 $o->load(ltrim($data['invoice'], 'OV'));
 
@@ -81,6 +84,9 @@ class PaypalController extends EController
                     $data['mc_gross'] == $o->total &&
                     $data['mc_currency'] == 'PHP'
                 ) {
+
+                    $this->writeLog('total amount + currency');
+
                     // Check txn_id not already used
                     if (!$pt->txnExists($data['txn_id'])) {
                         $o->status = 2;
