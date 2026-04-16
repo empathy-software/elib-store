@@ -127,8 +127,8 @@ class PaypalController extends EController
 //        $p->add_field('no_shipping', 1);
 
         //$countries = \Empathy\ELib\Country\Country::build();
-        $shippingCountry = Session::get('shipping_country') ? Session::get('shipping_country'): 'GB';
-        $p->add_field('country', $shippingCountry);
+        //$shippingCountry = Session::get('shipping_country') ? Session::get('shipping_country'): 'GB';
+        //$p->add_field('country', $shippingCountry);
 
 
         // shipping
