@@ -11,6 +11,7 @@ use Empathy\MVC\Config;
 use Empathy\ELib\Storage\OrderItem;
 use Empathy\ELib\Storage\ProductVariant;
 use Empathy\ELib\Storage\CategoryItem;
+use Empathy\ELib\Storage\LineItem;
 use Empathy\ELib\Storage\PaypalTransactions;
 use Empathy\MVC\Session;
 
@@ -44,13 +45,13 @@ class PaypalController extends EController
     }
 
 
-    private function writeLog($message)
+    private function writeLog($message, $level = 'info')
     {
         $log = new LogItem(
             'paypal ipn',
             [],
             self::class,
-            'info'
+            $level
         );
         $log->append('message', $message);
         $log->fire();
@@ -63,64 +64,96 @@ class PaypalController extends EController
         $p->ipn_log = true;
         $p->paypal_url = $this->getPayPalURL();
 
-        if ($p->validate_ipn()) {
+        if (!$p->validate_ipn()) {
+            $this->writeLog('IPN validation failed');
+            return;
+        }
 
-            $this->writeLog('Valid ipn data');
-            $data = $p->ipn_data;
-            $pt = Model::load(PaypalTransactions::class);
+        $this->writeLog('Valid ipn data');
 
-            $this->writeLog('Loaded transactions model');
+        $data = $p->ipn_data;
+        $pt = Model::load(PaypalTransactions::class);
 
-            if (
-                !empty($data['invoice']) &&
-                $data['payment_status'] === 'Completed' &&
-                $data['receiver_email'] === $this->getBusiness()
-            ) {
+        $this->writeLog('Loaded transactions model');
 
-                $this->writeLog('Completed');
+        if (
+            empty($data['invoice']) ||
+            ($data['payment_status'] ?? '') !== 'Completed' ||
+            ($data['receiver_email'] ?? '') !== $this->getBusiness()
+        ) {
+            $this->writeLog('Basic IPN checks failed');
+            return;
+        }
 
-                $o = Model::load(OrderItem::class);
-                $o->load(ltrim($data['invoice'], 'OV'));
+        $this->writeLog('Completed');
 
-                // Check amount + currency
-                if (
-                    (float) $data['mc_gross'] === ((float) $o->total + (float) $o->shipping) &&
-                    $data['mc_currency'] == 'PHP'
-                ) {
+        if (empty($data['txn_id'])) {
+            $this->writeLog('Missing txn_id');
+            return;
+        }
 
-                    $this->writeLog('total amount + currency');
+        if ($pt->txnExists($data['txn_id'])) {
+            $this->writeLog('Duplicate txn_id: ' . $data['txn_id']);
+            return;
+        }
 
-                    // Check txn_id not already used
-                    if (!$pt->txnExists($data['txn_id'])) {
-                        $o->status = 2;
-                        $o->save();
+        $o = Model::load(OrderItem::class);
+        $orderId = preg_replace('/^OV/', '', $data['invoice']);
+        $o->load($orderId);
 
-                        $pt->storeTxn($data['txn_id']);
-                        $this->writeLog('Payment completed');
-                    }
-                }
+        if (
+            (float)$data['mc_gross'] !== ((float)$o->total + (float)$o->shipping) ||
+            ($data['mc_currency'] ?? '') !== 'PHP'
+        ) {
+            $this->writeLog('Amount or currency mismatch');
+            return;
+        }
+
+        $this->writeLog('Total amount + currency');
+
+        $l = Model::load(LineItem::class);
+        $items = $l->getOrderItems($o->id);
+
+        // First pass: check all stock
+        $stockProblem = false;
+
+        foreach ($items as $item) {
+            $v = Model::load(ProductVariant::class);
+            $v->load($item['variant_id']);
+
+            if ((int)$v->stock < (int)$item['quantity']) {
+                $stockProblem = true;
+                $this->writeLog(
+                    'Out of stock for variant ' . $item['variant_id'] .
+                    '. Needed ' . $item['quantity'] .
+                    ', available ' . $v->stock, 'error'
+                );
             }
         }
 
+        if ($stockProblem) {
+            // use a separate status for paid but needs attention
+            $o->status = 3; // example: manual review / stock issue
+            $o->save();
 
-        // decrement stock
-//        $v = Model::load(ProductVariant::class);
-//        $v->load($l->variant_id);
-//        $v->stock--;
-//        $v->save();
+            $pt->storeTxn($data['txn_id']);
+            $this->writeLog('Payment received but stock issue flagged');
+            return;
+        }
 
-//        if ($p->validate_ipn()) {
-//            if(isset($p->ipn_data['invoice']) && is_numeric($p->ipn_data['invoice'])
-//               && 'Completed' == $p->ipn_data['payment_status'])
-//            {
-//                $o = Model::load(OrderItem::class);
-//                $o->id = $p->ipn_data['invoice'];
-//                $o->load();
-//                $o->status = 2;
-//                $o->save();
-//            }
-//            $this->writeLog($p->ipn_data);
-//        }
+        // Second pass: decrement stock now we know everything is available
+        foreach ($items as $item) {
+            $v = Model::load(ProductVariant::class);
+            $v->load($item['variant_id']);
+            $v->stock -= (int)$item['quantity'];
+            $v->save();
+        }
+
+        $o->status = 2;
+        $o->save();
+
+        $pt->storeTxn($data['txn_id']);
+        $this->writeLog('Payment completed');
     }
 
     public function assignMessage($message)
