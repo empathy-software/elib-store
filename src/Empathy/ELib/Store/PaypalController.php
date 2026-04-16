@@ -84,7 +84,7 @@ class PaypalController extends EController
 
                 // Check amount + currency
                 if (
-                    (float) $data['mc_gross'] === (float) $o->total &&
+                    (float) $data['mc_gross'] === ((float) $o->total + (float) $o->shipping) &&
                     $data['mc_currency'] == 'PHP'
                 ) {
 

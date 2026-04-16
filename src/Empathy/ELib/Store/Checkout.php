@@ -56,6 +56,7 @@ class Checkout
             }
         }
 
+        $o->load($this->invoice_no);
         $o->total = $total;
         $o->save();
 
