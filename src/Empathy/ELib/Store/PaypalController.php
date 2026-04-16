@@ -74,7 +74,7 @@ class PaypalController extends EController
                 $data['receiver_email'] === $this->getBusiness()
             ) {
                 $o = Model::load(OrderItem::class);
-                $o->load(ltrim('OV', $data['invoice']));
+                $o->load(ltrim($data['invoice'], 'OV'));
 
                 // Check amount + currency
                 if (
