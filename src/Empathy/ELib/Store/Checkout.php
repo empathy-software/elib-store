@@ -44,15 +44,20 @@ class Checkout
 
         $l = Model::load(LineItem::class);
 
+        $total = 0;
         foreach ($items as $item) {
             if (is_numeric($item['qty']) && $item['qty'] > 0) {
                 $l->order_id = $this->invoice_no;
                 $l->variant_id = $item['id'];
                 $l->price = $item['price'];
                 $l->quantity = $item['qty'];
+                $total += $l->quantity * $l->price;
                 $l->insert();
             }
         }
+
+        $o->total = $total;
+        $o->save();
 
         $countries = \Empathy\ELib\Country\Country::build();
         $shippingCountry = Session::get('shipping_country') ? Session::get('shipping_country'): 'GB';

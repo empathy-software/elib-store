@@ -11,6 +11,7 @@ use Empathy\MVC\Config;
 use Empathy\ELib\Storage\OrderItem;
 use Empathy\ELib\Storage\ProductVariant;
 use Empathy\ELib\Storage\CategoryItem;
+use Empathy\ELib\Storage\PaypalTransactions;
 use Empathy\MVC\Session;
 
 
@@ -43,6 +44,19 @@ class PaypalController extends EController
     }
 
 
+    private function writeLog($message)
+    {
+        $log = new LogItem(
+            'paypal ipn',
+            [],
+            self::class,
+            'notice'
+        );
+        $log->append('message', $message);
+        $log->fire();
+    }
+
+
     public function ipn()
     {
         $p = new PaypalClass();
@@ -50,14 +64,33 @@ class PaypalController extends EController
         $p->paypal_url = $this->getPayPalURL();
 
         if ($p->validate_ipn()) {
-            $log = new LogItem(
-                'paypal ipn',
-                [],
-                self::class,
-                'notice'
-            );
-            $log->append('ipn made', true);
-            $log->fire();
+
+            $data = $p->ipn_data;
+            $pt = Model::load(PaypalTransactions::class);
+
+            if (
+                !empty($data['invoice']) &&
+                $data['payment_status'] === 'Completed' &&
+                $data['receiver_email'] === $this->getBusiness()
+            ) {
+                $o = Model::load(OrderItem::class);
+                $o->load(ltrim('OV', $data['invoice']));
+
+                // Check amount + currency
+                if (
+                    $data['mc_gross'] == $o->total &&
+                    $data['mc_currency'] == 'PHP'
+                ) {
+                    // Check txn_id not already used
+                    if (!$pt->txnExists($data['txn_id'])) {
+                        $o->status = 2;
+                        $o->save();
+
+                        $pt->storeTxn($data['txn_id']);
+                        $this->writeLog('Payment completed');
+                    }
+                }
+            }
         }
 
 

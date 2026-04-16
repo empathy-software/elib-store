@@ -27,6 +27,7 @@ class OrderItem extends Entity
     public $zip;
     public $country;
     public $shipping;
+    public $total;
 
     public function getOrders()
     {
