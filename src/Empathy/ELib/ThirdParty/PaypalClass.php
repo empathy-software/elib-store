@@ -92,6 +92,8 @@
 
 namespace Empathy\ELib\ThirdParty;
 
+use Empathy\MVC\Config;
+
 class PaypalClass
 {
     public $last_error;                 // holds the last error encountered
@@ -103,7 +105,7 @@ class PaypalClass
     public $paypal_url = '';
 
 
-    function paypal_class()
+    public function __construct()
     {
 
         // initialization constructor.  Called when class is created.

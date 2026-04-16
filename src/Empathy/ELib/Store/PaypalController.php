@@ -49,14 +49,16 @@ class PaypalController extends EController
         $p->ipn_log = true;
         $p->paypal_url = $this->getPayPalURL();
 
-        $log = new LogItem(
-            'paypal ipn',
-            [],
-            self::class,
-            'notice'
-        );
-        $log->append('ipn made', true);
-        $log->fire();
+        if ($p->validate_ipn()) {
+            $log = new LogItem(
+                'paypal ipn',
+                [],
+                self::class,
+                'notice'
+            );
+            $log->append('ipn made', true);
+            $log->fire();
+        }
 
 
         // decrement stock
