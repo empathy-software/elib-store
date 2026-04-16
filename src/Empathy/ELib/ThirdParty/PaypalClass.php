@@ -180,36 +180,47 @@ class PaypalClass
         // Keep parsed values for your app/logging
         parse_str($raw_post_data, $this->ipn_data);
 
-        // Prepend cmd as PayPal requires
-        $post_string = 'cmd=_notify-validate&' . $raw_post_data;
+        $post_data = 'cmd=_notify-validate&' . $raw_post_data;
 
-        $url = parse_url($this->paypal_url);
+        $ch = curl_init($this->paypal_url);
 
-        $fp = fsockopen('ssl://' . $url['host'], 443, $err_num, $err_str, 30);
-        if (!$fp) {
-            $this->last_error = "fsockopen error no. $err_num: $err_str";
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/x-www-form-urlencoded',
+            'Connection: close',
+        ]);
+
+        $this->ipn_response = curl_exec($ch);
+
+        if ($this->ipn_response === false) {
+            $this->last_error = 'cURL error: ' . curl_error($ch);
+            curl_close($ch);
             $this->log_ipn_results(false);
             return false;
         }
 
-        fputs($fp, "POST " . $url['path'] . " HTTP/1.1\r\n");
-        fputs($fp, "Host: " . $url['host'] . "\r\n");
-        fputs($fp, "Content-Type: application/x-www-form-urlencoded\r\n");
-        fputs($fp, "Content-Length: " . strlen($post_string) . "\r\n");
-        fputs($fp, "Connection: close\r\n\r\n");
-        fputs($fp, $post_string . "\r\n\r\n");
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
 
-        while (!feof($fp)) {
-            $this->ipn_response .= fgets($fp, 1024);
+        $this->ipn_response = trim($this->ipn_response);
+
+        if ($http_code !== 200) {
+            $this->last_error = 'PayPal responded with HTTP ' . $http_code;
+            $this->log_ipn_results(false);
+            return false;
         }
-        fclose($fp);
 
-        if (stripos($this->ipn_response, 'VERIFIED') !== false) {
+        if ($this->ipn_response === 'VERIFIED') {
             $this->log_ipn_results(true);
             return true;
         }
 
-        $this->last_error = 'IPN Validation Failed.';
+        $this->last_error = 'IPN Validation Failed. Response: ' . $this->ipn_response;
         $this->log_ipn_results(false);
         return false;
     }
