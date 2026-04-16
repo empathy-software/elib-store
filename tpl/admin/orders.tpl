@@ -36,6 +36,9 @@
                                 <p>Quantity: {$p.quantity}</p>
 
                                 <div class="card-image">
+                                    {if $p.brand neq 'General' and $p.product->getStock() < 1}
+                                        <span class="sold-out">SOLD OUT</span>
+                                    {/if}
                                     <img class="card-img-top img-fluid mb-3" src="http://{$WEB_ROOT}{$PUBLIC_DIR}/uploads/{$image.image}"
                                          alt=""/>
                                 </div>

@@ -8,6 +8,7 @@ use Empathy\MVC\Session;
 use Empathy\ELib\Storage\ShippingAddress;
 use Empathy\ELib\Storage\OrderItem;
 use Empathy\ELib\Storage\LineItem;
+use Empathy\ELib\Storage\ProductVariant;
 
 
 class Checkout
@@ -53,6 +54,10 @@ class Checkout
             }
         }
 
+        $countries = \Empathy\ELib\Country\Country::build();
+        $shippingCountry = Session::get('shipping_country') ? Session::get('shipping_country'): 'GB';
+        $country = $countries[$shippingCountry];
+
         // add shipping
         $l = Model::load(LineItem::class);
         $l->order_id = $this->invoice_no;
@@ -60,7 +65,7 @@ class Checkout
         $sc = DI::getContainer()->get('ShippingCalculator');
         $l->price = $sc->getFee();
         $l->quantity = 1;
-        $l->notes = 'Shipping'; // add country
+        $l->notes = 'Shipping to ' . $country;
         $l->insert();
     }
 

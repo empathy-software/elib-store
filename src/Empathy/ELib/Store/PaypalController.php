@@ -3,6 +3,7 @@
 namespace Empathy\ELib\Store;
 
 use Empathy\MVC\DI;
+use Empathy\MVC\LogItem;
 use Empathy\MVC\Model;
 use Empathy\ELib\EController;
 use Empathy\ELib\ThirdParty\PaypalClass;
@@ -10,6 +11,7 @@ use Empathy\MVC\Config;
 use Empathy\ELib\Storage\OrderItem;
 use Empathy\ELib\Storage\ProductVariant;
 use Empathy\ELib\Storage\CategoryItem;
+use Empathy\MVC\Session;
 
 
 class PaypalController extends EController
@@ -40,34 +42,41 @@ class PaypalController extends EController
         $this->assignMessage('The order was canceled');
     }
 
-    public function writeLog($data)
-    {
-        if (sizeof($data) > 0) {
-            $yaml = \Spyc::YAMLDump($data, 4, 60);
-            $fh = fopen(DOC_ROOT.'/logs/paypal', "a");
-            fwrite($fh, $yaml);
-            fclose($fh);
-        }
-    }
-
+    
     public function ipn()
     {
         $p = new PaypalClass();
         $p->ipn_log = false;
         $p->paypal_url = $this->getPayPalURL();
 
-        if ($p->validate_ipn()) {
-            if(isset($p->ipn_data['invoice']) && is_numeric($p->ipn_data['invoice'])
-               && 'Completed' == $p->ipn_data['payment_status'])
-            {
-                $o = Model::load(OrderItem::class);
-                $o->id = $p->ipn_data['invoice'];
-                $o->load();
-                $o->status = 2;
-                $o->save();
-            }
-            $this->writeLog($p->ipn_data);
-        }
+        $log = new LogItem(
+            'paypal ipn',
+            [],
+            self::class,
+            'notice'
+        );
+        $log->append('ipn made', true);
+        $log->fire();
+
+
+        // decrement stock
+//        $v = Model::load(ProductVariant::class);
+//        $v->load($l->variant_id);
+//        $v->stock--;
+//        $v->save();
+
+//        if ($p->validate_ipn()) {
+//            if(isset($p->ipn_data['invoice']) && is_numeric($p->ipn_data['invoice'])
+//               && 'Completed' == $p->ipn_data['payment_status'])
+//            {
+//                $o = Model::load(OrderItem::class);
+//                $o->id = $p->ipn_data['invoice'];
+//                $o->load();
+//                $o->status = 2;
+//                $o->save();
+//            }
+//            $this->writeLog($p->ipn_data);
+//        }
     }
 
     public function assignMessage($message)
@@ -106,16 +115,21 @@ class PaypalController extends EController
         $p->add_field('upload', '1');
 
         // address
-        $p->add_field('first_name', $o->first_name);
-        $p->add_field('last_name', $o->last_name);
-        $p->add_field('address1', $o->address1);
-        $p->add_field('address2', $o->address2);
-        $p->add_field('city', $o->city);
-        $p->add_field('state', $o->state);
-        $p->add_field('zip', $o->zip);
-        $p->add_field('country', $o->country);
-        $p->add_field('address_override', 1);
-        $p->add_field('no_shipping', 1);
+//        $p->add_field('first_name', $o->first_name);
+//        $p->add_field('last_name', $o->last_name);
+//        $p->add_field('address1', $o->address1);
+//        $p->add_field('address2', $o->address2);
+//        $p->add_field('city', $o->city);
+//        $p->add_field('state', $o->state);
+//        $p->add_field('zip', $o->zip);
+//        $p->add_field('country', $o->country);
+//        $p->add_field('address_override', 1);
+//        $p->add_field('no_shipping', 1);
+
+        //$countries = \Empathy\ELib\Country\Country::build();
+        $shippingCountry = Session::get('shipping_country') ? Session::get('shipping_country'): 'GB';
+        $p->add_field('country', $shippingCountry);
+
 
         // shipping
         $ids = array();
@@ -166,11 +180,11 @@ class PaypalController extends EController
         $p->add_field('cancel_return', $interface.'cancel');
         $p->paypal_url = $this->getPayPalURL();
 
-        $c->emptyCart();
-
         $this->presenter->assign('paypal_url', $p->paypal_url);
         $this->presenter->assign('fields', $p->fields);
+
         //$p->dump_fields();
+        //exit();
     }
 
     protected function getBusiness()
