@@ -112,7 +112,7 @@ class PaypalClass
 
         $this->last_error = '';
 
-        $this->ipn_log_file = Config::get('DOC_ROOT') . '/.ipn_results.log';
+        $this->ipn_log_file = Config::get('DOC_ROOT') . '/logs/.ipn_results.log';
         $this->ipn_log = true;
         $this->ipn_response = '';
 
