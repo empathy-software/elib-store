@@ -127,8 +127,8 @@ class PaypalController extends EController
 //        $p->add_field('no_shipping', 1);
 
         //$countries = \Empathy\ELib\Country\Country::build();
-        //$shippingCountry = Session::get('shipping_country') ? Session::get('shipping_country'): 'GB';
-        //$p->add_field('country', $shippingCountry);
+        $shippingCountry = Session::get('shipping_country') ? Session::get('shipping_country'): 'GB';
+        $p->add_field('country', $shippingCountry);
 
 
         // shipping
@@ -171,8 +171,8 @@ class PaypalController extends EController
 
         //    $p->add_field('image_url', 'http://'.WEB_ROOT.PUBLIC_DIR.'/img/pier.png');
         $p->add_field('invoice', $this->getInvoiceNumber($invoice_no));
-        $p->add_field('no_shipping', 1);
-        $p->add_field('currency_code', 'GBP');
+        $p->add_field('no_shipping', false);
+        $p->add_field('currency_code', 'PH');
         $p->add_field('business', $this->getBusiness());
 
         $p->add_field('return', $interface.'success');
