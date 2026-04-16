@@ -172,65 +172,46 @@ class PaypalClass
 
     }
 
-    function validate_ipn()
+    public function validate_ipn()
     {
+        $raw_post_data = file_get_contents('php://input');
+        $this->ipn_response = '';
 
-        // parse the paypal URL
-        $url_parsed = parse_url($this->paypal_url);
+        // Keep parsed values for your app/logging
+        parse_str($raw_post_data, $this->ipn_data);
 
-        // generate the post string from the _POST vars aswell as load the
-        // _POST vars into an arry so we can play with them from the calling
-        // script.
-        $post_string = '';
-        foreach ($_POST as $field => $value) {
-            $this->ipn_data["$field"] = $value;
-            $post_string .= $field . '=' . urlencode(stripslashes($value)) . '&';
-        }
-        $post_string .= "cmd=_notify-validate"; // append ipn command
+        // Prepend cmd as PayPal requires
+        $post_string = 'cmd=_notify-validate&' . $raw_post_data;
 
-        // open the connection to paypal
-        $fp = fsockopen($url_parsed['host'], "80", $err_num, $err_str, 30);
+        $url = parse_url($this->paypal_url);
+
+        $fp = fsockopen('ssl://' . $url['host'], 443, $err_num, $err_str, 30);
         if (!$fp) {
-
-            // could not open the connection.  If loggin is on, the error message
-            // will be in the log.
-            $this->last_error = "fsockopen error no. $errnum: $errstr";
+            $this->last_error = "fsockopen error no. $err_num: $err_str";
             $this->log_ipn_results(false);
             return false;
-
-        } else {
-            // Post the data back to paypal
-            fputs($fp, 'POST ' . $url_parsed['path'] . ' HTTP/1.1' . "\r\n");
-            fputs($fp, 'Host: ' . $url_parsed['host'] . "\r\n");
-            fputs($fp, 'Content-type: application/x-www-form-urlencoded' . "\r\n");
-            fputs($fp, 'Content-length: ' . strlen($post_string) . "\r\n");
-            fputs($fp, 'Connection: close' . "\r\n\r\n");
-            fputs($fp, $post_string . "\r\n\r\n");
-
-            // loop through the response from the server and append to variable
-            while (!feof($fp)) {
-                $this->ipn_response .= fgets($fp, 1024);
-            }
-
-            fclose($fp); // close connection
-
         }
 
-        if (preg_match('/VERIFIED/', $this->ipn_response)) {
+        fputs($fp, "POST " . $url['path'] . " HTTP/1.1\r\n");
+        fputs($fp, "Host: " . $url['host'] . "\r\n");
+        fputs($fp, "Content-Type: application/x-www-form-urlencoded\r\n");
+        fputs($fp, "Content-Length: " . strlen($post_string) . "\r\n");
+        fputs($fp, "Connection: close\r\n\r\n");
+        fputs($fp, $post_string . "\r\n\r\n");
 
-            // Valid IPN transaction.
+        while (!feof($fp)) {
+            $this->ipn_response .= fgets($fp, 1024);
+        }
+        fclose($fp);
+
+        if (stripos($this->ipn_response, 'VERIFIED') !== false) {
             $this->log_ipn_results(true);
             return true;
-
-        } else {
-
-            // Invalid IPN transaction.  Check the log for details.
-            $this->last_error = 'IPN Validation Failed.';
-            $this->log_ipn_results(false);
-            return false;
-
         }
 
+        $this->last_error = 'IPN Validation Failed.';
+        $this->log_ipn_results(false);
+        return false;
     }
 
     function log_ipn_results($success)

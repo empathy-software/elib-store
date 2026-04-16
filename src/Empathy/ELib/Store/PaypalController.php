@@ -24,7 +24,7 @@ class PaypalController extends EController
             throw new \Exception('Do not know whether to use paypal sandbox.');
         }
         if (ELIB_USE_PAYPAL_SANDBOX) {
-            $url = 'https://www.sandbox.paypal.com/us/cgi-bin/webscr';
+            $url = 'https://www.sandbox.paypal.com/cgi-bin/webscr';
         } else {
             $url = 'https://www.paypal.com/cgi-bin/webscr';
         }
