@@ -50,7 +50,7 @@ class PaypalController extends EController
             'paypal ipn',
             [],
             self::class,
-            'notice'
+            'info'
         );
         $log->append('message', $message);
         $log->fire();
