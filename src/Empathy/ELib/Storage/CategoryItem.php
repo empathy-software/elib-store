@@ -27,7 +27,7 @@ class CategoryItem extends Entity
 
     public function buildDescendantIDs(mixed $id, mixed &$ids): void
     {
-        array_push($ids, $id);
+        $ids[] = $id;
         $sql = 'SELECT id FROM '.Model::getTable(self::class).' WHERE category_id = ?';
         $error = 'Could not check for descendants.';
         $result = $this->query($sql, $error, [$id]);
@@ -48,7 +48,7 @@ class CategoryItem extends Entity
         $result = $this->query($sql, $error, [$id]);
         if ($result->rowCount() > 0) {
             foreach ($result as $row) {
-                array_push($c, $row['id']);
+                $c[] = $row['id'];
             }
         }
 
@@ -81,7 +81,6 @@ class CategoryItem extends Entity
 
     public function getAncestorIDs(mixed $id, mixed $ancestors): mixed
     {
-        $section_id = 0;
         $category_id = 0;
         $sql = 'SELECT category_id FROM '.Model::getTable(self::class).' WHERE id = ?';
         $error = 'Could not get parent id.';
@@ -91,7 +90,7 @@ class CategoryItem extends Entity
             $category_id = $row['category_id'];
         }
         if ($category_id !== 0) {
-            array_push($ancestors, $category_id);
+            $ancestors[] = $category_id;
             $ancestors = $this->getAncestorIDs($category_id, $ancestors);
         }
 
@@ -149,7 +148,7 @@ class CategoryItem extends Entity
             $category['id'] = $row['id'];
             $category['name'] = $row['name'];
         }
-        array_push($ancestors, $category);
+        $ancestors[] = $category;
 
         if ($row !== null && $row['category_id'] !== 0) {
 
@@ -184,7 +183,7 @@ class CategoryItem extends Entity
         $result = $this->query($sql, $error, $idsString[1]);
         if ($result->rowCount() > 0) {
             foreach ($result as $row) {
-                array_push($shipping, $row['shipping']);
+                $shipping[] = $row['shipping'];
             }
         }
 

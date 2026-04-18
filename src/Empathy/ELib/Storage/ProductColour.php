@@ -51,7 +51,7 @@ class ProductColour extends Entity
                 $id = $row['id'];
                 $colour = $row['option_val'];
                 $colours[$id]['colour'] = $colour;
-                $colour = strtolower($colour);
+                $colour = strtolower((string) $colour);
                 $colour .= '.gif';
                 $colours[$id]['swatch'] = $colour;
             }
@@ -83,7 +83,7 @@ class ProductColour extends Entity
         $result = $this->query($sql, $error, [$product_id]);
         if ($result->rowCount() > 0) {
             foreach ($result as $row) {
-                array_push($colours, $row['property_option_id']);
+                $colours[] = $row['property_option_id'];
             }
         }
 

@@ -27,7 +27,7 @@ class ShoppingCart
 
         if (($cart = Session::get('cart')) !== false) {
             foreach ($cart as $v => $qty) {
-                array_push($ids, $v);
+                $ids[] = $v;
             }
             $v = Model::load(ProductVariant::class);
             $id_string = $v->buildUnionString($ids);
@@ -72,21 +72,17 @@ class ShoppingCart
 
     public function remove(mixed $variant_id): void
     {
-        if (($cart = Session::get('cart')) !== false) {
-            if (isset($cart[$variant_id])) {
-                unset($cart[$variant_id]);
-                Session::set('cart', $cart);
-            }
+        if (($cart = Session::get('cart')) !== false && isset($cart[$variant_id])) {
+            unset($cart[$variant_id]);
+            Session::set('cart', $cart);
         }
     }
 
     public function update(mixed $variant_id, mixed $qty): void
     {
-        if (($cart = Session::get('cart')) !== false) {
-            if (isset($cart[$variant_id])) {
-                $cart[$variant_id]['qty'] = (int) ($qty);
-                Session::set('cart', $cart);
-            }
+        if (($cart = Session::get('cart')) !== false && isset($cart[$variant_id])) {
+            $cart[$variant_id]['qty'] = (int) ($qty);
+            Session::set('cart', $cart);
         }
     }
 
@@ -94,7 +90,7 @@ class ShoppingCart
     {
         $total = 0;
         if (($cart = Session::get('cart')) !== false) {
-            foreach ($cart as $v => $qty) {
+            foreach ($cart as $qty) {
                 $total += $qty['qty'];
             }
         }
@@ -111,7 +107,7 @@ class ShoppingCart
     {
         $empty = false;
         if (($cart = Session::get('cart')) === false
-           || sizeof($cart) < 1) {
+           || count($cart) < 1) {
             $empty = true;
         }
 

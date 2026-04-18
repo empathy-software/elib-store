@@ -65,7 +65,7 @@ class OrderItem extends Entity
                     $item['id'] = $lastId;
                     $item['total'] = $total;
                     $total = 0;
-                    array_push($order, $item);
+                    $order[] = $item;
                     $item = ['items' => []];
                 }
 
@@ -74,7 +74,7 @@ class OrderItem extends Entity
                 $item['stamp'] = $row['stamp'];
                 $item['status'] = $row['status'];
                 $p->load($row['product_id']);
-                array_push($item['items'], [
+                $item['items'][] = [
                     'product' => $p,
                     'id' => $row['product_id'],
                     'name' => $row['name'] ?? $row['notes'],
@@ -83,11 +83,11 @@ class OrderItem extends Entity
                     'notes' => $row['notes'],
                     'brand' => $p->getBrand() ?? 'General',
                     'path' => $row['product_id'] ? Misc::generatePath($p->category_id, $p->name) : '',
-                ]);
+                ];
                 $total += $row['price'];
             }
             $item['total'] = $total;
-            array_push($order, $item);
+            $order[] = $item;
         }
 
         return $order;

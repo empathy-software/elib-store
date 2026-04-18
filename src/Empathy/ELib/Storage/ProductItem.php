@@ -53,11 +53,12 @@ class ProductItem extends Entity
         }
     }
 
+    #[\Override]
     public function load(mixed $id = null): bool
     {
         $i = Model::load(ProductImage::class);
         parent::load($id);
-        list($this->images, $this->noImageFound) = $i->loadByProductItemDisplayed($this);
+        [$this->images, $this->noImageFound] = $i->loadByProductItemDisplayed($this);
 
         $v = Model::load(ProductVariant::class);
         $this->stock = $v->getStockLevels($id);
@@ -153,7 +154,7 @@ class ProductItem extends Entity
         $result = $this->query($sql, $error);
         if ($result->rowCount() > 0) {
             foreach ($result as $row) {
-                array_push($image, $row['image']);
+                $image[] = $row['image'];
             }
         }
         $sql = 'SELECT image FROM '.Model::getTable(ProductVariant::class);
@@ -161,7 +162,7 @@ class ProductItem extends Entity
         $result = $this->query($sql, $error);
         if ($result->rowCount() > 0) {
             foreach ($result as $row) {
-                array_push($image, $row['image']);
+                $image[] = $row['image'];
             }
         }
 

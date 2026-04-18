@@ -15,24 +15,13 @@ define('BUTTONS_PER_PAGE', 12);
 
 class ProductsLayout
 {
-    private mixed $category;
-    private mixed $product;
-    private mixed $variant;
-    private mixed $option;
     private mixed $buttons = [];
     private mixed $breadcrumb = [];
     private mixed $redirect = '';
-    private mixed $controller;
     private mixed $p_nav = [];
 
-    public function __construct(mixed $c, mixed $p, mixed $v, mixed $o, mixed $controller)
+    public function __construct(private readonly mixed $category, private readonly mixed $product, private readonly mixed $variant, private readonly mixed $option, private readonly mixed $controller)
     {
-        $this->controller = $controller;
-        $this->category = $c;
-        $this->product = $p;
-        $this->variant = $v;
-        $this->option = $o;
-
         $this->buildBC();
 
         if ($this->option->id !== 0) {
@@ -76,7 +65,7 @@ class ProductsLayout
         $descendantsString = $this->category->buildUnionString($descendants);
 
         $products = $this->product->getAllCustom(' WHERE category_id IN '. $descendantsString[0], $descendantsString[1]);
-        if (sizeof($products) > 0) {
+        if (count($products) > 0) {
             shuffle($products);
             $p = $products[0];
             $image = $p['image'];
@@ -108,11 +97,7 @@ class ProductsLayout
                 .' AND t1.brand_id = t2.id'
                 .' AND t3.product_id = t1.id';
 
-            if (isset($_GET['page']) && is_numeric($_GET['page'])) {
-                $page = $_GET['page'];
-            } else {
-                $page = 1;
-            }
+            $page = isset($_GET['page']) && is_numeric($_GET['page']) ? $_GET['page'] : 1;
             $per_page = BUTTONS_PER_PAGE;
             $group = 't1.id';
             //$order = 't2.name, t1.name';
@@ -136,7 +121,7 @@ class ProductsLayout
                 $button['image'] = $p['image'];
                 $button['product_id'] = $p['product_id'];
                 $button['price'] = $p['price'];
-                array_push($this->buttons, $button);
+                $this->buttons[] = $button;
             }
 
             $this->p_nav = $this->product->getPaginatePagesMultiJoinGroup(
@@ -161,7 +146,7 @@ class ProductsLayout
                     $button['image'] = $this->randomImage($this->category->id);
                     $button['category_id'] = $this->category->id;
                     if ($button['image'] !== '') {
-                        array_push($this->buttons, $button);
+                        $this->buttons[] = $button;
                     }
                 } else {
                     $button['name'] = $this->category->name;
@@ -169,11 +154,11 @@ class ProductsLayout
 
                     $products = $this->product->getAllCustom(' WHERE category_id = ?', [$this->category->id]);
                     //shuffle($products);
-                    if (sizeof($products) > 0) {
+                    if (count($products) > 0) {
                         $p = $products[0];
                         $button['image'] = $p['image'];
                         if ($button['image'] !== '') {
-                            array_push($this->buttons, $button);
+                            $this->buttons[] = $button;
                         }
                     }
                 }
@@ -196,7 +181,7 @@ class ProductsLayout
             $button['name'] = $this->variant->getVariantName($v['id']);
             $button['image'] = $v['image'];
             $button['variant_id'] = $v['id'];
-            array_push($this->buttons, $button);
+            $this->buttons[] = $button;
         }
     }
 
@@ -211,7 +196,7 @@ class ProductsLayout
 
             // set image to first variant image
             $variants = $this->variant->getAllCustom(' WHERE product_id = ? ORDER BY id', [$this->product->id]);
-            if (sizeof($variants) > 0) {
+            if (count($variants) > 0) {
                 $this->product->image = $variants[0]['image'];
             }
 
@@ -231,7 +216,7 @@ class ProductsLayout
         if ($this->category->id !== 0) {
             $current['id'] = $this->category->id;
             $current['name'] = $this->category->name;
-            array_push($cats, $current);
+            $cats[] = $current;
 
             if ($this->category->category_id > 0) {
                 $this->category->buildBreadCrumb($this->category->category_id, $cats);
@@ -240,7 +225,7 @@ class ProductsLayout
 
         $root['id'] = 0;
         $root['name'] = 'All Products';
-        array_push($cats, $root);
+        $cats[] = $root;
         $this->breadcrumb = array_reverse($cats);
     }
 
@@ -249,7 +234,7 @@ class ProductsLayout
         $button = [];
 
         $variants = $this->variant->getAllForOption($this->option->id);
-        if (sizeof($variants) < 1) {
+        if (count($variants) < 1) {
             $this->controller->http_error(404);
         }
 
@@ -258,7 +243,7 @@ class ProductsLayout
             //	$button['name'] = $this->variant->getVariantName($v['id']);
             $button['image'] = $v['image'];
             $button['variant_id'] = $v['id'];
-            array_push($this->buttons, $button);
+            $this->buttons[] = $button;
         }
     }
 

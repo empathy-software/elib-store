@@ -188,14 +188,11 @@ class PaypalController extends EController
         $o = Model::load(OrderItem::class);
         $o->load($co->getInvoiceNo());
 
-        $products = [];
-
         //$product[0]['alias'] = 'Some product';
         //$product[0]['price'] = 1.99;
         //$product[0]['code'] = 23;
 
         $interface = 'https://'.Config::get('WEB_ROOT').Config::get('PUBLIC_DIR').'/paypal/';
-        $message = '';
         $p = new PaypalClass();
         $p->ipn_log = false;
         $p->add_field('cmd', '_cart');
@@ -214,24 +211,18 @@ class PaypalController extends EController
         //        $p->add_field('no_shipping', 1);
 
         //$countries = \Empathy\ELib\Country\Country::build();
-        $shippingCountry = Session::get('shipping_country') ? Session::get('shipping_country') : 'GB';
+        $shippingCountry = Session::get('shipping_country') ?: 'GB';
         $p->add_field('country', $shippingCountry);
 
 
         // shipping
         $ids = [];
         foreach ($items as $item) {
-            array_push($ids, $item['id']);
+            $ids[] = $item['id'];
         }
         $v = Model::load(ProductVariant::class);
-        $cat_ids = $v->getCategories($ids);
-        $cat = Model::load(CategoryItem::class);
-
-        if ($o->country !== 'GB') {
-            $intl = true;
-        } else {
-            $intl = false;
-        }
+        $v->getCategories($ids);
+        Model::load(CategoryItem::class);
         $sc = DI::getContainer()->get('ShippingCalculator');
         $shipping = $sc->getFee();
 
@@ -247,9 +238,9 @@ class PaypalController extends EController
             $p->add_field('item_number_'.$i, $item['id']);
             $p->add_field('quantity_'.$i, $item['qty']);
 
-            $o = explode(', ', $item['options']);
-            $pr = explode(', ', $item['properties']);
-            foreach ($o as $index => $item) {
+            $o = explode(', ', (string) $item['options']);
+            $pr = explode(', ', (string) $item['properties']);
+            foreach (array_keys($o) as $index) {
                 $p->add_field('os'.$index.'_'.$i, $o[$index]);
                 $p->add_field('on'.$index.'_'.$i, $pr[$index]);
             }

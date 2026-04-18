@@ -10,5 +10,5 @@ namespace Empathy\ELib\Store;
 final class Access
 {
     /** Vendor role (must align with values stored in {@see \Empathy\ELib\Storage\UserItem::$auth}). */
-    public const VENDOR = 4;
+    public const int VENDOR = 4;
 }

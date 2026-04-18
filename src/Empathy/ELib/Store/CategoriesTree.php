@@ -9,19 +9,15 @@ use Empathy\MVC\Config;
 
 class CategoriesTree extends Tree
 {
-    private mixed $category;
-    private mixed $data;
-    private mixed $category_ancestors;
+    private readonly mixed $data;
+    private mixed $category_ancestors = [0];
 
-    public function __construct(mixed $category, mixed $collapsed, mixed $url = '')
+    public function __construct(private readonly mixed $category, mixed $collapsed, mixed $url = '')
     {
         $this->url = $url;
-        $this->category = $category;
         $current_id = $this->category->id;
-        $this->category_ancestors = [0];
-
         if (!$collapsed) {
-            array_push($this->category_ancestors, $current_id);
+            $this->category_ancestors[] = $current_id;
         }
 
         if ($current_id !== 0) {
@@ -29,7 +25,7 @@ class CategoriesTree extends Tree
         }
 
         if (!$collapsed) {
-            array_push($this->category_ancestors, $current_id);
+            $this->category_ancestors[] = $current_id;
         }
 
         $this->data = $this->buildTree(0, $this);
@@ -38,10 +34,7 @@ class CategoriesTree extends Tree
 
     public function buildTree(mixed $id, mixed $tree): mixed
     {
-        $nodes = [];
-        $nodes = $tree->category->buildTree($id, $tree);
-
-        return $nodes;
+        return $tree->category->buildTree($id, $tree);
     }
 
     private function buildMarkup(mixed $data, mixed $level, mixed $current_id, mixed $last_id): mixed
@@ -61,21 +54,17 @@ class CategoriesTree extends Tree
             $level++;
         }
         $markup .= ">\n";
-        foreach ($data as $index => $value) {
+        foreach ($data as $value) {
             $toggle = '+';
             $folder = '<i class="far fa-folder"></i>';
-            if ($this->url === '') {
-                $url = 'admin/category';
-            } else {
-                $url = $this->url;
-            }
+            $url = $this->url === '' ? 'admin/category' : $this->url;
 
             if (in_array($value['id'], $ancestors, true)) {
                 $toggle = '-';
                 $folder = '<i class="far fa-folder-open"></i>';
             }
 
-            $children = sizeof($value['children']);
+            $children = count($value['children']);
             $markup .= '<li';
 
             $markup .= ">\n";
@@ -99,8 +88,7 @@ class CategoriesTree extends Tree
             }
             $markup .= "</li>\n";
         }
-        $markup .= "</ul>\n";
 
-        return $markup;
+        return $markup . "</ul>\n";
     }
 }

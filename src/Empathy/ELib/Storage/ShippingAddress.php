@@ -47,7 +47,7 @@ class ShippingAddress extends Entity
 
         $addresses = [];
         foreach ($result as $row) {
-            array_push($addresses, $row['id']);
+            $addresses[] = $row['id'];
         }
 
         if (in_array($address_id, $addresses, true)) {

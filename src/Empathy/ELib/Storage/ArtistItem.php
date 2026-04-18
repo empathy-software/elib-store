@@ -94,12 +94,12 @@ class ArtistItem extends Entity
         if ($result->rowCount() > 0) {
             foreach ($result as $row) {
                 if ($last_artist_id !== $row['artist_id']) {
-                    if (sizeof($books) > 0) {
+                    if (count($books) > 0) {
                         $bio['books'] = $books;
                         $books = [];
                     }
-                    if (sizeof($bio) > 0) {
-                        array_push($bios, $bio);
+                    if (count($bio) > 0) {
+                        $bios[] = $bio;
                         $bio = [];
                     }
 
@@ -108,32 +108,26 @@ class ArtistItem extends Entity
                     $bio['artist_alias'] = $row['artist_alias'];
                     $bio['forename'] = $row['forename'];
                     $bio['surname'] = $row['surname'];
-                    if ($row['artist_alias'] === '') {
-                        $bio['artist'] = $row['forename'].' '.$row['surname'];
-                    } else {
-                        $bio['artist'] = $row['artist_alias'];
-                    }
+                    $bio['artist'] = $row['artist_alias'] === '' ? $row['forename'].' '.$row['surname'] : $row['artist_alias'];
                     $bio['bio'] = $row['bio'];
                 }
 
-                if (isset($row['product_id'])) {
-                    if ($row['category_id'] === 14) {
-                        $book = [];
-                        $book['id'] = $row['product_id'];
-                        $book['image'] = $row['image'];
-                        $book['name'] = $row['name'];
-                        $book['price'] = $row['price'];
-                        array_push($books, $book);
-                    }
+                if (isset($row['product_id']) && $row['category_id'] === 14) {
+                    $book = [];
+                    $book['id'] = $row['product_id'];
+                    $book['image'] = $row['image'];
+                    $book['name'] = $row['name'];
+                    $book['price'] = $row['price'];
+                    $books[] = $book;
                 }
             }
 
         }
-        if (sizeof($books) > 0) {
+        if (count($books) > 0) {
             $bio['books'] = $books;
         }
-        if (sizeof($bio) > 0) {
-            array_push($bios, $bio);
+        if (count($bio) > 0) {
+            $bios[] = $bio;
         }
 
         return $bios;

@@ -50,11 +50,7 @@ class ProductController extends AdminController
             $p->shipping_eu = $_POST['shipping_eu'];
             $p->shipping_other = $_POST['shipping_other'];
 
-            if ($_POST['sold_in_store'] === 1) {
-                $p->status = 1;
-            } else {
-                $p->status = 0;
-            }
+            $p->status = $_POST['sold_in_store'] === 1 ? 1 : 0;
 
             $p->brand_id = $_POST['brand_id'];
 
@@ -106,6 +102,7 @@ class ProductController extends AdminController
         }
     }
 
+    #[\Override]
     public function default_event(): void
     {
         $this->setTemplate('elib://admin/product.tpl');
@@ -129,7 +126,7 @@ class ProductController extends AdminController
             $ids = [];
             $params = [];
             foreach ($variants as $index => $item) {
-                array_push($ids, $item['id']);
+                $ids[] = $item['id'];
                 //if($item['image'] == '' && $item['other_image'] != '')
                 // product colour images override variant images
                 if ($item['other_image'] !== '') {
@@ -139,7 +136,7 @@ class ProductController extends AdminController
 
             $sql = ' WHERE product_id = ?';
             $params[] = $p->id;
-            if (sizeof($ids) > 0) {
+            if (count($ids) > 0) {
                 $idsString = $v->buildUnionString($ids);
                 $sql .= ' AND id NOT IN ' . $idsString[0];
                 $params = array_merge($params, $idsString[1]);
@@ -188,7 +185,7 @@ class ProductController extends AdminController
 
             $error = '';
             $j = 0;
-            foreach ($images as $index => $image) {
+            foreach ($images as $image) {
                 $_FILES['file'] = $image;
 
                 $d = [['tn_', 100, 100], ['mid_', 400, 276]];
@@ -344,7 +341,7 @@ class ProductController extends AdminController
         $p->load($v->product_id);
         $this->assign('product', $p);
         // get variant data
-        $v_array = self::entityToJsonArray($v);
+        $v_array = $this->entityToJsonArray($v);
         $props = Model::load(Property::class);
         $v_array['properties'] = $props->loadForVariant($v_array['id']);
         $this->assign('v', $v_array);
@@ -380,7 +377,7 @@ class ProductController extends AdminController
         $this->assign('variant', $v);
 
         // get variant data
-        $v_array = self::entityToJsonArray($v);
+        $v_array = $this->entityToJsonArray($v);
         $props = Model::load(Property::class);
         $v_array['properties'] = $props->loadForVariant($v_array['id']);
         $this->assign('v', $v_array);
@@ -420,7 +417,7 @@ class ProductController extends AdminController
             $p->product_variant_id = $_GET['id'];
             //if(isset($_POST['property']))
             // {
-            foreach ($_POST['property'] as $index => $item) {
+            foreach ($_POST['property'] as $item) {
                 if ($item > 0 && is_numeric($item)) {
                     $p->property_option_id = (int) $item;
                     $p->insert();
@@ -439,7 +436,7 @@ class ProductController extends AdminController
         $v->load($_GET['id']);
 
         // get variant data
-        $v_array = self::entityToJsonArray($v);
+        $v_array = $this->entityToJsonArray($v);
         $property = Model::load(Property::class);
         $v_array['properties'] = $property->loadForVariant($v_array['id']);
         $this->assign('v', $v_array);
@@ -453,7 +450,7 @@ class ProductController extends AdminController
 
         $cp = Model::load(CategoryProperty::class);
 
-        array_push($cats, $p->category_id);
+        $cats[] = $p->category_id;
         $props = $cp->getPropertiesByCategory($cats);
 
         //array_push($props, 2); // always allow colour property
@@ -461,7 +458,7 @@ class ProductController extends AdminController
         $this->assign('product', $p);
         $this->assign('variant', $v);
 
-        if (sizeof($props) > 0) {
+        if (count($props) > 0) {
             $properties = $property->getAllWithOptions($props);
             $this->assign('properties', $properties);
 
@@ -469,8 +466,8 @@ class ProductController extends AdminController
             $sql = ' WHERE product_variant_id = ?';
             $options = $pv->getAllCustom($sql, [$_GET['id']]);
             $o = [];
-            foreach ($options as $index => $value) {
-                array_push($o, $value['property_option_id']);
+            foreach ($options as $value) {
+                $o[] = $value['property_option_id'];
             }
             $this->assign('options', $o);
         }
@@ -597,8 +594,8 @@ class ProductController extends AdminController
         $this->setTemplate('elib://admin/product.tpl');
         if (isset($_POST['submit'])) {
             $sets = [];
-            foreach ($_POST['property'] as $index => $value) {
-                array_push($sets, $value);
+            foreach ($_POST['property'] as $value) {
+                $sets[] = $value;
             }
 
             $g = new CombGen($sets);
@@ -638,11 +635,11 @@ class ProductController extends AdminController
         $c = Model::load(CategoryItem::class);
         $cats = $c->getAncestorIds($p->category_id, []);
         $cp = Model::load(CategoryProperty::class);
-        array_push($cats, $p->category_id);
+        $cats[] = $p->category_id;
         $props = $cp->getPropertiesByCategory($cats);
         //array_push($props, 2); // always allow colour property
 
-        if (sizeof($props) > 0) {
+        if (count($props) > 0) {
             $property = Model::load(Property::class);
             $properties = $property->getAllWithOptions($props);
             $this->assign('properties', $properties);
@@ -676,7 +673,7 @@ class ProductController extends AdminController
     /**
      * @return array<string, mixed>
      */
-    private static function entityToJsonArray(object $entity): array
+    private function entityToJsonArray(object $entity): array
     {
         $json = json_encode($entity);
         if ($json === false) {

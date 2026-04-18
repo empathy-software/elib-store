@@ -9,17 +9,13 @@ use Empathy\MVC\Config;
 
 class ArtistsTree extends Tree
 {
-    private mixed $artist;
-    private mixed $data;
-    private mixed $artist_ancestors;
+    private readonly mixed $data;
+    private mixed $artist_ancestors = [0];
 
-    public function __construct(mixed $artist)
+    public function __construct(private readonly mixed $artist)
     {
-        $this->artist = $artist;
-        $this->artist_ancestors = [0];
-
         $current_id = $this->artist->id;
-        array_push($this->artist_ancestors, $current_id);
+        $this->artist_ancestors[] = $current_id;
 
         $this->data = $this->buildTree(0, $this);
         $this->markup = $this->buildMarkup($this->data, 0, $current_id, 0);
@@ -27,10 +23,7 @@ class ArtistsTree extends Tree
 
     public function buildTree(mixed $id, mixed $tree): mixed
     {
-        $nodes = [];
-        $nodes = $tree->artist->buildTree($id, $tree);
-
-        return $nodes;
+        return $tree->artist->buildTree($id, $tree);
     }
 
     private function buildMarkup(mixed $data, mixed $level, mixed $current_id, mixed $last_id): mixed
@@ -50,7 +43,7 @@ class ArtistsTree extends Tree
             $level++;
         }
         $markup .= ">\n";
-        foreach ($data as $index => $value) {
+        foreach ($data as $value) {
             $toggle = '+';
             $folder = '<i class="far fa-file"></i>';
             $url = 'artist';
@@ -59,13 +52,9 @@ class ArtistsTree extends Tree
                 $toggle = '-';
             }
 
-            if ($value['artist_alias'] === '') {
-                $value['label'] = $value['forename'].' '.$value['surname'];
-            } else {
-                $value['label'] = $value['artist_alias'];
-            }
+            $value['label'] = $value['artist_alias'] === '' ? $value['forename'].' '.$value['surname'] : $value['artist_alias'];
 
-            $children = sizeof($value['children']);
+            $children = count($value['children']);
             $class = 'clearfix';
             $markup .= '<li';
             if ($current_id === $value['id']) {
@@ -100,8 +89,7 @@ class ArtistsTree extends Tree
             }
             $markup .= "</li>\n";
         }
-        $markup .= "</ul>\n";
 
-        return $markup;
+        return $markup . "</ul>\n";
     }
 }

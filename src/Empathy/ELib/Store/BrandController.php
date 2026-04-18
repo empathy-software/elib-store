@@ -9,6 +9,7 @@ use Empathy\MVC\Model;
 
 class BrandController extends AdminController
 {
+    #[\Override]
     public function default_event(): void
     {
         $ui_array = ['id'];

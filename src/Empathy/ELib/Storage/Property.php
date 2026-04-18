@@ -26,7 +26,7 @@ class Property extends Entity
         $error = 'Could not find variant properties.';
         $result = $this->query($sql, $error, [$variant_id]);
         foreach ($result as $row) {
-            array_push($p, $row);
+            $p[] = $row;
         }
 
         return ($p);
@@ -54,7 +54,7 @@ class Property extends Entity
         $sql = 'SELECT t1.id, t1.name, t2.id AS option_id, t2.option_val FROM '
             .Model::getTable(Property::class).' t1 '
             .'LEFT JOIN '.Model::getTable(PropertyOption::class).' t2 ON t2.property_id = t1.id';
-        if (sizeof($props)) {
+        if (count($props) !== 0) {
             $sql .= ' WHERE t1.id IN '.$propsString[0];
             $params = $propsString[1];
         }
@@ -110,7 +110,7 @@ class Property extends Entity
             .'LEFT JOIN '.Model::getTable(PropertyOption::class).' t2 ON t2.property_id = t1.id';
 
         $params = [];
-        if (sizeof($propsString[1]) > 1) {
+        if (count($propsString[1]) > 1) {
             $sql .= ' WHERE t1.id IN '. $propsString[0];
             $params = array_merge($params, $propsString[1]);
         }

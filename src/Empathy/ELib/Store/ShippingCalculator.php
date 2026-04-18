@@ -10,24 +10,14 @@ define('INTL_STANDARD', 10.00);
 
 class ShippingCalculator
 {
-    private mixed $cats;
-    private mixed $cat;
-    private mixed $calc_intl;
     private mixed $fee;
-    private mixed $item_count;
-    private mixed $intl_shipping;
+    private mixed $intl_shipping = 0;
 
-    public function __construct(mixed $total, mixed $cats, mixed $cat, mixed $item_count, mixed $calc_intl)
+    public function __construct(mixed $total, private readonly mixed $cats, private readonly mixed $cat, private readonly mixed $item_count, private readonly mixed $calc_intl)
     {
-        $this->cats = $cats;
-        $this->cat = $cat;
-        $this->item_count = $item_count;
-        $this->intl_shipping = 0;
-        $this->calc_intl = $calc_intl;
-
         $special_shipping = $this->cat->getShipping($this->cats);
 
-        if ($calc_intl) {
+        if ($this->calc_intl) {
             $this->intl_shipping = $this->cat->getShippingIntl($this->cats);
         }
 
@@ -47,25 +37,17 @@ class ShippingCalculator
             $this->fee = $highest;
         } elseif ($total > FREE_THRESHOLD) {
             $this->fee = 0;
+        } elseif ($this->item_count === 1 && $lowest < FLAT_FEE) {
+            $this->fee = $lowest;
         } else {
-            if ($this->item_count === 1 && $lowest < FLAT_FEE) {
-                $this->fee = $lowest;
-            } else {
-                $this->fee = FLAT_FEE;
-            }
+            $this->fee = FLAT_FEE;
         }
 
     }
 
     public function getFee(): mixed
     {
-        if ($this->calc_intl) {
-            $fee = $this->fee + $this->intl_shipping + INTL_STANDARD;
-        } else {
-            $fee = $this->fee;
-        }
-
-        return $fee;
+        return $this->calc_intl ? $this->fee + $this->intl_shipping + INTL_STANDARD : $this->fee;
     }
 
 }

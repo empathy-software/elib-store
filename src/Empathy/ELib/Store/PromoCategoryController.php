@@ -43,6 +43,7 @@ class PromoCategoryController extends AdminController
         $this->assign('brands', $b->getBrands());
     }
 
+    #[\Override]
     public function default_event(): void
     {
 
@@ -67,13 +68,6 @@ class PromoCategoryController extends AdminController
 
         $this->buildNav();
 
-
-        if (is_numeric($_GET['id'])) {
-            $showCat = $_GET['id'];
-        } else {
-            $showCat = 0;
-        }
-
         $sql = '';
         $sql .= 'WHERE category_id = ?';
 
@@ -87,7 +81,7 @@ class PromoCategoryController extends AdminController
 
         $c = Model::load(CategoryItem::class);
         $c->id = $_GET['id'];
-        $category = $c->loadIndexed($c->category_id);
+        $c->loadIndexed($c->category_id);
 
         /*
           foreach ($product as $index => $item) {

@@ -58,6 +58,7 @@ class PromoController extends AdminController
         }
     }
 
+    #[\Override]
     public function default_event(): void
     {
         $this->setTemplate('elib://admin/promo.tpl');

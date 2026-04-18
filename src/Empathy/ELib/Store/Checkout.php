@@ -14,7 +14,7 @@ use Empathy\MVC\Session;
 class Checkout
 {
     private mixed $invoice_no;
-    private mixed $invoice_id;
+    private readonly mixed $invoice_id;
 
     public function __construct(mixed $items)
     {
@@ -63,7 +63,7 @@ class Checkout
         $o->save();
 
         $countries = \Empathy\ELib\Country\Country::build();
-        $shippingCountry = Session::get('shipping_country') ? Session::get('shipping_country') : 'GB';
+        $shippingCountry = Session::get('shipping_country') ?: 'GB';
         $country = $countries[$shippingCountry];
 
         // add shipping

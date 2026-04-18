@@ -98,27 +98,20 @@ use Empathy\MVC\Config;
 
 class PaypalClass
 {
-    public mixed $last_error;                 // holds the last error encountered
-    public mixed $ipn_log;                    // bool: log IPN results to text file?
+    public mixed $last_error = '';                 // holds the last error encountered
+    public mixed $ipn_log = true;                    // bool: log IPN results to text file?
     public mixed $ipn_log_file;               // filename of the IPN log
-    public mixed $ipn_response;               // holds the IPN response from paypal
+    public mixed $ipn_response = '';               // holds the IPN response from paypal
     public mixed $ipn_data = [];         // array contains the POST values for IPN
     public mixed $fields = [];           // array holds the fields to submit to paypal
-    public mixed $paypal_url = '';
+    // initialization constructor.  Called when class is created.
+    public mixed $paypal_url = 'https://www.paypal.com/cgi-bin/webscr';
 
 
     public function __construct()
     {
 
-        // initialization constructor.  Called when class is created.
-
-        $this->paypal_url = 'https://www.paypal.com/cgi-bin/webscr';
-
-        $this->last_error = '';
-
         $this->ipn_log_file = Config::get('DOC_ROOT') . '/logs/.ipn_results.log';
-        $this->ipn_log = true;
-        $this->ipn_response = '';
 
         // populate $fields array with a few default values.  See the paypal
         // documentation for a list of fields and their data types. These defaul
@@ -285,7 +278,7 @@ class PaypalClass
 
         ksort($this->fields);
         foreach ($this->fields as $key => $value) {
-            echo "<tr><td>$key</td><td>" . urldecode($value) . '&nbsp;</td></tr>';
+            echo "<tr><td>$key</td><td>" . urldecode((string) $value) . '&nbsp;</td></tr>';
         }
 
         echo '</table><br>';

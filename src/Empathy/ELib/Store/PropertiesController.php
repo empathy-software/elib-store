@@ -10,6 +10,7 @@ use Empathy\MVC\Model;
 
 class PropertiesController extends AdminController
 {
+    #[\Override]
     public function default_event(): void
     {
         $this->setTemplate('elib://admin/properties.tpl');
@@ -17,19 +18,17 @@ class PropertiesController extends AdminController
         $properties = $p->getAllWithOptions([]);
         $this->assign('properties', $properties);
 
-        if (isset($_POST['add_option'])) {
-            if (isset($_POST['id']) && is_numeric($_POST['id'])) {
-                $o = Model::load(PropertyOption::class);
-                $o->property_id = (int) $_POST['id'];
-                $o->option_val = $_POST['option'];
-                $o->validates();
-                if ($o->hasValErrors()) {
-                    $this->assign('submitted_option', $o);
-                    $this->assign('errors', $o->getValErrors());
-                } else {
-                    $o->insert();
-                    $this->redirect('admin/properties');
-                }
+        if (isset($_POST['add_option']) && (isset($_POST['id']) && is_numeric($_POST['id']))) {
+            $o = Model::load(PropertyOption::class);
+            $o->property_id = (int) $_POST['id'];
+            $o->option_val = $_POST['option'];
+            $o->validates();
+            if ($o->hasValErrors()) {
+                $this->assign('submitted_option', $o);
+                $this->assign('errors', $o->getValErrors());
+            } else {
+                $o->insert();
+                $this->redirect('admin/properties');
             }
         }
 

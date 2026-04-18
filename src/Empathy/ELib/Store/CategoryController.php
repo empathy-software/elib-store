@@ -15,6 +15,7 @@ define('REQUESTS_PER_PAGE', 12);
 
 class CategoryController extends AdminController
 {
+    #[\Override]
     public function default_event(): void
     {
         $ui_array = ['order_by', 'page', 'id', 'brand_id'];
@@ -40,11 +41,6 @@ class CategoryController extends AdminController
 
         $params = [];
         $p = Model::load(ProductItem::class);
-        if (is_numeric($_GET['id'])) {
-            $showCat = $_GET['id'];
-        } else {
-            $showCat = 0;
-        }
 
         $sql = '';
         $params[] = $_GET['id'];
@@ -64,16 +60,12 @@ class CategoryController extends AdminController
         $product = $p->getAllCustomPaginate($sql, $_GET['page'], REQUESTS_PER_PAGE, $params);
 
         foreach ($product as &$product_item) {
-            if ($product_item['status'] > 0) {
-                $product_item['sold_in_store'] = 1;
-            } else {
-                $product_item['sold_in_store'] = 0;
-            }
+            $product_item['sold_in_store'] = $product_item['status'] > 0 ? 1 : 0;
         }
 
         $c = Model::load(CategoryItem::class);
         $c->id = $_GET['id'];
-        $category = $c->loadIndexed($c->category_id);
+        $c->loadIndexed($c->category_id);
 
         /*
           foreach ($product as $index => $item) {
@@ -175,7 +167,7 @@ class CategoryController extends AdminController
         if (isset($_POST['save'])) {
             $c = Model::load(CategoryProperty::class);
             $c->emptyByCategory($_GET['id']);
-            if (isset($_POST['property']) && sizeof($_POST['property']) > 0) {
+            if (isset($_POST['property']) && count($_POST['property']) > 0) {
                 foreach ($_POST['property'] as $index => $item) {
                     $c->category_id = $_GET['id'];
                     $c->property_id = $index;
@@ -196,7 +188,7 @@ class CategoryController extends AdminController
             $cp = Model::load(CategoryProperty::class);
 
             $inherited = [];
-            if (sizeof($ancestors) > 0) {
+            if (count($ancestors) > 0) {
                 $inherited = $cp->getPropertiesByCategory($ancestors);
             }
 

@@ -25,7 +25,7 @@ class ProductImage extends Entity
         if ($this->image === '') {
             $this->addValError('Missing filename');
         }
-        if ((int) $this->product_id === 0) {
+        if ($this->product_id === 0) {
             $this->addValError('Invlalid product id');
         }
     }
@@ -58,6 +58,7 @@ class ProductImage extends Entity
         return [ $images, $noneFound ];
     }
 
+    #[\Override]
     public function delete(): void
     {
         $images_removed = false;
@@ -69,7 +70,7 @@ class ProductImage extends Entity
         }
         if ($this->image === '' || $images_removed) {
             parent::delete();
-            if ($this->default_image) {
+            if ($this->default_image !== 0) {
                 $p = Model::load(ProductItem::class);
                 $p->load($this->product_id);
                 $remaining = $this->loadByProductItem($p);

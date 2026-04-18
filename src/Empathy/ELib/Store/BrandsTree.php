@@ -9,17 +9,13 @@ use Empathy\MVC\Config;
 
 class BrandsTree extends Tree
 {
-    private mixed $brand;
-    private mixed $data;
-    private mixed $brand_ancestors;
+    private readonly mixed $data;
+    private mixed $brand_ancestors = [0];
 
-    public function __construct(mixed $brand)
+    public function __construct(private readonly mixed $brand)
     {
-        $this->brand = $brand;
-        $this->brand_ancestors = [0];
-
         $current_id = $this->brand->id;
-        array_push($this->brand_ancestors, $current_id);
+        $this->brand_ancestors[] = $current_id;
 
         $this->data = $this->buildTree(0, $this);
         $this->markup = $this->buildMarkup($this->data, 0, $current_id, 0);
@@ -27,10 +23,7 @@ class BrandsTree extends Tree
 
     public function buildTree(mixed $id, mixed $tree): mixed
     {
-        $nodes = [];
-        $nodes = $tree->brand->buildTree($id, $tree);
-
-        return $nodes;
+        return $tree->brand->buildTree($id, $tree);
     }
 
     private function buildMarkup(mixed $data, mixed $level, mixed $current_id, mixed $last_id): mixed
@@ -50,7 +43,7 @@ class BrandsTree extends Tree
             $level++;
         }
         $markup .= ">\n";
-        foreach ($data as $index => $value) {
+        foreach ($data as $value) {
             $toggle = '+';
             $folder = '<i class="far fa-file"></i>';
             $url = 'brand';
@@ -59,9 +52,9 @@ class BrandsTree extends Tree
                 $toggle = '-';
             }
 
-            $value['label'] = htmlentities($value['name']);
+            $value['label'] = htmlentities((string) $value['name']);
 
-            $children = sizeof($value['children']);
+            $children = count($value['children']);
             $class = 'clearfix';
             $markup .= '<li';
 
@@ -97,8 +90,7 @@ class BrandsTree extends Tree
             }
             $markup .= "</li>\n";
         }
-        $markup .= "</ul>\n";
 
-        return $markup;
+        return $markup . "</ul>\n";
     }
 }

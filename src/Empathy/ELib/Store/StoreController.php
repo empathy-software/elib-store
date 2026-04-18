@@ -18,6 +18,7 @@ use Empathy\MVC\Model;
 
 class StoreController extends StoreControllerLite
 {
+    #[\Override]
     public function default_event(): void
     {
         $this->setTemplate('elib://store_category.tpl');
@@ -87,8 +88,8 @@ class StoreController extends StoreControllerLite
         }
 
         if (isset($_GET['product_name'])) {
-            $name_arr = explode('-', $_GET['product_name']);
-            $product_id = $name_arr[sizeof($name_arr) - 1];
+            $name_arr = explode('-', (string) $_GET['product_name']);
+            $product_id = $name_arr[count($name_arr) - 1];
         }
 
         $_GET['product_id'] = $product_id;
@@ -122,16 +123,16 @@ class StoreController extends StoreControllerLite
                 $variant_id = 0;
                 if (isset($_POST['property'])) {
                     foreach ($_POST['property'] as $option) {
-                        array_push($options, $option);
+                        $options[] = $option;
                     }
                 }
 
-                if (sizeof($options) > 0) {
+                if (count($options) > 0) {
                     $variant_id = $v->findVariant($options, $p->id);
                 } else {
                     $sql = ' WHERE product_id = ? LIMIT 0, 1';
                     $variant = $v->getAllCustom($sql, [$p->id]);
-                    if (sizeof($variant) > 0) {
+                    if (count($variant) > 0) {
                         $variant_id = $variant[0]['id'];
                     }
                 }
@@ -154,7 +155,7 @@ class StoreController extends StoreControllerLite
             if ($_GET['product_id'] !== 0) {
                 $productColour = Model::load(ProductColour::class);
                 $colours = $productColour->getColoursIndexed($_GET['product_id']);
-                if (sizeof($colours) > 0) {
+                if (count($colours) > 0) {
                     $this->assign('colours', $colours);
                 }
 
@@ -168,7 +169,7 @@ class StoreController extends StoreControllerLite
                 $this->assign('product_view', 1);
                 //$variant_count = $this->assignVariantsTableData($p, $v);
                 //$this->getPropertiesAndOptions($p->id, (sizeof($colours) > 0));
-                $this->getPropertiesAndOptions($p, (sizeof($colours) > 0));
+                $this->getPropertiesAndOptions($p, (count($colours) > 0));
             }
 
             $_GET['category_id'] = -1;
@@ -179,7 +180,7 @@ class StoreController extends StoreControllerLite
 
             if ($_GET['product_id'] !== 0) {
                 $p = $l->getProduct();
-                if (sizeof($colours) > 0 && $productColour instanceof ProductColour) {
+                if (count($colours) > 0 && $productColour instanceof ProductColour) {
                     $p->image = $productColour->getFirstColourImage((int) $_GET['product_id']);
                 }
 
@@ -214,7 +215,7 @@ class StoreController extends StoreControllerLite
 
         $this->assign('custom_title', $custom_title);
         $this->assign('custom_keywords', strtolower($custom_keywords));
-        $this->assign('custom_description', $custom_description.' - '.strip_tags($p->description));
+        $this->assign('custom_description', $custom_description.' - '.strip_tags((string) $p->description));
     }
 
     // copied across from store.php
@@ -332,10 +333,10 @@ class StoreController extends StoreControllerLite
         //    print_r($variants);
         $fixed_properties = ['id', 'weight_g', 'weight_lb', 'name'];
         $dynamic_properties = [];
-        foreach ($variants as $index => $value) {
+        foreach ($variants as $value) {
             foreach ($value as $index2 => $value2) {
                 if (!in_array($index2, $fixed_properties, true) && !in_array($index2, $dynamic_properties, true)) {
-                    array_push($dynamic_properties, $index2);
+                    $dynamic_properties[] = $index2;
                 }
             }
         }
@@ -344,7 +345,7 @@ class StoreController extends StoreControllerLite
         $this->assign('total_weight_g', $total_weight_g);
         $this->assign('total_weight_lb', $total_weight_lb);
 
-        return sizeof($variants);
+        return count($variants);
     }
 
 }

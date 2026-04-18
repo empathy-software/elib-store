@@ -39,7 +39,7 @@ class ProductVariantPropertyOption extends Entity
         $result = $this->query($sql, $error, [$product_id]);
         if ($result->rowCount() > 0) {
             foreach ($result as $row) {
-                array_push($ids, $row['id']);
+                $ids[] = $row['id'];
             }
         }
 

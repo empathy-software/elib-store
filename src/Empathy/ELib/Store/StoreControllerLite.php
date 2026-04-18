@@ -84,7 +84,7 @@ class StoreControllerLite extends EController
         ];
         $this->assign('brands_available', $brands_available);
 
-        $page = $this->filterInt('page');
+        $this->filterInt('page');
 
         if (
             isset($_GET['order_by_price']) &&
@@ -114,7 +114,7 @@ class StoreControllerLite extends EController
         }
 
         // vendor lock
-        if (isset($this->vendor_lock)) {
+        if ($this->vendor_lock !== null) {
             $_GET['vendor_id'] = $this->vendor_lock;
         }
 
@@ -150,11 +150,7 @@ class StoreControllerLite extends EController
         $c->buildDescendantIDs($category_id, $descendants);
 
 
-        if (!isset($_GET['vendor_id'])) {
-            $_GET['vendor_id'] = 0;
-        } else {
-            $_GET['vendor_id'] = (int) $_GET['vendor_id'];
-        }
+        $_GET['vendor_id'] = isset($_GET['vendor_id']) ? (int) $_GET['vendor_id'] : 0;
 
         $p = Model::load(ProductItem::class);
 
@@ -240,19 +236,19 @@ class StoreControllerLite extends EController
         $variant_id = 0;
         if (isset($_POST['property'])) {
             foreach ($_POST['property'] as $option) {
-                array_push($options, $option);
+                $options[] = $option;
             }
         }
 
         $v = Model::load(ProductVariant::class);
         $p = Model::load(ProductItem::class);
 
-        if (sizeof($options) > 0) {
+        if (count($options) > 0) {
             $variant_id = $v->findVariant($options, $product_id);
         } else {
             $sql = ' WHERE product_id = ? LIMIT 0, 1';
             $variant = $v->getAllCustom($sql, [$product_id]);
-            if (sizeof($variant) > 0) {
+            if (count($variant) > 0) {
                 $variant_id = $variant[0]['id'];
             }
         }
@@ -337,7 +333,7 @@ class StoreControllerLite extends EController
         $product = Model::load(ProductItem::class);
 
         $countries = \Empathy\ELib\Country\Country::build();
-        $shippingCountry = Session::get('shipping_country') ? Session::get('shipping_country') : 'GB';
+        $shippingCountry = Session::get('shipping_country') ?: 'GB';
 
         if (isset($_GET['shipping_country']) && in_array($_GET['shipping_country'], array_keys($countries), true)) {
 
@@ -390,14 +386,14 @@ class StoreControllerLite extends EController
         }
 
         $items = $c->loadFromCart();
-        if (sizeof($items) > 0) {
+        if (count($items) > 0) {
             $shipping = $sc->getFee();
             $this->assign('shipping', $shipping);
             $this->assign('total', $c->calcTotal($items) + $shipping);
             $this->assign('items', $items);
         }
 
-        if (isset($this->vendor_lock)) {
+        if ($this->vendor_lock !== null) {
             $this->assign('vendor_id', $this->vendor_lock);
         }
 
@@ -460,11 +456,12 @@ class StoreControllerLite extends EController
 
         $cp = Model::load(CategoryProperty::class);
 
-        array_push($cats, $p->category_id);
+        $cats[] = $p->category_id;
         $props = $cp->getPropertiesByCategory($cats);
 
         if (!$colours && $p->category_id !== 8) {
-            array_push($props, 2); // always allow colour property
+            $props[] = 2;
+            // always allow colour property
         }
 
         //    $this->assign('product', $p);
@@ -474,7 +471,7 @@ class StoreControllerLite extends EController
         $pv = Model::load(ProductVariantPropertyOption::class);
         $opts = $pv->buildUnionString($pv->getActiveOptions($p->id));
 
-        if (sizeof($props) > 0) {
+        if (count($props) > 0) {
             $property = Model::load(Property::class);
             $properties = $property->getAllWithOptionsForProduct($props, $opts);
             $this->assign('properties', $properties);

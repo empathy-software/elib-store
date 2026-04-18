@@ -17,11 +17,9 @@ class ImageUpload
     public mixed $origX;
     public mixed $origY;
     public mixed $quality;
-    public mixed $gallery;
 
-    public function __construct(mixed $gallery, mixed $upload, mixed $deriv)
+    public function __construct(public mixed $gallery, mixed $upload, mixed $deriv)
     {
-        $this->gallery = $gallery;
         if ($this->gallery !== '') {
             //$this->target_dir = DOC_ROOT."/public_html/img/$this->gallery/";
             $this->target_dir = Config::get('DOC_ROOT').'/public_html/uploads/';
@@ -29,13 +27,9 @@ class ImageUpload
             $this->target_dir = Config::get('DOC_ROOT').'/public_html/uploads/';
         }
 
-        if (sizeof($deriv) < 1) {
-            $this->deriv = [['l_', 800, 600],
-                                 ['tn_', 200, 200],
-                                 ['mid_', 500, 500]];
-        } else {
-            $this->deriv = $deriv;
-        }
+        $this->deriv = count($deriv) < 1 ? [['l_', 800, 600],
+                             ['tn_', 200, 200],
+                             ['mid_', 500, 500]] : $deriv;
         $this->quality = 85;
         $this->error = '';
 
@@ -90,19 +84,11 @@ class ImageUpload
 
     public function makeDerived(mixed $prefix, mixed $max_width, mixed $max_height): void
     {
-        if ($max_width < 300 || $max_height < 300) {
-            $quality = 100;
-        } else {
-            $quality = $this->quality;
-        }
+        $quality = $max_width < 300 || $max_height < 300 ? 100 : $this->quality;
         if ($this->origX > $max_width || $this->origY > $max_height) {
             $factorX = $max_width / $this->origX;
             $factorY = $max_height / $this->origY;
-            if ($factorX < $factorY) {
-                $factor = $factorX;
-            } else {
-                $factor = $factorY;
-            }
+            $factor = $factorX < $factorY ? $factorX : $factorY;
         } else {
             $factor = 1;
         }
@@ -151,15 +137,10 @@ class ImageUpload
             }
         }
         foreach ($all_files as $file) {
-            array_push($success_arr, @unlink($file));
-        }
-        if (in_array(false, $success_arr, true)) {
-            $success = false;
-        } else {
-            $success = true;
+            $success_arr[] = @unlink($file);
         }
 
-        return $success;
+        return !in_array(false, $success_arr, true);
     }
 
     /** @phpstan-impure */
@@ -168,8 +149,8 @@ class ImageUpload
         if ($_FILES['file']['name'] === '') {
             $this->error .= 'Problem uploading file. Empty file?';
         } else {
-            $name_array = explode('.', $_FILES['file']['name']);
-            $size = sizeof($name_array);
+            $name_array = explode('.', (string) $_FILES['file']['name']);
+            $size = count($name_array);
             $ext = $name_array[$size - 1];
 
             /* check for jpeg */
@@ -179,7 +160,7 @@ class ImageUpload
                 $this->error .= 'Invalid file format.';
             } else {
                 $name = '';
-                if (sizeof($name_array) > 2) {
+                if (count($name_array) > 2) {
                     for ($i = 0; $i < $size - 1; $i++) {
                         $name .= $name_array[$i];
                         if ($i + 1 !== $size - 1) {
@@ -196,7 +177,7 @@ class ImageUpload
                 while (file_exists($this->target)) {
                     $this->target = $this->target_dir.$name.'_'.$i++.'.'.$ext;
                 }
-                $this->file = substr($this->target, strlen($this->target_dir));
+                $this->file = substr($this->target, strlen((string) $this->target_dir));
                 if (!@move_uploaded_file($_FILES['file']['tmp_name'], $this->target)) {
                     $this->error .= 'Internal error';
                 }

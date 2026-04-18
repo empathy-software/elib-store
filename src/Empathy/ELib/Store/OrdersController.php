@@ -9,6 +9,7 @@ use Empathy\MVC\Model;
 
 class OrdersController extends AdminController
 {
+    #[\Override]
     public function default_event(): void
     {
         $o = Model::load(OrderItem::class);

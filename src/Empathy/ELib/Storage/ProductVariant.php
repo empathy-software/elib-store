@@ -55,7 +55,7 @@ class ProductVariant extends Entity
         $result = $this->query($sql, $error, [$id]);
         if ($result->rowCount() > 0) {
             foreach ($result as $row) {
-                array_push($name, $row['option_val']);
+                $name[] = $row['option_val'];
             }
         }
 
@@ -93,13 +93,11 @@ class ProductVariant extends Entity
         $result = $this->query($sql, $error, $productIdString[1]);
         if ($result->rowCount() > 0) {
             foreach ($result as $row) {
-                if ($last_id !== 0) {
-                    if ($last_id !== $row['id']) {
-                        $variant['name'] = implode('-', str_replace(' ', '-', $variant_name));
-                        array_push($variants, $variant);
-                        $variant = [];
-                        $variant_name = [$name];
-                    }
+                if ($last_id !== 0 && $last_id !== $row['id']) {
+                    $variant['name'] = implode('-', str_replace(' ', '-', $variant_name));
+                    $variants[] = $variant;
+                    $variant = [];
+                    $variant_name = [$name];
                 }
                 if (!isset($variant['id'])) {
                     $variant['id'] = $row['id'];
@@ -108,12 +106,12 @@ class ProductVariant extends Entity
                 }
                 $property_name = $row['property_name'];
                 $variant[$property_name] = $row['option_val'];
-                array_push($variant_name, $row['option_val']);
+                $variant_name[] = $row['option_val'];
                 $last_id = $row['id'];
             }
         }
         $variant['name'] = implode('-', $variant_name);
-        array_push($variants, $variant);
+        $variants[] = $variant;
 
         return $variants;
     }
@@ -127,7 +125,7 @@ class ProductVariant extends Entity
         $result = $this->query($sql, $error, [$option_id]);
         if ($result->rowCount() > 0) {
             foreach ($result as $row) {
-                array_push($variants, $row);
+                $variants[] = $row;
             }
         }
 
@@ -137,7 +135,7 @@ class ProductVariant extends Entity
     public function getCartData(mixed $ids): mixed
     {
         $products = [];
-        $shippingCountry = Session::get('shipping_country') ? Session::get('shipping_country') : 'GB';
+        $shippingCountry = Session::get('shipping_country') ?: 'GB';
 
         // @todo: override shipping amounts
         // with variant values if they exist
@@ -197,7 +195,7 @@ class ProductVariant extends Entity
                         $item['product_id'] = $product_id;
                         $item['shipping'] = $shippingCountry === 'GB' ? $shipping_uk :
                             (\Empathy\ELib\Country\Country::isEurope($shippingCountry) ? $shipping_eu : $shipping_other);
-                        array_push($products, $item);
+                        $products[] = $item;
                     }
                     $options = [];
                     $properties = [];
@@ -211,8 +209,8 @@ class ProductVariant extends Entity
                 $shipping_eu = $row['shipping_eu'];
                 $shipping_other = $row['shipping_other'];
 
-                array_push($options, $row['option_val']);
-                array_push($properties, $row['p_name']);
+                $options[] = $row['option_val'];
+                $properties[] = $row['p_name'];
             }
             $item['name'] = $name;
             $item['options'] = implode(', ', $options);
@@ -225,7 +223,7 @@ class ProductVariant extends Entity
             $item['shipping_other'] = $shipping_other;
             $item['shipping'] = $shippingCountry === 'GB' ? $shipping_uk :
                 (\Empathy\ELib\Country\Country::isEurope($shippingCountry) ? $shipping_eu : $shipping_other);
-            array_push($products, $item);
+            $products[] = $item;
         }
 
         return $products;
@@ -250,7 +248,7 @@ class ProductVariant extends Entity
         $result = $this->query($sql, $error, [$product_id]);
         if ($result->rowCount() > 0) {
             foreach ($result as $row) {
-                array_push($variants, $row);
+                $variants[] = $row;
             }
         }
 
@@ -305,7 +303,7 @@ class ProductVariant extends Entity
         $result = $this->query($sql, $error, $idsString[1]);
         if ($result->rowCount() > 0) {
             foreach ($result as $row) {
-                array_push($cat_ids, $row['id']);
+                $cat_ids[] = $row['id'];
             }
         }
 

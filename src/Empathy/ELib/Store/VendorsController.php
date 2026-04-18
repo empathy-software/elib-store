@@ -13,6 +13,7 @@ use Empathy\MVC\Model;
 
 class VendorsController extends AdminController
 {
+    #[\Override]
     public function default_event(): void
     {
         $vendorModel = DI::getContainer()->get('VendorModel');
@@ -23,7 +24,7 @@ class VendorsController extends AdminController
             $v->load((int) $_POST['vendor_id']);
 
             $u = Model::load(UserItem::class);
-            $u->load((int) $v->user_id);
+            $u->load($v->user_id);
 
             if ($u->active && $v->name !== '') {
                 $u->auth = Access::VENDOR;

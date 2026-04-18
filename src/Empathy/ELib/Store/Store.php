@@ -23,11 +23,8 @@ define('REQUESTS_PER_PAGE', 12);
 
 class Store
 {
-    private mixed $c;
-
-    public function __construct(mixed $c)
+    public function __construct(private readonly mixed $c)
     {
-        $this->c = $c;
     }
 
     // from category controller
@@ -56,11 +53,6 @@ class Store
         $this->buildNav();
 
         $p = Model::load(ProductItem::class);
-        if (is_numeric($_GET['id'])) {
-            $showCat = $_GET['id'];
-        } else {
-            $showCat = 0;
-        }
 
         $params = [];
 
@@ -98,7 +90,7 @@ class Store
 
         $c = Model::load(CategoryItem::class);
         $c->id = $_GET['id'];
-        $category = $c->loadIndexed($c->category_id);
+        $c->loadIndexed($c->category_id);
 
         $this->c->assign('products', $product);
     }
@@ -163,11 +155,7 @@ class Store
                     if ($vendorId > 0) {
                         $v->load($vendorId);
 
-                        if ($v->verified !== null) {
-                            $p->vendor_verified = 1;
-                        } else {
-                            $p->vendor_verified = 0;
-                        }
+                        $p->vendor_verified = $v->verified !== null ? 1 : 0;
                         $p->vendor_id = $vendorId;
                     }
                 } else {
@@ -198,7 +186,7 @@ class Store
             $variants = $v->getAllColourVariants($p->id);
             $ids = [];
             foreach ($variants as $index => $item) {
-                array_push($ids, $item['id']);
+                $ids[] = $item['id'];
                 //if($item['image'] == '' && $item['other_image'] != '')
                 if ($item['other_image'] !== '') { // product colour images override variant images
                     $variants[$index]['image'] = $variants[$index]['other_image'];
@@ -207,7 +195,7 @@ class Store
 
             $sql = ' WHERE product_id = '.$p->id;
             $params = [];
-            if (sizeof($ids) > 0) {
+            if (count($ids) > 0) {
                 $union = $v->buildUnionString($ids);
                 $sql .= ' AND id NOT IN '.$union[0];
                 $params = $union[1];
@@ -225,19 +213,19 @@ class Store
 
         foreach ($variants as &$v) {
             $props = $property->loadForVariant($v['id']);
-            if (sizeof($props) > 0) {
+            if (count($props) > 0) {
                 $v['properties'] = $props;
             }
-            if ($this->setStatusFlags($v) === true
-               && $available_variant !== true) {
+            if ($this->setStatusFlags($v)
+               && !$available_variant) {
                 $available_variant = true;
             }
             $v['status_text'] = ProductVariantStatus::getStatus($v['status']);
         }
 
-        if ($available_variant === true
+        if ($available_variant
            && $p->name !== 'New Product'
-           && !($p->description === 'No description.' || $p->description === '<p>No description.</p>')
+           && ($p->description !== 'No description.' && $p->description !== '<p>No description.</p>')
            && count($p->getImages())) {
             if ($p->status !== ProductItemStatus::AVAILABLE) {
                 $this->c->assign('product_available_link', true);
@@ -299,7 +287,7 @@ class Store
         $sql = ' WHERE status = ?'
             .' AND product_id = ?';
         $variants = $v->getAllCustom($sql, [ProductVariantStatus::AVAILABLE, $product_id]);
-        if (sizeof($variants) < 1) {
+        if (count($variants) < 1) {
             $p = Model::load(ProductItem::class);
             $p->load((int) $product_id);
             $p->status = ProductItemStatus::CREATED;
@@ -384,14 +372,9 @@ class Store
             $p->name = $_POST['name'];
             $p->description = $_POST['description'];
 
-            if (isset($_POST['sold_in_store']) &&
-                $_POST['sold_in_store'] === 1) {
-                $p->status = 1;
-            } else {
-                $p->status = 0;
-            }
+            $p->status = isset($_POST['sold_in_store']) && $_POST['sold_in_store'] === 1 ? 1 : 0;
 
-            $p->brand_id = (isset($_POST['brand_id'])) ? $_POST['brand_id'] : null;
+            $p->brand_id = $_POST['brand_id'] ?? null;
 
             $p->validates();
             if ($p->hasValErrors()) {
@@ -511,9 +494,9 @@ class Store
         } elseif (isset($_POST['save'])) {
             $v = Model::load(ProductVariant::class);
             $v->load($_POST['id']);
-            $v->weight_g = (isset($_POST['weight_g'])) ? $_POST['weight_g'] : null;
-            $v->weight_lb = (isset($_POST['weight_lb'])) ? $_POST['weight_lb'] : null;
-            $v->weight_oz = (isset($_POST['weight_oz'])) ? $_POST['weight_oz'] : null;
+            $v->weight_g = $_POST['weight_g'] ?? null;
+            $v->weight_lb = $_POST['weight_lb'] ?? null;
+            $v->weight_oz = $_POST['weight_oz'] ?? null;
             $v->price = $_POST['price'];
             $v->validates();
             if ($v->hasValErrors()) {
@@ -584,7 +567,7 @@ class Store
             $p->product_variant_id = $_GET['id'];
             //if(isset($_POST['property']))
             // {
-            foreach ($_POST['property'] as $index => $item) {
+            foreach ($_POST['property'] as $item) {
                 if ($item > 0 && is_numeric($item)) {
                     $p->property_option_id = (int) $item;
                     $p->insert();
@@ -607,7 +590,7 @@ class Store
 
         $cp = Model::load(CategoryProperty::class);
 
-        array_push($cats, $p->category_id);
+        $cats[] = $p->category_id;
         $props = $cp->getPropertiesByCategory($cats);
 
         //array_push($props, 2); // always allow colour property
@@ -615,7 +598,7 @@ class Store
         $this->c->assign('product', $p);
         $this->c->assign('variant', $v);
 
-        if (sizeof($props) > 0) {
+        if (count($props) > 0) {
             $property = Model::load(Property::class);
             $properties = $property->getAllWithOptions($props);
             $this->c->assign('properties', $properties);
@@ -624,8 +607,8 @@ class Store
             $sql = ' WHERE product_variant_id = ?';
             $options = $pv->getAllCustom($sql, [$_GET['id']]);
             $o = [];
-            foreach ($options as $index => $value) {
-                array_push($o, $value['property_option_id']);
+            foreach ($options as $value) {
+                $o[] = $value['property_option_id'];
             }
             $this->c->assign('options', $o);
         }
