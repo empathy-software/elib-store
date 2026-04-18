@@ -36,6 +36,8 @@ class PaypalController extends EController
 
     public function success()
     {
+        $c = new ShoppingCart();
+        $c->emptyCart();
         $this->assignMessage('Thank you for your order');
     }
 
