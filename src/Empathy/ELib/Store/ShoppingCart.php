@@ -10,8 +10,7 @@ use Empathy\MVC\Session;
 
 class ShoppingCart
 {
-    public function calcTotal($items)
-    {
+    public function calcTotal(mixed $items): mixed {
         $total = 0;
         foreach ($items as $item) {
             $total += $item['line'];
@@ -20,8 +19,7 @@ class ShoppingCart
         return $total;
     }
 
-    public function loadFromCart()
-    {
+    public function loadFromCart(): mixed {
         $ids = [];
         $product_data = [];
 
@@ -55,8 +53,7 @@ class ShoppingCart
         return $product_data;
     }
 
-    public function add($variant_id, $qty)
-    {
+    public function add(mixed $variant_id, mixed $qty): void {
         if (($cart = Session::get('cart')) === false) {
             $cart = [];
         }
@@ -70,8 +67,7 @@ class ShoppingCart
         Session::set('cart', $cart);
     }
 
-    public function remove($variant_id)
-    {
+    public function remove(mixed $variant_id): void {
         if (($cart = Session::get('cart')) !== false) {
             if (isset($cart[$variant_id])) {
                 unset($cart[$variant_id]);
@@ -80,8 +76,7 @@ class ShoppingCart
         }
     }
 
-    public function update($variant_id, $qty)
-    {
+    public function update(mixed $variant_id, mixed $qty): void {
         if (($cart = Session::get('cart')) !== false) {
             if (isset($cart[$variant_id])) {
                 $cart[$variant_id]['qty'] = (int) ($qty);
@@ -90,8 +85,7 @@ class ShoppingCart
         }
     }
 
-    public static function getTotalItems()
-    {
+    public static function getTotalItems(): mixed {
         $total = 0;
         if (($cart = Session::get('cart')) !== false) {
             foreach ($cart as $v => $qty) {
@@ -102,13 +96,11 @@ class ShoppingCart
         return $total;
     }
 
-    public function emptyCart()
-    {
+    public function emptyCart(): void {
         Session::set('cart', []);
     }
 
-    public function isEmpty()
-    {
+    public function isEmpty(): mixed {
         $empty = false;
         if (($cart = Session::get('cart')) === false
            || sizeof($cart) < 1) {
@@ -118,8 +110,7 @@ class ShoppingCart
         return $empty;
     }
 
-    public static function dump()
-    {
+    public static function dump(): void {
         $c = Session::get('cart');
         print_r($c);
     }

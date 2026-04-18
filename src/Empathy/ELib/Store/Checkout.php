@@ -13,10 +13,10 @@ use Empathy\MVC\Session;
 
 class Checkout
 {
-    private $invoice_no;
-    private $invoice_id;
+    private mixed $invoice_no;
+    private mixed $invoice_id;
 
-    public function __construct($items)
+    public function __construct(mixed $items)
     {
         $s = Model::load(ShippingAddress::class);
         $s->id = Session::get('shipping_address_id');
@@ -39,14 +39,17 @@ class Checkout
 
         $l = Model::load(LineItem::class);
 
-        $total = 0;
+        $total = 0.0;
         foreach ($items as $item) {
             if (is_numeric($item['qty']) && $item['qty'] > 0) {
                 $l->order_id = $this->invoice_no;
                 $l->variant_id = $item['id'];
-                $l->price = $item['price'];
-                $l->quantity = $item['qty'];
-                $total += $l->quantity * $l->price;
+                $price = $item['price'];
+                $l->price = is_string($price)
+                    ? $price
+                    : number_format((float) $price, 2, '.', '');
+                $l->quantity = (int) $item['qty'];
+                $total += $l->quantity * (float) $l->price;
                 $l->insert();
             }
         }
@@ -56,7 +59,7 @@ class Checkout
         $o->order_id = 'OV' . $this->invoice_no . '-' . bin2hex(random_bytes(3));
         $this->invoice_id = $o->order_id;
 
-        $o->total = $total;
+        $o->total = number_format($total, 2, '.', '');
         $o->save();
 
         $countries = \Empathy\ELib\Country\Country::build();
@@ -74,18 +77,15 @@ class Checkout
         $l->insert();
     }
 
-    public function getInvoiceNo()
-    {
+    public function getInvoiceNo(): mixed {
         return $this->invoice_no;
     }
 
-    public function setInvoiceNo($id)
-    {
+    public function setInvoiceNo(mixed $id): void {
         $this->invoice_no = $id;
     }
 
-    public function getInvoiceId()
-    {
+    public function getInvoiceId(): mixed {
         return $this->invoice_id;
     }
 }

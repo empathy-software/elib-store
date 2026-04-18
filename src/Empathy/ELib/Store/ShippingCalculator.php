@@ -10,17 +10,15 @@ define('INTL_STANDARD', 10.00);
 
 class ShippingCalculator
 {
-    private $total;
-    private $cats;
-    private $cat;
-    private $calc_intl;
-    private $fee;
-    private $item_count;
-    private $intl_shipping;
+    private mixed $cats;
+    private mixed $cat;
+    private mixed $calc_intl;
+    private mixed $fee;
+    private mixed $item_count;
+    private mixed $intl_shipping;
 
-    public function __construct($total, $cats, $cat, $item_count, $calc_intl)
+    public function __construct(mixed $total, mixed $cats, mixed $cat, mixed $item_count, mixed $calc_intl)
     {
-        $this->total = $total;
         $this->cats = $cats;
         $this->cat = $cat;
         $this->item_count = $item_count;
@@ -59,8 +57,7 @@ class ShippingCalculator
 
     }
 
-    public function getFee()
-    {
+    public function getFee(): mixed {
         if ($this->calc_intl) {
             $fee = $this->fee + $this->intl_shipping + INTL_STANDARD;
         } else {

@@ -11,14 +11,18 @@ class LineItem extends Entity
     public const TABLE = 'line_item';
 
     public int $id;
-    public $order_id;
-    public $variant_id;
-    public $price;
-    public $quantity;
-    public $notes;
 
-    public function getOrderItems($orderId)
-    {
+    public int $order_id = 0;
+
+    public int $variant_id = 0;
+
+    public string $price = '0.00';
+
+    public int $quantity = 0;
+
+    public ?string $notes = null;
+
+    public function getOrderItems(mixed $orderId): mixed {
         return $this->getAllCustom('where order_id = ? and variant_id > 0', [$orderId]);
     }
 }

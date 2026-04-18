@@ -19,15 +19,13 @@ use Empathy\MVC\Model;
 
 class ProductController extends AdminController
 {
-    public function assertID()
-    {
+    public function assertID(): void {
         if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
             $this->redirect('admin/category');
         }
     }
 
-    public function edit()
-    {
+    public function edit(): void {
         $this->setTemplate('elib://admin/product.tpl');
         $p = Model::load(ProductItem::class);
         //$pr = new ProductRange($this);
@@ -164,8 +162,7 @@ class ProductController extends AdminController
         $this->presenter->assign('variants', $variants);
     }
 
-    public function upload_image()
-    {
+    public function upload_image(): void {
         $this->setTemplate('elib://admin/product.tpl');
         if (isset($_POST['upload'])) {
             $_GET['id'] = $_POST['id'];
@@ -218,8 +215,7 @@ class ProductController extends AdminController
         }
     }
 
-    public function resize_images()
-    {
+    public function resize_images(): void {
         $this->setTemplate('elib://admin/product.tpl');
         if (isset($_POST['submit'])) {
             set_time_limit(300);
@@ -237,8 +233,7 @@ class ProductController extends AdminController
         }
     }
 
-    public function delete_image()
-    {
+    public function delete_image(): void {
         $productId = (int) $_GET['product_id'];
         $imageId = (int) $_GET['image_id'];
 
@@ -253,8 +248,7 @@ class ProductController extends AdminController
         $this->redirect('admin/product/' . $i->product_id);
     }
 
-    public function make_default_image()
-    {
+    public function make_default_image(): void {
         $imageId = (int) $_GET['image_id'];
         $i = Model::load(ProductImage::class);
         $i->load($imageId);
@@ -262,8 +256,7 @@ class ProductController extends AdminController
         $this->redirect('admin/product/' . $i->product_id);
     }
 
-    public function delete()
-    {
+    public function delete(): void {
         $p = Model::load(ProductItem::class);
         $p->load($_GET['id']);
         if (!$p->hasVariants()) {
@@ -283,8 +276,7 @@ class ProductController extends AdminController
         }
     }
 
-    public function delete_variant()
-    {
+    public function delete_variant(): void {
         if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
             $_GET['id'] = 0;
         }
@@ -305,22 +297,20 @@ class ProductController extends AdminController
         $this->redirect('admin/product/' . $v->product_id);
     }
 
-    public function add_variant()
-    {
+    public function add_variant(): void {
         $this->assertID();
         $v = Model::load(ProductVariant::class);
         $v->product_id = $_GET['id'];
         $v->weight_g = 0;
-        $v->weight_lb = 0;
-        $v->weight_oz = 0;
+        $v->weight_lb = '0.00';
+        $v->weight_oz = '0.00';
         $v->price = 'DEFAULT';
         $v->status = 'DEFAULT';
         $v->insert();
         $this->redirect('admin/product/' . $_GET['id']);
     }
 
-    public function add()
-    {
+    public function add(): void {
         $p = Model::load(ProductItem::class);
         $p->category_id = $_GET['id'];
         $p->brand_id = 0;
@@ -333,8 +323,7 @@ class ProductController extends AdminController
         $this->redirect('admin/category/' . $_GET['id']);
     }
 
-    public function edit_variant()
-    {
+    public function edit_variant(): void {
         $this->assertID();
         $this->setTemplate('elib://admin/product.tpl');
         $v = Model::load(ProductVariant::class);
@@ -344,7 +333,7 @@ class ProductController extends AdminController
         $p->load($v->product_id);
         $this->presenter->assign('product', $p);
         // get variant data
-        $v_array = json_decode(json_encode($v), JSON_OBJECT_AS_ARRAY);
+        $v_array = json_decode(json_encode($v), true);
         $props = Model::load(Property::class);
         $v_array['properties'] = $props->loadForVariant($v_array['id']);
         $this->assign('v', $v_array);
@@ -370,8 +359,7 @@ class ProductController extends AdminController
         }
     }
 
-    public function upload_variant_image()
-    {
+    public function upload_variant_image(): void {
         $this->setTemplate('elib://admin/product.tpl');
         $this->assertID();
         $v = Model::load(ProductVariant::class);
@@ -380,7 +368,7 @@ class ProductController extends AdminController
         $this->presenter->assign('variant', $v);
 
         // get variant data
-        $v_array = json_decode(json_encode($v), JSON_OBJECT_AS_ARRAY);
+        $v_array = json_decode(json_encode($v), true);
         $props = Model::load(Property::class);
         $v_array['properties'] = $props->loadForVariant($v_array['id']);
         $this->assign('v', $v_array);
@@ -409,8 +397,7 @@ class ProductController extends AdminController
         }
     }
 
-    public function variant_properties()
-    {
+    public function variant_properties(): void {
         $this->setTemplate('elib://admin/product.tpl');
         $this->assertID();
 
@@ -439,7 +426,7 @@ class ProductController extends AdminController
         $v->load($_GET['id']);
 
         // get variant data
-        $v_array = json_decode(json_encode($v), JSON_OBJECT_AS_ARRAY);
+        $v_array = json_decode(json_encode($v), true);
         $property = Model::load(Property::class);
         $v_array['properties'] = $property->loadForVariant($v_array['id']);
         $this->assign('v', $v_array);
@@ -476,8 +463,7 @@ class ProductController extends AdminController
         }
     }
 
-    public function edit_colours()
-    {
+    public function edit_colours(): void {
         $this->setTemplate('elib://admin/product.tpl');
         $p = Model::load(ProductItem::class);
         $p->load($_GET['id']);
@@ -490,8 +476,7 @@ class ProductController extends AdminController
         $this->presenter->assign('product', $p);
     }
 
-    public function add_colour()
-    {
+    public function add_colour(): void {
         $this->setTemplate('elib://admin/product.tpl');
         $p = Model::load(ProductItem::class);
         $p->load($_GET['id']);
@@ -527,8 +512,7 @@ class ProductController extends AdminController
         }
     }
 
-    public function delete_colour()
-    {
+    public function delete_colour(): void {
         $p = Model::load(ProductColour::class);
         $p->load($_GET['id']);
 
@@ -545,8 +529,7 @@ class ProductController extends AdminController
         $this->redirect('admin/product/edit_colours/' . $p->product_id);
     }
 
-    public function edit_colour()
-    {
+    public function edit_colour(): void {
         $this->setTemplate('elib://admin/product.tpl');
         if (isset($_POST['save_colour'])) {
             $c = Model::load(ProductColour::class);
@@ -593,8 +576,7 @@ class ProductController extends AdminController
         $this->presenter->assign('colour', $colours[$c->property_option_id]);
     }
 
-    public function variants_wizard()
-    {
+    public function variants_wizard(): void {
         $this->setTemplate('elib://admin/product.tpl');
         if (isset($_POST['submit'])) {
             $sets = [];
@@ -624,7 +606,7 @@ class ProductController extends AdminController
                     foreach ($options as $o) {
                         $p = Model::load(ProductVariantPropertyOption::class);
                         $p->product_variant_id = $v->id;
-                        $p->property_option_id = $o;
+                        $p->property_option_id = (int) $o;
                         $p->insert();
                     }
                 }
@@ -663,7 +645,7 @@ class ProductController extends AdminController
         $v = Model::load(ProductVariant::class);
         $v->weight_g = 0;
         $v->weight_lb = '0.00';
-        $v->weight_oz = 0;
+        $v->weight_oz = '0.00';
         $v->price = '0.00';
         $this->presenter->assign('variant', $v);
 

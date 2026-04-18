@@ -12,18 +12,18 @@ class BrandItem extends Entity
     public const TABLE = 'brand';
 
     public int $id;
-    public $name;
-    public $about;
 
-    public function validates()
-    {
+    public ?string $name = null;
+
+    public ?string $about = null;
+
+    public function validates(): void {
         if ($this->name === '') {
             $this->addValError('Invalid brand name.');
         }
     }
 
-    public function buildTree($current, $tree)
-    {
+    public function buildTree(mixed $current, mixed $tree): mixed {
         $i = 0;
         $nodes = [];
         $sql = 'SELECT id,name FROM '.Model::getTable(self::class).' ORDER BY name';
@@ -43,8 +43,7 @@ class BrandItem extends Entity
 
     // produce a list of artists ordered correctly
     // not used to produce the artist tree
-    public function getBrands()
-    {
+    public function getBrands(): mixed {
         $brand = [];
         $brand[0] = 'None';
         $sql = 'SELECT * FROM '.Model::getTable(self::class).' ORDER BY name';

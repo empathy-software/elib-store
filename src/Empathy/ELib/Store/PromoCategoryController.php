@@ -13,15 +13,13 @@ define('REQUESTS_PER_PAGE', 12);
 
 class PromoCategoryController extends AdminController
 {
-    public function assertID()
-    {
+    public function assertID(): void {
         if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
             $_GET['id'] = 0;
         }
     }
 
-    public function buildNav()
-    {
+    public function buildNav(): void {
 
         //$this->assertID();
         if (!isset($_GET['collapsed']) || !is_numeric($_GET['collapsed'])) {
@@ -68,7 +66,7 @@ class PromoCategoryController extends AdminController
         $this->buildNav();
 
 
-        if (isset($_GET['id']) && is_numeric($_GET['id'])) {
+        if (is_numeric($_GET['id'])) {
             $showCat = $_GET['id'];
         } else {
             $showCat = 0;
@@ -104,8 +102,7 @@ class PromoCategoryController extends AdminController
         $this->presenter->assign('promos', $promo);
     }
 
-    public function add()
-    {
+    public function add(): void {
         if (isset($_GET['id']) && is_numeric($_GET['id'])) {
             $p = Model::load(PromoItem::class);
             $p->category_id = $_GET['id'];

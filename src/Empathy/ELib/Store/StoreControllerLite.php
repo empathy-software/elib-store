@@ -21,10 +21,10 @@ use Empathy\MVC\Session;
 //class StoreControllerLite extends AuthedController
 class StoreControllerLite extends EController
 {
-    protected $pages;
-    protected $vendor_lock;
+    protected mixed $pages;
+    protected mixed $vendor_lock;
 
-    public function __construct($boot)
+    public function __construct(mixed $boot)
     {
         parent::__construct($boot);
         $this->assign('cart_items', ShoppingCart::getTotalItems());
@@ -37,8 +37,7 @@ class StoreControllerLite extends EController
         }
     }
 
-    public function filterInt($name)
-    {
+    public function filterInt(mixed $name): mixed {
         if (isset($_GET[$name])) {
             return (int) $_GET[$name];
         } else {
@@ -51,8 +50,7 @@ class StoreControllerLite extends EController
         $this->setTemplate('elib://store_category.tpl');
     }
 
-    public function minimalLayout()
-    {
+    public function minimalLayout(): void {
         //        if (0 && CurrentUser::loggedIn()) {
         //            $ui_array = array('page', 'vendor_id', 'id');
         //            $this->loadUIVars('ui_blog', $ui_array);
@@ -79,8 +77,8 @@ class StoreControllerLite extends EController
         }
 
         $brands_available = [
-            1 => ['name' => 'A.CE', 'set' =>  isset($_GET['brands']) && is_array($_GET['brands']) ? in_array(1, $_GET['brands'], true) : 0],
-            2 => ['name' => 'VEIL', 'set' => isset($_GET['brands']) && is_array($_GET['brands']) ? in_array(2, $_GET['brands'], true) : 0],
+            1 => ['name' => 'A.CE', 'set' => is_array($_GET['brands']) ? in_array(1, $_GET['brands'], true) : 0],
+            2 => ['name' => 'VEIL', 'set' => is_array($_GET['brands']) ? in_array(2, $_GET['brands'], true) : 0],
         ];
         $this->assign('brands_available', $brands_available);
 
@@ -175,7 +173,7 @@ class StoreControllerLite extends EController
             $params = array_merge($params, $descendantsString[1]);
         }
 
-        if (isset($_GET['brands']) && count($_GET['brands']) > 0) {
+        if (is_array($_GET['brands']) && count($_GET['brands']) > 0) {
             $brands = $p->buildUnionString($_GET['brands']);
             $sql .= ' AND brand_id IN ' . $brands[0];
             $params = array_merge($params, $brands[1]);
@@ -226,8 +224,7 @@ class StoreControllerLite extends EController
         }
     }
 
-    public function addProductToCart($product_id)
-    {
+    public function addProductToCart(mixed $product_id): void {
         $options = [];
         $variant_id = 0;
         if (isset($_POST['property'])) {
@@ -277,8 +274,7 @@ class StoreControllerLite extends EController
         }
     }
 
-    public function minimalProductView()
-    {
+    public function minimalProductView(): void {
         $this->setTemplate('store_product.tpl');
         $p = Model::load(ProductItem::class);
         $p->id = $this->filterInt('id');
@@ -317,8 +313,7 @@ class StoreControllerLite extends EController
         }
     }
 
-    public function cart()
-    {
+    public function cart(): void {
         $sc = DI::getContainer()->get('ShippingCalculator');
 
         if (isset($_GET['get_shipping']) && $_GET['get_shipping']) {
@@ -416,8 +411,7 @@ class StoreControllerLite extends EController
         }
     }
 
-    public function checkout()
-    {
+    public function checkout(): void {
         //        $this->setTemplate('checkout.tpl');
         //        $s = Model::load(ShippingAddress::class);
         //
@@ -437,8 +431,7 @@ class StoreControllerLite extends EController
     }
 
     // taken from product admin (variant properties)
-    public function getPropertiesAndOptions($p, $colours)
-    {
+    public function getPropertiesAndOptions(mixed $p, mixed $colours): void {
         /*
           $v = new ProductVariant($this);
           $v->id = $_GET['id'];

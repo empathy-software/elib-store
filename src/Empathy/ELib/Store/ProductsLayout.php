@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Empathy\ELib\Store;
 
+use Empathy\ELib\Storage\BrandItem;
 use Empathy\ELib\Storage\CategoryItem;
 use Empathy\ELib\Storage\ProductItem;
+use Empathy\ELib\Storage\ProductVariant;
 use Empathy\ELib\Storage\ProductItemStatus;
 use Empathy\MVC\Model;
 
@@ -13,17 +15,17 @@ define('BUTTONS_PER_PAGE', 12);
 
 class ProductsLayout
 {
-    private $category;
-    private $product;
-    private $variant;
-    private $option;
-    private $buttons = [];
-    private $breadcrumb = [];
-    private $redirect = '';
-    private $controller;
-    private $p_nav = [];
+    private mixed $category;
+    private mixed $product;
+    private mixed $variant;
+    private mixed $option;
+    private mixed $buttons = [];
+    private mixed $breadcrumb = [];
+    private mixed $redirect = '';
+    private mixed $controller;
+    private mixed $p_nav = [];
 
-    public function __construct($c, $p, $v, $o, $controller)
+    public function __construct(mixed $c, mixed $p, mixed $v, mixed $o, mixed $controller)
     {
         $this->controller = $controller;
         $this->category = $c;
@@ -49,23 +51,19 @@ class ProductsLayout
         }
     }
 
-    public function getRedirect()
-    {
+    public function getRedirect(): mixed {
         return $this->redirect;
     }
 
-    public function getBreadCrumb()
-    {
+    public function getBreadCrumb(): mixed {
         return $this->breadcrumb;
     }
 
-    public function getProduct()
-    {
+    public function getProduct(): mixed {
         return $this->product;
     }
 
-    public function randomImage($c_id)
-    {
+    public function randomImage(mixed $c_id): mixed {
         $image = '';
         $descendants = [];
 
@@ -91,13 +89,11 @@ class ProductsLayout
         return $image;
     }
 
-    public function getButtons()
-    {
+    public function getButtons(): mixed {
         return $this->buttons;
     }
 
-    public function buildByCategory()
-    {
+    public function buildByCategory(): void {
         $button = [];
 
         if (!$this->category->getChildren($this->category->id)) {
@@ -119,8 +115,8 @@ class ProductsLayout
             $select = '*,t1.name AS product_name, t1.image AS image, t2.name AS brand_name, t1.id AS product_id, MIN(t3.price) AS price';
             $products = $this->product->getAllCustomPaginateMultiJoinGroup(
                 $select,
-                Model::getTable('BrandItem'),
-                Model::getTable('ProductVariant'),
+                Model::getTable(BrandItem::class),
+                Model::getTable(ProductVariant::class),
                 $sql,
                 $page,
                 $per_page,
@@ -139,8 +135,8 @@ class ProductsLayout
 
             $this->p_nav = $this->product->getPaginatePagesMultiJoinGroup(
                 $select,
-                Model::getTable('BrandItem'),
-                Model::getTable('ProductVariant'),
+                Model::getTable(BrandItem::class),
+                Model::getTable(ProductVariant::class),
                 $sql,
                 $page,
                 $per_page,
@@ -181,13 +177,11 @@ class ProductsLayout
         }
     }
 
-    public function getPNav()
-    {
+    public function getPNav(): mixed {
         return $this->p_nav;
     }
 
-    public function buildByProduct()
-    {
+    public function buildByProduct(): void {
         $button = [];
 
         $variants = $this->variant->getAllCustom(' WHERE product_id = ?', [$this->product->id]);
@@ -200,8 +194,7 @@ class ProductsLayout
         }
     }
 
-    public function buildBC()
-    {
+    public function buildBC(): void {
         $cats = [];
 
         if ($this->product->id !== 0) {
@@ -245,8 +238,7 @@ class ProductsLayout
         $this->breadcrumb = array_reverse($cats);
     }
 
-    public function buildByOption()
-    {
+    public function buildByOption(): void {
         $button = [];
 
         $variants = $this->variant->getAllForOption($this->option->id);
@@ -263,8 +255,7 @@ class ProductsLayout
         }
     }
 
-    public static function getTopCats()
-    {
+    public static function getTopCats(): mixed {
         $categories = [];
         $c = Model::load(CategoryItem::class);
         if ($_GET['module'] === 'store') {

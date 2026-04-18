@@ -9,7 +9,7 @@ use Empathy\MVC\DI;
 
 class VendorController extends EController
 {
-    public function __construct($boot)
+    public function __construct(mixed $boot)
     {
         parent::__construct($boot);
         $user = DI::getContainer()->get('CurrentUser');

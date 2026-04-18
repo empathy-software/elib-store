@@ -9,11 +9,11 @@ use Empathy\MVC\Config;
 
 class BrandsTree extends Tree
 {
-    private $brand;
-    private $data;
-    private $brand_ancestors;
+    private mixed $brand;
+    private mixed $data;
+    private mixed $brand_ancestors;
 
-    public function __construct($brand)
+    public function __construct(mixed $brand)
     {
         $this->brand = $brand;
         $this->brand_ancestors = [0];
@@ -25,16 +25,14 @@ class BrandsTree extends Tree
         $this->markup = $this->buildMarkup($this->data, 0, $current_id, 0);
     }
 
-    public function buildTree($id, $tree)
-    {
+    public function buildTree(mixed $id, mixed $tree): mixed {
         $nodes = [];
         $nodes = $tree->brand->buildTree($id, $tree);
 
         return $nodes;
     }
 
-    private function buildMarkup($data, $level, $current_id, $last_id)
-    {
+    private function buildMarkup(mixed $data, mixed $level, mixed $current_id, mixed $last_id): mixed {
         $markup = "\n<ul";
 
         $ancestors = $this->brand_ancestors;

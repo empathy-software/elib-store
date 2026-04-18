@@ -9,11 +9,11 @@ use Empathy\MVC\Config;
 
 class PromosTree extends Tree
 {
-    private $category;
-    private $data;
-    private $category_ancestors;
+    private mixed $category;
+    private mixed $data;
+    private mixed $category_ancestors;
 
-    public function __construct($category, $collapsed)
+    public function __construct(mixed $category, mixed $collapsed)
     {
         $this->category = $category;
         $current_id = $this->category->id;
@@ -35,16 +35,14 @@ class PromosTree extends Tree
         $this->markup = $this->buildMarkup($this->data, 0, $current_id, 0);
     }
 
-    public function buildTree($id, $tree)
-    {
+    public function buildTree(mixed $id, mixed $tree): mixed {
         $nodes = [];
         $nodes = $tree->category->buildTree($id, $tree);
 
         return $nodes;
     }
 
-    private function buildMarkup($data, $level, $current_id, $last_id)
-    {
+    private function buildMarkup(mixed $data, mixed $level, mixed $current_id, mixed $last_id): mixed {
         $markup = "\n<ul";
 
         $ancestors = $this->category_ancestors;

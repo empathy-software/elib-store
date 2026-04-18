@@ -12,14 +12,20 @@ class CategoryItem extends Entity
     public const TABLE = 'category';
 
     public int $id;
-    public $category_id;
-    public $hidden;
-    public $name;
-    public $shipping;
-    public $intl_shipping;
 
-    public function buildDescendantIDs($id, &$ids)
-    {
+    public int $category_id;
+
+    /**
+     * May be {@see \Empathy\MVC\Entity} insert sentinel <code>'DEFAULT'</code>.
+     */
+    public int|string $hidden = 0;
+
+    public string $name = '';
+
+    public ?string $shipping = null;
+    public ?string $intl_shipping = null;
+
+    public function buildDescendantIDs(mixed $id, mixed &$ids): void {
         array_push($ids, $id);
         $sql = 'SELECT id FROM '.Model::getTable(self::class).' WHERE category_id = ?';
         $error = 'Could not check for descendants.';
@@ -31,8 +37,7 @@ class CategoryItem extends Entity
         }
     }
 
-    public function getChildren($id)
-    {
+    public function getChildren(mixed $id): mixed {
         $c = [];
         $sql = 'SELECT id FROM '.Model::getTable(self::class).' WHERE category_id = ?'
             .' AND hidden != 1'
@@ -48,8 +53,7 @@ class CategoryItem extends Entity
         return $c;
     }
 
-    public function hasChildren()
-    {
+    public function hasChildren(): mixed {
         $c = 0;
         $sql = 'SELECT id FROM '.Model::getTable(self::class).' WHERE category_id = ?';
         $error = 'Could not check for child categories.';
@@ -61,8 +65,7 @@ class CategoryItem extends Entity
         return $c;
     }
 
-    public function validates()
-    {
+    public function validates(): void {
         $name = $this->name;
         $name = str_replace(' ', '', $name);
         $name = str_replace('-', '', $name);
@@ -72,8 +75,7 @@ class CategoryItem extends Entity
         }
     }
 
-    public function getAncestorIDs($id, $ancestors)
-    {
+    public function getAncestorIDs(mixed $id, mixed $ancestors): mixed {
         $section_id = 0;
         $category_id = 0;
         $sql = 'SELECT category_id FROM '.Model::getTable(self::class).' WHERE id = ?';
@@ -91,8 +93,7 @@ class CategoryItem extends Entity
         return $ancestors;
     }
 
-    public function buildTree($current, $tree)
-    {
+    public function buildTree(mixed $current, mixed $tree): mixed {
         $i = 0;
         $nodes = [];
         $sql = 'SELECT id,name AS label FROM '.Model::getTable(self::class).' WHERE category_id = ? ORDER BY name';
@@ -111,8 +112,7 @@ class CategoryItem extends Entity
         return $nodes;
     }
 
-    public function hasCategoriesOrProducts($id)
-    {
+    public function hasCategoriesOrProducts(mixed $id): mixed {
         $data = 0;
         $sql = 'SELECT id FROM '.Model::getTable(self::class).' WHERE category_id = ?';
         $error = 'Could not check for existing child categories.';
@@ -130,8 +130,7 @@ class CategoryItem extends Entity
         return $data;
     }
 
-    public function buildBreadCrumb($id, &$ancestors)
-    {
+    public function buildBreadCrumb(mixed $id, mixed &$ancestors): void {
         $category = [];
         $row = null;
         $sql = 'SELECT id,category_id,name FROM '.Model::getTable(self::class).' WHERE id = ?';
@@ -151,8 +150,7 @@ class CategoryItem extends Entity
     }
 
     //public function loadIndexed()
-    public function loadIndexed($parent_id)
-    {
+    public function loadIndexed(mixed $parent_id): mixed {
         $sql = 'SELECT * FROM '.Model::getTable(self::class);
         //$sql .= ' WHERE parent_id = '.$parent_id;
         $error = 'Could not fetch categories.';
@@ -166,8 +164,7 @@ class CategoryItem extends Entity
         return $category;
     }
 
-    public function getShipping($ids)
-    {
+    public function getShipping(mixed $ids): mixed {
         $idsString = $this->buildUnionString($ids);
         $shipping = [];
         $sql = 'SELECT shipping FROM '.Model::getTable(self::class)
@@ -184,8 +181,7 @@ class CategoryItem extends Entity
         return $shipping;
     }
 
-    public function getShippingIntl($ids)
-    {
+    public function getShippingIntl(mixed $ids): mixed {
         $idsString = $this->buildUnionString($ids);
         $shipping = 0;
         $sql = 'SELECT MAX(intl_shipping) AS intl_shipping FROM '.Model::getTable(self::class)
@@ -201,8 +197,7 @@ class CategoryItem extends Entity
         return $shipping;
     }
 
-    public function loadIDByName($name)
-    {
+    public function loadIDByName(mixed $name): mixed {
         $id = 0;
         $sql = 'SELECT id FROM '.Model::getTable(self::class)
             .' WHERE name LIKE ?';

@@ -11,19 +11,21 @@ class PromoItem extends Entity
     public const TABLE = 'promo';
 
     public int $id;
-    public $category_id;
-    public $name;
-    public $alt;
-    public $url;
-    public $image;
-    public $hidden;
 
-    public function validates()
-    {
-        if ($this->url === '') {
+    public int $category_id;
+
+    public ?string $name = null;
+    public ?string $alt = null;
+    public ?string $url = null;
+    public ?string $image = null;
+
+    public string $hidden = '';
+
+    public function validates(): void {
+        if (($this->url ?? '') === '') {
             $this->addValError('Invalid URL');
         }
-        if ($this->name === '') {
+        if (($this->name ?? '') === '') {
             $this->addValError('Invliad name.');
         }
     }

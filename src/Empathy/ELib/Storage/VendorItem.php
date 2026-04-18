@@ -13,11 +13,11 @@ use Empathy\MVC\Model;
  */
 abstract class VendorItem extends Entity
 {
-    public mixed $user_id = null;
+    public int $user_id = 0;
 
-    public mixed $name = null;
+    public ?string $name = null;
 
-    public mixed $verified = null;
+    public ?string $verified = null;
 
     abstract public function getIDByUserID(int $user_id): int;
 
@@ -27,11 +27,6 @@ abstract class VendorItem extends Entity
         if (!is_string($class) || !is_a($class, self::class, true)) {
             throw new \LogicException('VendorModel must be a class-string extending ' . self::class);
         }
-        $entity = Model::load($class);
-        if (!$entity instanceof self) {
-            throw new \LogicException('VendorModel must instantiate ' . self::class);
-        }
-
-        return $entity;
+        return Model::load($class);
     }
 }

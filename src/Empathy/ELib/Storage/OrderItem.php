@@ -13,23 +13,34 @@ class OrderItem extends Entity
     public const TABLE = 'e_order';
 
     public int $id;
-    public $user_id;
-    public $status;
-    public $stamp;
-    public $first_name;
-    public $last_name;
-    public $address1;
-    public $address2;
-    public $city;
-    public $state;
-    public $zip;
-    public $country;
-    public $shipping;
-    public $total;
-    public $order_id;
 
-    public function getOrders()
-    {
+    public int $user_id = 0;
+
+    /**
+     * May be {@see \Empathy\MVC\Entity} insert sentinel <code>'DEFAULT'</code>.
+     */
+    public int|string $status = 1;
+
+    /**
+     * May be {@see \Empathy\MVC\Entity} insert sentinel <code>'MYSQLTIME'</code>.
+     */
+    public string|null $stamp = null;
+
+    public ?string $first_name = null;
+    public ?string $last_name = null;
+    public ?string $address1 = null;
+    public ?string $address2 = null;
+    public ?string $city = null;
+    public ?string $state = null;
+    public ?string $zip = null;
+    public ?string $country = null;
+
+    public ?string $shipping = null;
+    public ?string $total = null;
+
+    public ?string $order_id = null;
+
+    public function getOrders(): mixed {
         $order = [];
         $sql = 'select t3.order_id as order_id, t3.stamp, t5.id as product_id,  t5.name, t2.status, t4.price, t4.quantity, t4.notes from '
             . Model::getTable(OrderItem::class) . ' t3 '
@@ -81,8 +92,7 @@ class OrderItem extends Entity
         return $order;
     }
 
-    public function loadByOrderId($order_id)
-    {
+    public function loadByOrderId(mixed $order_id): mixed {
         $sql = 'select id from ' . Model::getTable(OrderItem::class) . ' where order_id = ?';
         $result = $this->query($sql, 'Could not load by order id', [$order_id]);
         if ($result->rowCount() > 0) {

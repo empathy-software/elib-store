@@ -13,10 +13,10 @@ class Property extends Entity
     public const TABLE = 'property';
 
     public int $id;
-    public $name;
 
-    public function loadForVariant($variant_id)
-    {
+    public string $name = '';
+
+    public function loadForVariant(mixed $variant_id): mixed {
         $p = [];
         $sql = 'SELECT t1.name as property_name, t2.option_val '
             .' FROM '.Model::getTable(ProductVariantPropertyOption::class).', '.Model::getTable(Property::class).' t1 LEFT JOIN '
@@ -31,8 +31,7 @@ class Property extends Entity
         return ($p);
     }
 
-    public function findColourId()
-    {
+    public function findColourId(): mixed {
         $id = 0;
         $sql = 'select t1.id from '.Model::getTable(Property::class).' t1 '
             .' where t1.name like ? limit 0, 1';
@@ -44,8 +43,7 @@ class Property extends Entity
         return $id;
     }
 
-    public function getAllWithOptions($props)
-    {
+    public function getAllWithOptions(mixed $props): mixed {
         $propsString = $this->buildUnionString($props);
 
         $params = [];
@@ -77,8 +75,7 @@ class Property extends Entity
         return $property;
     }
 
-    public function validates()
-    {
+    public function validates(): void {
         $this->doValType(Validate::TEXT, 'name', $this->name, false);
     }
 
@@ -99,8 +96,7 @@ class Property extends Entity
       }
     */
 
-    public function getAllWithOptionsForProduct($props, $opts)
-    {
+    public function getAllWithOptionsForProduct(mixed $props, mixed $opts): mixed {
         $propsString = $this->buildUnionString($props);
 
         $property = [];

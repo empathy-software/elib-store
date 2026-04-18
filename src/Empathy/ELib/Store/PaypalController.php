@@ -19,8 +19,7 @@ use Empathy\MVC\Session;
 
 class PaypalController extends EController
 {
-    private function getPayPalURL()
-    {
+    private function getPayPalURL(): mixed {
         $url = '';
         if (!defined('ELIB_USE_PAYPAL_SANDBOX')) {
             throw new \Exception('Do not know whether to use paypal sandbox.');
@@ -34,21 +33,18 @@ class PaypalController extends EController
         return $url;
     }
 
-    public function success()
-    {
+    public function success(): void {
         $c = new ShoppingCart();
         $c->emptyCart();
         $this->assignMessage('Thank you for your order');
     }
 
-    public function cancel()
-    {
+    public function cancel(): void {
         $this->assignMessage('The order was canceled');
     }
 
 
-    private function writeLog($message, $level = 'info')
-    {
+    private function writeLog(mixed $message, mixed $level = 'info'): void {
         $log = new LogItem(
             'paypal ipn',
             [],
@@ -60,8 +56,7 @@ class PaypalController extends EController
     }
 
 
-    public function ipn()
-    {
+    public function ipn(): void {
         $p = new PaypalClass();
         $p->ipn_log = true;
         $p->paypal_url = $this->getPayPalURL();
@@ -167,8 +162,7 @@ class PaypalController extends EController
         $this->writeLog('Payment completed');
     }
 
-    public function assignMessage($message)
-    {
+    public function assignMessage(mixed $message): void {
         if ($message !== '') {
             $this->presenter->assign('message', $message);
         }
@@ -275,8 +269,7 @@ class PaypalController extends EController
         //exit();
     }
 
-    protected function getBusiness()
-    {
+    protected function getBusiness(): mixed {
         return ELIB_PAYPAL_BUSINESS_EMAIL;
     }
 }

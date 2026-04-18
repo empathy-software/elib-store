@@ -13,12 +13,14 @@ class ProductImage extends Entity
     public const TABLE = 'product_image';
 
     public int $id;
-    public $image;
-    public $product_id;
-    public $default_image;
 
-    public function validates()
-    {
+    public string $image = '';
+
+    public int $product_id = 0;
+
+    public int $default_image = 1;
+
+    public function validates(): void {
         if ($this->image === '') {
             $this->addValError('Missing filename');
         }
@@ -27,8 +29,7 @@ class ProductImage extends Entity
         }
     }
 
-    public function loadByProductItem($product)
-    {
+    public function loadByProductItem(mixed $product): mixed {
         $sql = 'SELECT * FROM '.Model::getTable(self::class)
             .' WHERE product_id = ?'
             .' order by default_image DESC';
@@ -37,8 +38,7 @@ class ProductImage extends Entity
         return $this->query($sql, $error, [$product->id])->fetchAll();
     }
 
-    public function loadByProductItemDisplayed($product)
-    {
+    public function loadByProductItemDisplayed(mixed $product): mixed {
         $noneFound = false;
         $images = $this->loadByProductItem($product);
         if (count($images) < 1) {
@@ -79,8 +79,7 @@ class ProductImage extends Entity
         }
     }
 
-    public function makeDefault()
-    {
+    public function makeDefault(): void {
         $sql = 'UPDATE '.Model::getTable(self::class)
             .' SET default_image = 0 WHERE product_id = ?';
         $error = 'Could not update default image.';

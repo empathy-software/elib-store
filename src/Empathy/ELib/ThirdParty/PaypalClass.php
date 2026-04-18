@@ -98,13 +98,13 @@ use Empathy\MVC\Config;
 
 class PaypalClass
 {
-    public $last_error;                 // holds the last error encountered
-    public $ipn_log;                    // bool: log IPN results to text file?
-    public $ipn_log_file;               // filename of the IPN log
-    public $ipn_response;               // holds the IPN response from paypal
-    public $ipn_data = [];         // array contains the POST values for IPN
-    public $fields = [];           // array holds the fields to submit to paypal
-    public $paypal_url = '';
+    public mixed $last_error;                 // holds the last error encountered
+    public mixed $ipn_log;                    // bool: log IPN results to text file?
+    public mixed $ipn_log_file;               // filename of the IPN log
+    public mixed $ipn_response;               // holds the IPN response from paypal
+    public mixed $ipn_data = [];         // array contains the POST values for IPN
+    public mixed $fields = [];           // array holds the fields to submit to paypal
+    public mixed $paypal_url = '';
 
 
     public function __construct()
@@ -129,8 +129,7 @@ class PaypalClass
 
     }
 
-    public function add_field($field, $value)
-    {
+    public function add_field(mixed $field, mixed $value): void {
 
         // adds a key=>value pair to the fields array, which is what will be
         // sent to paypal as POST variables.  If the value is already in the
@@ -139,8 +138,7 @@ class PaypalClass
         $this->fields["$field"] = $value;
     }
 
-    public function submit_paypal_post()
-    {
+    public function submit_paypal_post(): void {
 
         // this function actually generates an entire HTML page consisting of
         // a form with hidden elements which is submitted to paypal via the
@@ -174,8 +172,7 @@ class PaypalClass
 
     }
 
-    public function validate_ipn()
-    {
+    public function validate_ipn(): mixed {
         $raw_post_data = file_get_contents('php://input');
         $this->ipn_response = '';
 
@@ -186,7 +183,7 @@ class PaypalClass
 
         $ch = curl_init($this->paypal_url);
 
-        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_HEADER, false);
@@ -227,8 +224,7 @@ class PaypalClass
         return false;
     }
 
-    public function log_ipn_results($success)
-    {
+    public function log_ipn_results(mixed $success): void {
 
         if (!$this->ipn_log) {
             return;
@@ -260,8 +256,7 @@ class PaypalClass
         fclose($fp);  // close file
     }
 
-    public function dump_fields()
-    {
+    public function dump_fields(): void {
 
         // Used for debugging, this function will output all the field/value pairs
         // that are currently defined in the instance of the class using the

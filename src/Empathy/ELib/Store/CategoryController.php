@@ -40,7 +40,7 @@ class CategoryController extends AdminController
 
         $params = [];
         $p = Model::load(ProductItem::class);
-        if (isset($_GET['id']) && is_numeric($_GET['id'])) {
+        if (is_numeric($_GET['id'])) {
             $showCat = $_GET['id'];
         } else {
             $showCat = 0;
@@ -90,8 +90,7 @@ class CategoryController extends AdminController
         $this->presenter->assign('products', $product);
     }
 
-    public function buildNav()
-    {
+    public function buildNav(): void {
         $this->setTemplate('elib://admin/category.tpl');
         if (!isset($_GET['collapsed']) || !is_numeric($_GET['collapsed'])) {
             $_GET['collapsed'] = 0;
@@ -111,15 +110,13 @@ class CategoryController extends AdminController
         $this->presenter->assign('brands', $b->getBrands());
     }
 
-    public function assertID()
-    {
+    public function assertID(): void {
         if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
             $_GET['id'] = 0;
         }
     }
 
-    public function add_category()
-    {
+    public function add_category(): void {
         if (isset($_GET['id']) && is_numeric($_GET['id'])) {
             $c = Model::load(CategoryItem::class);
             $c->category_id = $_GET['id'];
@@ -130,8 +127,7 @@ class CategoryController extends AdminController
         $this->redirect('admin/category/'.$_GET['id']);
     }
 
-    public function rename()
-    {
+    public function rename(): void {
         $this->buildNav();
         if (isset($_POST['save'])) {
             $c = Model::load(CategoryItem::class);
@@ -154,8 +150,7 @@ class CategoryController extends AdminController
         }
     }
 
-    public function delete()
-    {
+    public function delete(): void {
         $this->assertID();
         $c = Model::load(CategoryItem::class);
         $c->load($_GET['id']);
@@ -168,8 +163,7 @@ class CategoryController extends AdminController
 
     }
 
-    public function active_properties()
-    {
+    public function active_properties(): void {
         $this->buildNav();
 
         if (isset($_POST['save'])) {

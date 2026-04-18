@@ -8,18 +8,18 @@ use Empathy\MVC\Config;
 
 class ImageUpload
 {
-    public $error;
-    public $target;
-    public $target_dir;
-    public $file;
-    public $deriv;
-    public $orig;
-    public $origX;
-    public $origY;
-    public $quality;
-    public $gallery;
+    public mixed $error;
+    public mixed $target;
+    public mixed $target_dir;
+    public mixed $file;
+    public mixed $deriv;
+    public mixed $orig;
+    public mixed $origX;
+    public mixed $origY;
+    public mixed $quality;
+    public mixed $gallery;
 
-    public function __construct($gallery, $upload, $deriv)
+    public function __construct(mixed $gallery, mixed $upload, mixed $deriv)
     {
         $this->gallery = $gallery;
         if ($this->gallery !== '') {
@@ -53,8 +53,7 @@ class ImageUpload
     }
 
     /*
-      public function create()
-      {
+      public function create(): mixed {
       $this->orig = imagecreatefromjpeg($this->target);
       $this->origX = imagesx($this->orig);
       $this->origY = imagesy($this->orig);
@@ -62,7 +61,7 @@ class ImageUpload
     */
 
     // new
-    public function create()
+    public function create(): bool
     {
         $error = false;
         $this->orig = imagecreatefromjpeg($this->target);
@@ -82,8 +81,7 @@ class ImageUpload
         return $error;
     }
 
-    public function makeDerived($prefix, $max_width, $max_height)
-    {
+    public function makeDerived(mixed $prefix, mixed $max_width, mixed $max_height): void {
         if ($max_width < 300 || $max_height < 300) {
             $quality = 100;
         } else {
@@ -112,8 +110,7 @@ class ImageUpload
         imagedestroy($img);
     }
 
-    public function resize($files)
-    {
+    public function resize(mixed $files): void {
         foreach ($files as $file) {
             $this->file = $file;
             $this->target = $this->target_dir.$file;
@@ -127,8 +124,7 @@ class ImageUpload
         }
     }
 
-    public function remove($files)
-    {
+    public function remove(mixed $files): mixed {
         $success_arr = [];
         $all_files = [];
 
@@ -149,8 +145,8 @@ class ImageUpload
         return $success;
     }
 
-    public function upload()
-    {
+    /** @phpstan-impure */
+    public function upload(): void {
         if ($_FILES['file']['name'] === '') {
             $this->error .= 'Problem uploading file. Empty file?';
         } else {

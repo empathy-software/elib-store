@@ -9,11 +9,11 @@ use Empathy\MVC\Config;
 
 class CategoriesTree extends Tree
 {
-    private $category;
-    private $data;
-    private $category_ancestors;
+    private mixed $category;
+    private mixed $data;
+    private mixed $category_ancestors;
 
-    public function __construct($category, $collapsed, $url = '')
+    public function __construct(mixed $category, mixed $collapsed, mixed $url = '')
     {
         $this->url = $url;
         $this->category = $category;
@@ -36,16 +36,14 @@ class CategoriesTree extends Tree
         $this->markup = $this->buildMarkup($this->data, 0, $current_id, 0);
     }
 
-    public function buildTree($id, $tree)
-    {
+    public function buildTree(mixed $id, mixed $tree): mixed {
         $nodes = [];
         $nodes = $tree->category->buildTree($id, $tree);
 
         return $nodes;
     }
 
-    private function buildMarkup($data, $level, $current_id, $last_id)
-    {
+    private function buildMarkup(mixed $data, mixed $level, mixed $current_id, mixed $last_id): mixed {
         $markup = "\n<ul";
 
         $ancestors = $this->category_ancestors;
@@ -64,7 +62,7 @@ class CategoriesTree extends Tree
         foreach ($data as $index => $value) {
             $toggle = '+';
             $folder = '<i class="far fa-folder"></i>';
-            if ($this->url === null) {
+            if ($this->url === '') {
                 $url = 'admin/category';
             } else {
                 $url = $this->url;

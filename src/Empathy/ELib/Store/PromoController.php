@@ -9,15 +9,13 @@ use Empathy\MVC\Model;
 
 class PromoController extends AdminController
 {
-    public function assertID()
-    {
+    public function assertID(): void {
         if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
             $this->redirect('admin/category');
         }
     }
 
-    public function edit()
-    {
+    public function edit(): void {
         $this->setTemplate('elib://admin/promo.tpl');
         $p = Model::load(PromoItem::class);
         //$pr = new ProductRange($this);
@@ -68,8 +66,7 @@ class PromoController extends AdminController
         $this->presenter->assign('promo', $p);
     }
 
-    public function upload_image()
-    {
+    public function upload_image(): void {
         $this->setTemplate('elib://admin/promo.tpl');
         if (isset($_POST['upload'])) {
             $_GET['id'] = $_POST['id'];
@@ -101,8 +98,7 @@ class PromoController extends AdminController
         }
     }
 
-    public function delete()
-    {
+    public function delete(): void {
         $p = Model::load(PromoItem::class);
         $p->load($_GET['id']);
 

@@ -12,19 +12,19 @@ class CategoryProperty extends Entity
     public const TABLE = 'category_property';
 
     public int $id;
-    public $category_id;
-    public $property_id;
 
-    public function emptyByCategory($category_id)
-    {
+    public int $category_id = 0;
+
+    public int $property_id = 0;
+
+    public function emptyByCategory(mixed $category_id): void {
         $sql = 'DELETE FROM '.Model::getTable(self::class).' WHERE category_id = ?';
         $error = 'Could not clear properties associated with categories.';
         $this->query($sql, $error, [$category_id]);
     }
 
     // this function has replaced old 'loadForCategory' function
-    public function getPropertiesByCategory($cat)
-    {
+    public function getPropertiesByCategory(mixed $cat): mixed {
         $catString = $this->buildUnionString($cat);
         $properties = [];
         $sql = 'SELECT property_id FROM '.Model::getTable(self::class)

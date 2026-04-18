@@ -11,8 +11,6 @@ class OrderStatus extends Entity
     public const TABLE = 'order_status';
 
     public int $id;
-    public $user_id;
-    public $status;
-    public $stamp;
 
+    public ?string $status = null;
 }

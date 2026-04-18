@@ -12,27 +12,38 @@ class ProductItem extends Entity
     public const TABLE = 'product';
 
     public int $id;
-    public $category_id;
-    public $brand_id;
-    public $name;
-    public $description;
-    public $image;
-    public $upc;
-    public $status;
-    public $vendor_id;
-    public $min_price;
-    public $vendor_verified;
-    public $shipping_uk;
-    public $shipping_eu;
-    public $shipping_other;
-    private $images = [];
-    private $noImageFound = false;
-    private $soldInStore = 0;
-    private $stock;
-    private $brand;
 
-    public function validates()
-    {
+    public int $category_id = 1;
+    public ?int $brand_id = null;
+    public string $name = '';
+    public ?string $description = null;
+    public ?string $image = null;
+    public ?string $upc = null;
+    /**
+     * May be {@see \Empathy\MVC\Entity} insert sentinel <code>'DEFAULT'</code>.
+     */
+    public int|string $status = 0;
+    public ?int $vendor_id = null;
+    public ?string $min_price = null;
+    public int $vendor_verified = 0;
+    public ?string $shipping_uk = null;
+    public ?string $shipping_eu = null;
+    public ?string $shipping_other = null;
+
+    /** Populated in {@see load()}; not a DB column. */
+    /** @var list<array<string, mixed>> */
+    private array $images = [];
+
+    private bool $noImageFound = false;
+    private int $soldInStore = 0;
+
+    /** Populated in {@see load()} from variant stock aggregate. */
+    private int|string|null $stock = null;
+
+    /** Populated in {@see load()} from {@see BrandItem::name}. */
+    private ?string $brand = null;
+
+    public function validates(): void {
         if ($this->name === '') { // || !ctype_alnum(str_replace(' ', '', $this->name)))
             $this->addValError('Invalid product name');
         }
@@ -59,28 +70,23 @@ class ProductItem extends Entity
         return true;
     }
 
-    public function getStock()
-    {
+    public function getStock(): mixed {
         return $this->stock;
     }
 
-    public function getImages()
-    {
+    public function getImages(): mixed {
         return $this->images;
     }
 
-    public function getNoImageFound()
-    {
+    public function getNoImageFound(): mixed {
         return $this->noImageFound;
     }
 
-    public function getDefaultImage()
-    {
+    public function getDefaultImage(): mixed {
         return $this->images[0];
     }
 
-    public function hasOneVariant()
-    {
+    public function hasOneVariant(): mixed {
         $id = 0;
         $sql = 'SELECT id FROM '.Model::getTable(ProductVariant::class).' WHERE product_id = ?';
         $error = 'Could not check for single variant on product.';
@@ -93,8 +99,7 @@ class ProductItem extends Entity
         return $id;
     }
 
-    public function hasVariants()
-    {
+    public function hasVariants(): mixed {
         $variants = false;
         $sql = 'SELECT id FROM '.Model::getTable(ProductVariant::class).' WHERE product_id = ?';
         $error = 'Could not check for product variants.';
@@ -106,8 +111,7 @@ class ProductItem extends Entity
         return $variants;
     }
 
-    public function convertCategory()
-    {
+    public function convertCategory(): mixed {
         $sql = 'SELECT name from '.Model::getTable(CategoryItem::class).' WHERE id = ?';
         $error = 'Could not get category name.';
         $result = $this->query($sql, $error, [$this->category_id]);
@@ -116,8 +120,7 @@ class ProductItem extends Entity
         return $row['name'];
     }
 
-    public function getOnlyVariantID()
-    {
+    public function getOnlyVariantID(): mixed {
         $id = 0;
         $sql = 'SELECT id FROM '.Model::getTable(ProductVariant::class)
             .' WHERE product_id = ? LIMIT 0,1';
@@ -133,8 +136,7 @@ class ProductItem extends Entity
 
     // including variants
 
-    public function getAllImages()
-    {
+    public function getAllImages(): mixed {
         $image = [];
         $sql = 'SELECT image FROM '.Model::getTable(ProductItem::class);
         $error = 'Could not get product images.';
@@ -156,8 +158,7 @@ class ProductItem extends Entity
         return $image;
     }
 
-    public function getPrice()
-    {
+    public function getPrice(): mixed {
         $price = 0;
         $sql = 'SELECT MIN(price) AS price FROM '.Model::getTable(ProductVariant::class)
             .' WHERE product_id = ?'
@@ -173,8 +174,7 @@ class ProductItem extends Entity
     }
 
     // new get price function
-    public function getMinPrice($id)
-    {
+    public function getMinPrice(mixed $id): mixed {
         $price = 0;
         $sql = 'SELECT MIN(price) AS price FROM '.Model::getTable(ProductVariant::class)
             .' WHERE product_id = ?'
@@ -189,8 +189,7 @@ class ProductItem extends Entity
         return $price;
     }
 
-    public function loadIDByName($name)
-    {
+    public function loadIDByName(mixed $name): mixed {
         $id = 0;
         $sql = 'SELECT id FROM '.Model::getTable(ProductItem::class)
             .' WHERE name LIKE ?';
@@ -206,18 +205,15 @@ class ProductItem extends Entity
         return $id;
     }
 
-    public function setSoldInStore($soldInStore)
-    {
+    public function setSoldInStore(mixed $soldInStore): void {
         $this->soldInStore = $soldInStore;
     }
 
-    public function getSoldInStore()
-    {
+    public function getSoldInStore(): mixed {
         return $this->soldInStore;
     }
 
-    public function getBrand()
-    {
+    public function getBrand(): mixed {
         return $this->brand;
     }
 

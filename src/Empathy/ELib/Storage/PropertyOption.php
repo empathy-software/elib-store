@@ -13,20 +13,20 @@ class PropertyOption extends Entity
     public const TABLE = 'property_option';
 
     public int $id;
-    public $property_id;
-    public $option_val;
 
-    public function validates()
-    {
-        if (!isset($this->property_id) || !is_numeric($this->property_id)) {
+    public int $property_id = 0;
+
+    public string $option_val;
+
+    public function validates(): void {
+        if ($this->property_id < 1) {
             $this->addValError('Invalid property id');
         }
 
         $this->doValType(Validate::TEXT, 'option_val', $this->option_val, false);
     }
 
-    public function getColoursIndexed($property_id)
-    {
+    public function getColoursIndexed(mixed $property_id): mixed {
         $colour = [];
         $sql = 'SELECT * FROM '.Model::getTable(PropertyOption::class).' WHERE property_id = ?'
             .' ORDER BY option_val';

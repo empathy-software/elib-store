@@ -9,11 +9,11 @@ use Empathy\MVC\Config;
 
 class ArtistsTree extends Tree
 {
-    private $artist;
-    private $data;
-    private $artist_ancestors;
+    private mixed $artist;
+    private mixed $data;
+    private mixed $artist_ancestors;
 
-    public function __construct($artist)
+    public function __construct(mixed $artist)
     {
         $this->artist = $artist;
         $this->artist_ancestors = [0];
@@ -25,16 +25,14 @@ class ArtistsTree extends Tree
         $this->markup = $this->buildMarkup($this->data, 0, $current_id, 0);
     }
 
-    public function buildTree($id, $tree)
-    {
+    public function buildTree(mixed $id, mixed $tree): mixed {
         $nodes = [];
         $nodes = $tree->artist->buildTree($id, $tree);
 
         return $nodes;
     }
 
-    private function buildMarkup($data, $level, $current_id, $last_id)
-    {
+    private function buildMarkup(mixed $data, mixed $level, mixed $current_id, mixed $last_id): mixed {
         $markup = "\n<ul";
 
         $ancestors = $this->artist_ancestors;

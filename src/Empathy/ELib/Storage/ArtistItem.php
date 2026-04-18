@@ -12,22 +12,21 @@ class ArtistItem extends Entity
     public const TABLE = 'artist_item';
 
     public int $id;
-    public $artist_alias;
-    public $forename;
-    public $surname;
-    public $bio;
-    public $image;
-    public $active;
 
-    public function validates()
-    {
+    public ?string $artist_alias = null;
+    public ?string $forename = null;
+    public ?string $surname = null;
+    public ?string $bio = null;
+    public ?string $image = null;
+    public int $active = 1;
+
+    public function validates(): void {
         if ($this->forename === '' || $this->surname === '') {
             $this->addValError('Invalid artist name. Please enter a full name.');
         }
     }
 
-    public function buildTree($current, $tree)
-    {
+    public function buildTree(mixed $current, mixed $tree): mixed {
         $i = 0;
         $nodes = [];
         $sql = 'SELECT id,artist_alias,forename,surname FROM '.Model::getTable(self::class).' ORDER BY surname, forename';
@@ -49,8 +48,7 @@ class ArtistItem extends Entity
 
     // produce a list of artists ordered correctly
     // not used to produce the artist tree
-    public function getArtists()
-    {
+    public function getArtists(): mixed {
         $artist = [];
         $sql = 'SELECT * FROM '.Model::getTable(self::class)
             .' WHERE active = 1'
@@ -75,8 +73,7 @@ class ArtistItem extends Entity
         return $artist;
     }
 
-    public function getBios()
-    {
+    public function getBios(): mixed {
         $sql = 'SELECT t1.id AS artist_id, t3.id AS product_id, t1.artist_alias,'
             .' t1.forename, t1.surname, t1.bio, t3.name, t3.image, t3.category_id, t3.price'
             .' FROM '.Model::getTable(self::class).' t1'

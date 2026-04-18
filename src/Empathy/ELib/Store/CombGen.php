@@ -6,17 +6,16 @@ namespace Empathy\ELib\Store;
 
 class CombGen
 {
-    private $sets;
-    private $results = [];
+    private mixed $sets;
+    private mixed $results = [];
 
-    public function __construct($sets)
+    public function __construct(mixed $sets)
     {
         $this->sets = $sets;
         $this->generateCombinations('', 0, $this->sets);
     }
 
-    public function generateCombinations($string, $start, $sets)
-    {
+    public function generateCombinations(mixed $string, mixed $start, mixed $sets): void {
         $current = $sets[$start];
         for ($i = 0; $i < sizeof($current); $i++) {
             if ($start + 1 < sizeof($sets)) {
@@ -31,8 +30,7 @@ class CombGen
         }
     }
 
-    public function getResults()
-    {
+    public function getResults(): mixed {
         return $this->results;
     }
 
