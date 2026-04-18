@@ -6,6 +6,7 @@ namespace Empathy\ELib\Store;
 
 use Empathy\ELib\Storage\CategoryItem;
 use Empathy\ELib\Storage\ProductItem;
+use Empathy\ELib\Storage\ProductItemStatus;
 use Empathy\MVC\Model;
 
 define('BUTTONS_PER_PAGE', 12);
@@ -101,7 +102,7 @@ class ProductsLayout
 
         if (!$this->category->getChildren($this->category->id)) {
             $sql = ' WHERE category_id = ?'
-                .' AND t1.status = '.\ELib\Storage\ProductItemStatus::AVAILABLE
+                .' AND t1.status = '.ProductItemStatus::AVAILABLE
                 .' AND t1.brand_id = t2.id'
                 .' AND t3.product_id = t1.id';
 

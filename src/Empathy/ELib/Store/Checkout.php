@@ -16,14 +16,14 @@ class Checkout
     private $invoice_no;
     private $invoice_id;
 
-    public function __construct($items, $c)
+    public function __construct($items)
     {
         $s = Model::load(ShippingAddress::class);
         $s->id = Session::get('shipping_address_id');
         $s->load();
 
         $o = Model::load(OrderItem::class);
-        $o->user_id = DI::getContainer()->get('CurrentUser')->getUserId();
+        $o->user_id = DI::getContainer()->get('CurrentUser')->getUserID();
         $o->status = 'DEFAULT';
         $o->stamp = 'MYSQLTIME';
         $o->first_name = $s->first_name;

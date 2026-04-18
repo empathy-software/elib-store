@@ -182,7 +182,7 @@ class PaypalController extends EController
         }
         $items = $c->loadFromCart();
 
-        $co = new Checkout($items, $this);
+        $co = new Checkout($items);
         $invoice_no = $co->getInvoiceId();
 
         $o = Model::load(OrderItem::class);

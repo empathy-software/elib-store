@@ -220,4 +220,14 @@ class ProductItem extends Entity
     {
         return $this->brand;
     }
+
+    /**
+     * Mark products for a vendor as verified after the vendor account is approved.
+     */
+    public function verify(int $vendorId): void
+    {
+        $sql = 'UPDATE ' . Model::getTable(self::class)
+            . ' SET vendor_verified = 1 WHERE vendor_id = ?';
+        $this->query($sql, 'Could not verify vendor products.', [$vendorId]);
+    }
 }

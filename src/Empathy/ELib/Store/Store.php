@@ -6,6 +6,7 @@ namespace Empathy\ELib\Store;
 
 use Empathy\ELib\Storage\BrandItem;
 use Empathy\ELib\Storage\CategoryItem;
+use Empathy\ELib\Storage\CategoryProperty;
 use Empathy\ELib\Storage\ProductColour;
 use Empathy\ELib\Storage\ProductItem;
 use Empathy\ELib\Storage\ProductItemStatus;
@@ -13,6 +14,7 @@ use Empathy\ELib\Storage\ProductVariant;
 use Empathy\ELib\Storage\ProductVariantPropertyOption;
 use Empathy\ELib\Storage\ProductVariantStatus;
 use Empathy\ELib\Storage\Property;
+use Empathy\ELib\Storage\VendorItem;
 use Empathy\MVC\DI;
 use Empathy\MVC\Model;
 use Empathy\MVC\Session;
@@ -22,12 +24,10 @@ define('REQUESTS_PER_PAGE', 12);
 class Store
 {
     private $c;
-    private $vendorModel;
 
     public function __construct($c)
     {
         $this->c = $c;
-        $this->vendorModel = DI::getContainer()->get('VendorModel');
     }
 
     // from category controller
@@ -77,7 +77,7 @@ class Store
         $sql .= ' AND status != '.ProductItemStatus::DELETED;
 
         // vendor
-        $v = Model::load($this->vendorModel);
+        $v = VendorItem::loadFromContainer();
         $vendor_id = $v->getIDByUserID(DI::getContainer()->get('CurrentUser')->getUserID());
         $sql .= ' AND vendor_id = ?';
         $params[] = $vendor_id;
@@ -158,8 +158,8 @@ class Store
                 if (defined('ELIB_MULTIPLE_VENDORS') &&
                    ELIB_MULTIPLE_VENDORS === true) {
                     $user_id = DI::getContainer()->get('CurrentUser');
-                    $v = Model::load($this->vendorModel);
-                    $v->id = $v->getIDByUserID($user_id);
+                    $v = VendorItem::loadFromContainer();
+                    $v->id = $v->getIDByUserID($user_id->getUserID());
                     if ($v->id > 0) {
                         $v->load($v->id);
 
@@ -206,10 +206,13 @@ class Store
             }
 
             $sql = ' WHERE product_id = '.$p->id;
+            $params = [];
             if (sizeof($ids) > 0) {
-                $sql .= ' AND id NOT IN '.$v->buildUnionString($ids);
+                $union = $v->buildUnionString($ids);
+                $sql .= ' AND id NOT IN '.$union[0];
+                $params = $union[1];
             }
-            $variants = array_merge($variants, $v->getAllCustom(Model::getTable('ProductVariant'), $sql));
+            $variants = array_merge($variants, $v->getAllCustom($sql, $params));
         } else {
             $sql = ' WHERE product_id = ?';
             $sql .= ' AND status != ?';
@@ -352,7 +355,7 @@ class Store
         $i = new ImageUpload(null, false, []);
         if ($v->image !== '') {
             $i->remove([$v->image]);
-            unset($v->image);
+            $v->image = '';
             $v->save();
         }
         $this->c->redirect('storeadmin/product/'.$v->product_id);

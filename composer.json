@@ -23,11 +23,12 @@
     },
     "minimum-stability": "dev",
     "require-dev": {
-        "laravel/pint": "dev-main"
+        "laravel/pint": "dev-main",
+        "phpstan/phpstan": "2.2.x-dev"
     },
     "scripts": {
         "format": "pint ./src",
         "format-check": "pint --test ./src",
-        "analyse": "phpstan --memory-limit=1G"
+        "analyse": "phpstan analyse -c phpstan.neon.dist --memory-limit=512M"
     }
 }

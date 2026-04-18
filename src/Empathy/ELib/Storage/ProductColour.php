@@ -18,8 +18,8 @@ class ProductColour extends Entity
 
     public function validates()
     {
-        if ($this->name === '') {
-            $this->addValError('Invalid brand name.');
+        if ($this->property_option_id === '' || $this->property_option_id === null) {
+            $this->addValError('Invalid colour option.');
         }
     }
 
@@ -63,11 +63,12 @@ class ProductColour extends Entity
             .' ORDER BY id LIMIT 0,1';
         $error = 'Could not get first colour image.';
         $result = $this->query($sql, $error, [$product_id]);
+        $row = null;
         if ($result->rowCount() > 0) {
             $row = $result->fetch();
         }
 
-        return $row['image'];
+        return $row !== null ? $row['image'] : '';
     }
 
     public function getColourOptionIDs($product_id)

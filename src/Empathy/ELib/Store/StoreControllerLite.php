@@ -13,6 +13,7 @@ use Empathy\ELib\Storage\ProductVariant;
 use Empathy\ELib\Storage\ProductVariantPropertyOption;
 use Empathy\ELib\Storage\Property;
 use Empathy\ELib\Storage\ShippingAddress;
+use Empathy\ELib\Storage\VendorItem;
 use Empathy\MVC\DI;
 use Empathy\MVC\Model;
 use Empathy\MVC\Session;
@@ -228,6 +229,7 @@ class StoreControllerLite extends EController
     public function addProductToCart($product_id)
     {
         $options = [];
+        $variant_id = 0;
         if (isset($_POST['property'])) {
             foreach ($_POST['property'] as $option) {
                 array_push($options, $option);
@@ -283,8 +285,8 @@ class StoreControllerLite extends EController
         $p->load($p->id);
 
         $vendorModel = DI::getContainer()->get('VendorModel');
-        if ($vendorModel) {
-            $v = Model::load($vendorModel);
+        if (is_string($vendorModel) && $vendorModel !== '') {
+            $v = VendorItem::loadFromContainer();
             $v->id = $p->vendor_id;
             $v->load($v->id);
             $this->assign('vendor', $v);

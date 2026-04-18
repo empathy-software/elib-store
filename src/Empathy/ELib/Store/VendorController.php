@@ -13,7 +13,7 @@ class VendorController extends EController
     {
         parent::__construct($boot);
         $user = DI::getContainer()->get('CurrentUser');
-        if (!$user->isLoggedIn() && $user->isAuthLevel(Access::VENDOR)) {
+        if (!$user->isLoggedIn() || !$user->isAuthLevel(Access::VENDOR)) {
             $this->redirect('');
         }
     }

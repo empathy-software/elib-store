@@ -75,6 +75,7 @@ class CategoryItem extends Entity
     public function getAncestorIDs($id, $ancestors)
     {
         $section_id = 0;
+        $category_id = 0;
         $sql = 'SELECT category_id FROM '.Model::getTable(self::class).' WHERE id = ?';
         $error = 'Could not get parent id.';
         $result = $this->query($sql, $error, [$id]);
@@ -132,6 +133,7 @@ class CategoryItem extends Entity
     public function buildBreadCrumb($id, &$ancestors)
     {
         $category = [];
+        $row = null;
         $sql = 'SELECT id,category_id,name FROM '.Model::getTable(self::class).' WHERE id = ?';
         $error = 'Could not get parent id.';
         $result = $this->query($sql, $error, [$id]);
@@ -142,7 +144,7 @@ class CategoryItem extends Entity
         }
         array_push($ancestors, $category);
 
-        if ($row['category_id'] !== 0) {
+        if ($row !== null && $row['category_id'] !== 0) {
 
             $this->buildBreadCrumb($row['category_id'], $ancestors);
         }

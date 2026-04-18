@@ -226,7 +226,7 @@ class ProductController extends AdminController
             if (isset($_POST['tn_width']) && is_numeric($_POST['tn_width'])
                 && isset($_POST['tn_height']) && is_numeric($_POST['tn_height'])
                 && isset($_POST['mid_width']) && is_numeric($_POST['mid_height'])) {
-                $p = Model::load('ProductItem');
+                $p = Model::load(ProductItem::class);
                 $images = $p->getAllImages();
 
                 $d = [['tn_', $_POST['tn_width'], $_POST['tn_height']],

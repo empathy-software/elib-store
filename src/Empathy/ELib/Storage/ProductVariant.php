@@ -164,6 +164,11 @@ class ProductVariant extends Entity
             $options = [];
             $properties = [];
             $id = 0;
+            $price = 0;
+            $product_id = 0;
+            $shipping_uk = 0;
+            $shipping_eu = 0;
+            $shipping_other = 0;
             foreach ($result as $row) {
                 /*
                   if ($name != $row['name']) {

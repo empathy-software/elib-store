@@ -44,6 +44,7 @@ class ShoppingCart
             }
 
             // sort
+            $stamp = [];
             foreach ($product_data as $key => $row) {
                 $stamp[$key] = $row['stamp'];
                 unset($row['stamp']);

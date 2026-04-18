@@ -65,7 +65,7 @@ class ArtistsTree extends Tree
                 $value['label'] = $value['artist_alias'];
             }
 
-            $children = 0;
+            $children = sizeof($value['children']);
             $class = 'clearfix';
             $markup .= '<li';
             if ($current_id === $value['id']) {
@@ -96,7 +96,7 @@ class ArtistsTree extends Tree
                 $markup .= '<span class="label"><a href="http://'.Config::get('WEB_ROOT').Config::get('PUBLIC_DIR')."/admin/$url/".$value['id'].'">'.$value['label'].'</a></span>';
             }
             if ($children > 0) {
-                $markup .= $this->buildMarkup($value['children'], $level, $current_id, $value['id'], $value['banner'], $current_is_dir);
+                $markup .= $this->buildMarkup($value['children'], $level, $current_id, $value['id']);
             }
             $markup .= "</li>\n";
         }

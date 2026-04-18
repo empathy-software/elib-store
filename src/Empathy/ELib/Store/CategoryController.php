@@ -184,7 +184,7 @@ class CategoryController extends AdminController
             }
             $this->redirect('admin/category/' . $_GET['id']);
         } elseif (isset($_POST['cancel'])) {
-            $this->redirecT('admin/category/' . $_GET['id']);
+            $this->redirect('admin/category/' . $_GET['id']);
         } else {
             $p = Model::load(Property::class);
             $properties = $p->getAllWithOptions([]);

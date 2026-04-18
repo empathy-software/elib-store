@@ -8,6 +8,10 @@ use Empathy\ELib\Country\Country;
 use Empathy\ELib\Storage\BrandItem;
 use Empathy\ELib\Storage\CategoryItem;
 use Empathy\ELib\Storage\ProductColour;
+use Empathy\ELib\Storage\ProductItem;
+use Empathy\ELib\Storage\ProductVariant;
+use Empathy\ELib\Storage\ProductVariantPropertyOption;
+use Empathy\ELib\Storage\PromoItem;
 use Empathy\ELib\Storage\ShippingAddress;
 use Empathy\MVC\DI;
 use Empathy\MVC\Model;
@@ -44,10 +48,10 @@ class StoreController extends StoreControllerLite
         $_GET['product_id'] = 0;
         $_GET['option_id'] = 0;
 
-        $p = Model::load('ProductItem');
-        $c = Model::load('CategoryItem');
-        $v = Model::load('ProductVariant');
-        $o = Model::load('ProductVariantPropertyOption');
+        $p = Model::load(ProductItem::class);
+        $c = Model::load(CategoryItem::class);
+        $v = Model::load(ProductVariant::class);
+        $o = Model::load(ProductVariantPropertyOption::class);
 
         $c->id = $_GET['category_id'];
         $p->id = 0;
@@ -91,7 +95,7 @@ class StoreController extends StoreControllerLite
 
         if ($this->isXMLHttpRequest()) {
             header('Content-type: application/json');
-            $c = Model::load('ProductColour');
+            $c = Model::load(ProductColour::class);
             $c->id = $_GET['colour_id'];
             $c->load();
             $item = [];
@@ -100,12 +104,13 @@ class StoreController extends StoreControllerLite
             echo json_encode($item);
             exit();
         } else {
+            $colours = [];
             // default event from store.php
 
-            $p = Model::load('ProductItem');
-            $c = Model::load('CategoryItem');
-            $v = Model::load('ProductVariant');
-            $o = Model::load('ProductVariantPropertyOption');
+            $p = Model::load(ProductItem::class);
+            $c = Model::load(CategoryItem::class);
+            $v = Model::load(ProductVariant::class);
+            $o = Model::load(ProductVariantPropertyOption::class);
 
             $c->id = 0;
             $p->id = $_GET['product_id'];
@@ -114,6 +119,7 @@ class StoreController extends StoreControllerLite
 
             if (isset($_POST['add'])) {
                 $options = [];
+                $variant_id = 0;
                 if (isset($_POST['property'])) {
                     foreach ($_POST['property'] as $option) {
                         array_push($options, $option);
@@ -214,16 +220,16 @@ class StoreController extends StoreControllerLite
     // copied across from store.php
     public function getPromos($category_id)
     {
-        $p = Model::load('PromoItem');
+        $p = Model::load(PromoItem::class);
 
-        $c = Model::load('CategoryItem');
+        $c = Model::load(CategoryItem::class);
         $ids = [];
         $c->buildDescendantIDs($category_id, $ids);
         $cat_string = $c->buildUnionString($ids);
 
         // remove root category unless in root
         $cat_string[0] = str_replace('(0,', '(', $cat_string[0]);
-        shift($cat_string[1]);
+        array_shift($cat_string[1]);
 
         $sql = ' WHERE category_id IN '.$cat_string[0]
             .' AND image IS NOT NULL'

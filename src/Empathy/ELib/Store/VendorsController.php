@@ -7,6 +7,7 @@ namespace Empathy\ELib\Store;
 use Empathy\ELib\Storage\ProductItem;
 use Empathy\ELib\Storage\ShippingAddress;
 use Empathy\ELib\Storage\UserItem;
+use Empathy\ELib\Storage\VendorItem;
 use Empathy\MVC\DI;
 use Empathy\MVC\Model;
 
@@ -18,12 +19,12 @@ class VendorsController extends AdminController
 
 
         if (isset($_POST['verify'])) {
-            $v = Model::load($vendorModel);
-            $v->id = $_POST['vendor_id'];
+            $v = VendorItem::loadFromContainer();
+            $v->id = (int) $_POST['vendor_id'];
             $v->load($v->id);
 
             $u = Model::load(UserItem::class);
-            $u->id = $v->user_id;
+            $u->id = (int) $v->user_id;
             $u->load($u->id);
 
             if ($u->active && $v->name !== '') {
