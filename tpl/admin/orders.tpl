@@ -14,8 +14,9 @@
     <tbody>
     {foreach from=$orders item=order}
         <tr>
-            <td><a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/order/{$order.id}">00{$order.id}
-                    / {$order.stamp|date_format:"%d%m%y"}</a></td>
+            <td>
+                {$order.id}
+            </td>
             <td>{$order.username}</td>
             <td>{$order.status}</td>
             <td>{$order.total}</td>

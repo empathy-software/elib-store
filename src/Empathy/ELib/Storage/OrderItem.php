@@ -28,17 +28,18 @@ class OrderItem extends Entity
     public $country;
     public $shipping;
     public $total;
+    public $order_id;
 
     public function getOrders()
     {
         $order = [];
-        $sql = 'select t3.id as order_id, t3.stamp, t5.id as product_id,  t5.name, t2.status, t4.price, t4.quantity, t4.notes from '
+        $sql = 'select t3.order_id as order_id, t3.stamp, t5.id as product_id,  t5.name, t2.status, t4.price, t4.quantity, t4.notes from '
             . Model::getTable(OrderItem::class) . ' t3 '
             . 'join ' . Model::getTable(OrderStatus::class) . ' t2 on t3.status = t2.id '
             . 'join ' . Model::getTable(LineItem::class) . ' t4 on t4.order_id = t3.id '
-            . 'left join '. Model::getTable(ProductVariant::class) . ' t6 on t6.id = t4.variant_id '
-            .' left join ' . Model::getTable(ProductItem::class) . ' t5 on t5.id = t6.product_id '
-            .' order by t3.id desc';
+            . 'left join ' . Model::getTable(ProductVariant::class) . ' t6 on t6.id = t4.variant_id '
+            . ' left join ' . Model::getTable(ProductItem::class) . ' t5 on t5.id = t6.product_id '
+            . ' order by t3.id desc';
 
         //echo $sql;
         $error = 'Could not get orders.';
@@ -82,4 +83,14 @@ class OrderItem extends Entity
         return $order;
     }
 
+    public function loadByOrderId($order_id)
+    {
+        $sql = 'select id from ' . Model::getTable(OrderItem::class) . ' where order_id = ?';
+        $result = $this->query($sql, 'Could not load by order id', [$order_id]);
+        if ($result->rowCount() > 0) {
+            $row = $result->fetch();
+            return $this->load($row['id']);
+        }
+        return false;
+    }
 }

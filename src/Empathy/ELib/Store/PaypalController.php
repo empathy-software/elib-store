@@ -98,14 +98,16 @@ class PaypalController extends EController
         }
 
         $o = Model::load(OrderItem::class);
-        $orderId = preg_replace('/^OV/', '', $data['invoice']);
-        $o->load($orderId);
+        if (!($o->loadByOrderId($data['invoice']))) {
+            $this->writeLog('Invalid order id', 'error');
+            return;
+        }
 
         if (
             (float)$data['mc_gross'] !== ((float)$o->total + (float)$o->shipping) ||
             ($data['mc_currency'] ?? '') !== 'PHP'
         ) {
-            $this->writeLog('Amount or currency mismatch');
+            $this->writeLog('Amount or currency mismatch', 'error');
             return;
         }
 
@@ -172,10 +174,9 @@ class PaypalController extends EController
         $items = $c->loadFromCart();
 
         $co = new Checkout($items, $this);
-        $invoice_no = $co->getInvoiceNo();
+        $invoice_no = $co->getInvoiceId();
 
         $o = Model::load(OrderItem::class);
-        $o->id = $invoice_no;
         $o->load($o->id);
 
         $products = array();
@@ -225,15 +226,16 @@ class PaypalController extends EController
         $sc = DI::getContainer()->get('ShippingCalculator');
         $shipping = $sc->getFee();
 
-        $p->add_field('shipping_1', $shipping);
+        $p->add_field('shipping1', number_format($shipping, 2, '.', ''));
         $o->shipping = $shipping;
         $o->save();
+
 
         $i = 1;
         foreach ($items as $index => $item) {
             $p->add_field('item_name_'.$i, $item['name']);
             $p->add_field('amount_'.$i, $item['price']);
-            $p->add_field('item_number_'.$i, $this->getItemNumber($item['id']));
+            $p->add_field('item_number_'.$i, $item['id']);
             $p->add_field('quantity_'.$i, $item['qty']);
 
             $o = explode(', ', $item['options']);
@@ -247,8 +249,8 @@ class PaypalController extends EController
         }
 
         //    $p->add_field('image_url', 'http://'.WEB_ROOT.PUBLIC_DIR.'/img/pier.png');
-        $p->add_field('invoice', $this->getInvoiceNumber($invoice_no));
-        $p->add_field('no_shipping', 1);
+        $p->add_field('invoice', $invoice_no);
+        $p->add_field('no_shipping', 0);
         $p->add_field('currency_code', 'PHP');
         $p->add_field('business', $this->getBusiness());
 
@@ -268,20 +270,4 @@ class PaypalController extends EController
     {
         return ELIB_PAYPAL_BUSINESS_EMAIL;
     }
-
-    protected function getItemNumber($id)
-    {
-        return $id;
-    }
-
-    protected function getInvoiceNumber($id)
-    {
-        return $id;
-    }
-
-    protected function getShipping()
-    {
-        return 0;
-    }
-
 }

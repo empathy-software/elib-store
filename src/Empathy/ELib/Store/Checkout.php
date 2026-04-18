@@ -14,6 +14,7 @@ use Empathy\ELib\Storage\ProductVariant;
 class Checkout
 {
     private $invoice_no;
+    private $invoice_id;
 
     public function __construct($items, $c)
     {
@@ -36,12 +37,6 @@ class Checkout
 
         $this->invoice_no = $o->insert();
 
-        if(!defined('ELIB_PAYPAL_TEST_MODE')
-           || (defined('ELIB_PAYPAL_TEST_MODE') && !ELIB_PAYPAL_TEST_MODE))
-        {
-            $this->invoice_no = time().'/'.$this->invoice_no;
-        }
-
         $l = Model::load(LineItem::class);
 
         $total = 0;
@@ -57,6 +52,10 @@ class Checkout
         }
 
         $o->load($this->invoice_no);
+
+        $o->order_id = 'OV' . $this->invoice_no . '-' . bin2hex(random_bytes(3));
+        $this->invoice_id = $o->order_id;
+
         $o->total = $total;
         $o->save();
 
@@ -85,4 +84,8 @@ class Checkout
         $this->invoice_no = $id;
     }
 
+    public function getInvoiceId()
+    {
+        return $this->invoice_id;
+    }
 }
