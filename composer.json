@@ -20,5 +20,14 @@
         "psr-0": {
             "Empathy": "src/"
         }
+    },
+    "minimum-stability": "dev",
+    "require-dev": {
+        "laravel/pint": "dev-main"
+    },
+    "scripts": {
+        "format": "pint ./src",
+        "format-check": "pint --test ./src",
+        "analyse": "phpstan --memory-limit=1G"
     }
 }

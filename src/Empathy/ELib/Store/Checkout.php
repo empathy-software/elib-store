@@ -1,15 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\ELib\Store;
 
-use Empathy\MVC\Model;
-use Empathy\MVC\DI;
-use Empathy\MVC\Session;
-use Empathy\ELib\Storage\ShippingAddress;
-use Empathy\ELib\Storage\OrderItem;
 use Empathy\ELib\Storage\LineItem;
-use Empathy\ELib\Storage\ProductVariant;
-
+use Empathy\ELib\Storage\OrderItem;
+use Empathy\ELib\Storage\ShippingAddress;
+use Empathy\MVC\DI;
+use Empathy\MVC\Model;
+use Empathy\MVC\Session;
 
 class Checkout
 {
@@ -60,7 +60,7 @@ class Checkout
         $o->save();
 
         $countries = \Empathy\ELib\Country\Country::build();
-        $shippingCountry = Session::get('shipping_country') ? Session::get('shipping_country'): 'GB';
+        $shippingCountry = Session::get('shipping_country') ? Session::get('shipping_country') : 'GB';
         $country = $countries[$shippingCountry];
 
         // add shipping

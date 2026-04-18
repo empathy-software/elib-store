@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\ELib\Store;
 
-use Empathy\MVC\Model;
 use Empathy\ELib\Storage\PromoItem;
+use Empathy\MVC\Model;
 
 class PromoController extends AdminController
 {
     public function assertID()
     {
-        if (!isset($_GET['id'] ) || !is_numeric($_GET['id'])) {
+        if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
             $this->redirect('admin/category');
         }
     }
@@ -63,7 +65,7 @@ class PromoController extends AdminController
         $p = Model::load(PromoItem::class);
         $p->load($_GET['id']);
 
-        $this->presenter->assign("promo", $p);
+        $this->presenter->assign('promo', $p);
     }
 
     public function upload_image()
@@ -76,17 +78,17 @@ class PromoController extends AdminController
         $p = Model::load(PromoItem::class);
         $p->load($_GET['id']);
 
-        $this->presenter->assign("promo", $p);
+        $this->presenter->assign('promo', $p);
 
         if (isset($_POST['upload'])) {
-            $d = array(array('mid_', 770, 300));
+            $d = [['mid_', 770, 300]];
             $u = new ImageUpload('', true, $d);
 
-            if ($u->error != '') {
-                $this->presenter->assign("error", $u->error);
+            if ($u->error !== '') {
+                $this->presenter->assign('error', $u->error);
             } else {
-                if ($p->image != "") {
-                    $u->remove(array($p->image));
+                if ($p->image !== '') {
+                    $u->remove([$p->image]);
                 }
                 // update db
                 $p->image = $u->file;
@@ -105,13 +107,13 @@ class PromoController extends AdminController
         $p->load($_GET['id']);
 
         $images_removed = false;
-        if ($p->image != '') {
-            $u = new ImageUpload('', false, array());
-            if ($u->remove(array($p->image))) {
+        if ($p->image !== '') {
+            $u = new ImageUpload('', false, []);
+            if ($u->remove([$p->image])) {
                 $images_removed = true;
             }
         }
-        if ($p->image == '' || $images_removed) {
+        if ($p->image === '' || $images_removed) {
             $p->delete();
             $this->redirect('admin/promo_category/'.$p->category_id);
         }

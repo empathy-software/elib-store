@@ -1,18 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\ELib\Store;
 
-use Empathy\MVC\Model;
 use Empathy\ELib\Storage\ArtistItem;
+use Empathy\MVC\Model;
 
 class ArtistController extends AdminController
 {
-
     public function default_event(): void
     {
-        $ui_array = array('id');
+        $ui_array = ['id'];
         $this->loadUIVars('ui_banner', $ui_array);
-        if (!isset($_GET['id']) || $_GET['id'] == '') {
+        if (!isset($_GET['id']) || $_GET['id'] === '') {
             $_GET['id'] = 0;
         }
         $this->buildNav();
@@ -104,13 +105,13 @@ class ArtistController extends AdminController
         $a = Model::load(ArtistItem::class);
         $a->load($_GET['id']);
         $images_removed = false;
-        if ($a->image != '') {
-            $u = new ImageUpload('', false, array());
-            if ($u->remove(array($a->image))) {
+        if ($a->image !== '') {
+            $u = new ImageUpload('', false, []);
+            if ($u->remove([$a->image])) {
                 $images_removed = true;
             }
         }
-        if ($a->image == '' || $images_removed) {
+        if ($a->image === '' || $images_removed) {
             $a->delete();
             $this->redirect('admin/artist/0');
         } else {
@@ -154,17 +155,17 @@ class ArtistController extends AdminController
         $a = Model::load(ArtistItem::class);
         $a->load($_GET['id']);
 
-        $this->presenter->assign("artist", $a);
+        $this->presenter->assign('artist', $a);
 
         if (isset($_POST['upload'])) {
-            $d = array(array('tn_', 70, 80), array('mid_', 1000, 370));
+            $d = [['tn_', 70, 80], ['mid_', 1000, 370]];
             $u = new ImageUpload('', true, $d);
 
-            if ($u->error != '') {
-                $this->presenter->assign("error", $u->error);
+            if ($u->error !== '') {
+                $this->presenter->assign('error', $u->error);
             } else {
-                if ($a->image != "") {
-                    $u->remove(array($a->image));
+                if ($a->image !== '') {
+                    $u->remove([$a->image]);
                 }
                 // update db
                 $a->image = $u->file;

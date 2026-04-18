@@ -1,21 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\ELib\Store;
 
-use Empathy\ELib\Store\ShoppingCart;
-use Empathy\MVC\Model;
 use Empathy\ELib\AuthedController;
 use Empathy\ELib\EController;
-use Empathy\MVC\Session;
+use Empathy\ELib\Storage\CategoryItem;
+use Empathy\ELib\Storage\CategoryProperty;
 use Empathy\ELib\Storage\ProductItem;
 use Empathy\ELib\Storage\ProductVariant;
-use Empathy\ELib\Storage\CategoryItem;
-use Empathy\ELib\Storage\ShippingAddress;
-use Empathy\ELib\Storage\CategoryProperty;
-use Empathy\ELib\Storage\Property;
 use Empathy\ELib\Storage\ProductVariantPropertyOption;
+use Empathy\ELib\Storage\Property;
+use Empathy\ELib\Storage\ShippingAddress;
 use Empathy\MVC\DI;
-
+use Empathy\MVC\Model;
+use Empathy\MVC\Session;
 
 //class StoreControllerLite extends AuthedController
 class StoreControllerLite extends EController
@@ -52,15 +52,15 @@ class StoreControllerLite extends EController
 
     public function minimalLayout()
     {
-//        if (0 && CurrentUser::loggedIn()) {
-//            $ui_array = array('page', 'vendor_id', 'id');
-//            $this->loadUIVars('ui_blog', $ui_array);
-//        } else {
-//            $page = $this->filterInt('page');
-//            $vendor_id = $this->filterInt('vendor_id');
-//            $category_id = $this->filterInt('id');
-//        }
-        
+        //        if (0 && CurrentUser::loggedIn()) {
+        //            $ui_array = array('page', 'vendor_id', 'id');
+        //            $this->loadUIVars('ui_blog', $ui_array);
+        //        } else {
+        //            $page = $this->filterInt('page');
+        //            $vendor_id = $this->filterInt('vendor_id');
+        //            $category_id = $this->filterInt('id');
+        //        }
+
         $category_id = $_GET['category_id'] ?? 0;
 
         if (isset($_GET['order_by_price'])) {
@@ -78,8 +78,8 @@ class StoreControllerLite extends EController
         }
 
         $brands_available = [
-            1 => ['name' => 'A.CE', 'set' =>  isset($_GET['brands']) && is_array($_GET['brands']) ? in_array(1,  $_GET['brands']): 0],
-            2 => ['name' => 'VEIL', 'set' => isset($_GET['brands']) && is_array($_GET['brands']) ? in_array(2,  $_GET['brands']): 0],
+            1 => ['name' => 'A.CE', 'set' =>  isset($_GET['brands']) && is_array($_GET['brands']) ? in_array(1, $_GET['brands'], true) : 0],
+            2 => ['name' => 'VEIL', 'set' => isset($_GET['brands']) && is_array($_GET['brands']) ? in_array(2, $_GET['brands'], true) : 0],
         ];
         $this->assign('brands_available', $brands_available);
 
@@ -108,7 +108,7 @@ class StoreControllerLite extends EController
         $this->assign('order_by_recent', $orderByRecent ?? 'desc');
 
 
-        if (!isset($_GET['page']) || $_GET['page'] == '') {
+        if (!isset($_GET['page']) || $_GET['page'] === '') {
             $_GET['page'] = 1;
         }
 
@@ -119,12 +119,12 @@ class StoreControllerLite extends EController
 
         $cats = ProductsLayout::getTopCats();
 
-//        $top_cat = array(
-//            'id' => 0,
-//            'name' => 'All',
-//            'hidden' => false
-//        );
-//        array_unshift($cats, $top_cat);
+        //        $top_cat = array(
+        //            'id' => 0,
+        //            'name' => 'All',
+        //            'hidden' => false
+        //        );
+        //        array_unshift($cats, $top_cat);
 
         $current_cat_id = 0;
         foreach ($cats as $c) {
@@ -135,7 +135,7 @@ class StoreControllerLite extends EController
                     }
                 }
             }
-            if ($c['id'] == $category_id) {
+            if ($c['id'] === $category_id) {
                 //$this->assign('current_category', $c['name']);
                 $current_cat_id = $c['id'];
             }
@@ -145,7 +145,7 @@ class StoreControllerLite extends EController
         $this->assign('top_cats', $cats);
 
         $c = Model::load(CategoryItem::class);
-        $descendants = array();
+        $descendants = [];
         $c->buildDescendantIDs($category_id, $descendants);
 
 
@@ -168,7 +168,7 @@ class StoreControllerLite extends EController
             $params[] = $_GET['vendor_id'];
         }
 
-        if ($category_id != 0) {
+        if ($category_id !== 0) {
             $descendantsString = $p->buildUnionString($descendants);
             $sql .= ' AND category_id IN ' . $descendantsString[0];
             $params = array_merge($params, $descendantsString[1]);
@@ -184,11 +184,11 @@ class StoreControllerLite extends EController
 
         $order = [];
         if (isset($orderByRecent)) {
-            $order[] = 'id ' .  ($orderByRecent === 'desc' ? 'desc': 'asc');
+            $order[] = 'id ' .  ($orderByRecent === 'desc' ? 'desc' : 'asc');
         }
 
         if (isset($orderByPrice)) {
-            $order[] = 'min_price ' . ($orderByPrice === 'asc' ? 'asc': 'desc');
+            $order[] = 'min_price ' . ($orderByPrice === 'asc' ? 'asc' : 'desc');
         }
 
         if (count($order) > 0) {
@@ -227,7 +227,7 @@ class StoreControllerLite extends EController
 
     public function addProductToCart($product_id)
     {
-        $options = array();
+        $options = [];
         if (isset($_POST['property'])) {
             foreach ($_POST['property'] as $option) {
                 array_push($options, $option);
@@ -250,7 +250,7 @@ class StoreControllerLite extends EController
         if (is_numeric($variant_id) && $variant_id > 0) {
             $sc = new ShoppingCart();
             $cartData = $sc->loadFromCart();
-            $cartItem = array_find($cartData, fn($item) => $item['id'] === $variant_id);
+            $cartItem = array_find($cartData, fn ($item) => $item['id'] === $variant_id);
 
             $notAdded = false;
             $v->load($variant_id);
@@ -261,14 +261,14 @@ class StoreControllerLite extends EController
             } else {
                 $sc->add($variant_id, 1);
                 // set vendor lock
-//                if (Session::get('vendor_lock') == false) {
-//                    $v = Model::load(ProductVariant::class);
-//                    $v->load($variant_id);
-//                    $p = Model::load(ProductItem::class);
-//                    $p->id = $v->product_id;
-//                    $p->load($p->id);
-//                    Session::set('vendor_lock', $p->vendor_id);
-//                }
+                //                if (Session::get('vendor_lock') == false) {
+                //                    $v = Model::load(ProductVariant::class);
+                //                    $v->load($variant_id);
+                //                    $p = Model::load(ProductItem::class);
+                //                    $p->id = $v->product_id;
+                //                    $p->load($p->id);
+                //                    Session::set('vendor_lock', $p->vendor_id);
+                //                }
             }
             Session::set('cart_not_added', $notAdded);
             $this->redirect('store/cart');
@@ -299,13 +299,13 @@ class StoreControllerLite extends EController
 
         // breadcrumb
         $c = Model::load(CategoryItem::class);
-        $bc = array();
+        $bc = [];
         $c->buildBreadCrumb($p->category_id, $bc);
         $bc = array_reverse($bc);
         $this->assign('breadcrumb', $bc);
         $this->assign('vendor_id', $p->vendor_id);
         $this->assign('product', $p);
-        $this->assign('colours', array());
+        $this->assign('colours', []);
 
         $cart = new ShoppingCart();
         $cartQty = $cart->getQtyByProductId($p->id);
@@ -329,9 +329,9 @@ class StoreControllerLite extends EController
         $product = Model::load(ProductItem::class);
 
         $countries = \Empathy\ELib\Country\Country::build();
-        $shippingCountry = Session::get('shipping_country') ? Session::get('shipping_country'): 'GB';
+        $shippingCountry = Session::get('shipping_country') ? Session::get('shipping_country') : 'GB';
 
-        if (isset($_GET['shipping_country']) && in_array($_GET['shipping_country'], array_keys($countries))) {
+        if (isset($_GET['shipping_country']) && in_array($_GET['shipping_country'], array_keys($countries), true)) {
 
             if ($shippingCountry !== $_GET['shipping_country']) {
                 Session::set('shipping_country', $_GET['shipping_country']);
@@ -339,7 +339,7 @@ class StoreControllerLite extends EController
                 return;
             }
 
-            if (isset($_GET['checkout']) && $_GET['checkout'] == '1') {
+            if (isset($_GET['checkout']) && $_GET['checkout'] === '1') {
                 $this->redirect('store/checkout');
                 return;
             }
@@ -361,12 +361,12 @@ class StoreControllerLite extends EController
                         $autoRemoved = true;
                         $c->remove($v);
                         break;
-                    } else if ($stock < $qty) {
+                    } elseif ($stock < $qty) {
                         $maxQuantitiesSet = true;
                         $qty = $stock;
                     }
                     $c->update($v, $qty);
-                } elseif (is_numeric($qty) && $qty == 0) {
+                } elseif (is_numeric($qty) && $qty === 0) {
                     $c->remove($v);
 
                     // vendor locking
@@ -416,18 +416,18 @@ class StoreControllerLite extends EController
 
     public function checkout()
     {
-//        $this->setTemplate('checkout.tpl');
-//        $s = Model::load(ShippingAddress::class);
-//
-//        $sql = ' WHERE user_id = ? ORDER BY default_address DESC';
-//        $addresses = $s->getAllCustom($sql, [DI::getContainer()->get('CurrentUser')->getUserID()]);
-//
-//        $this->assign('addresses', $addresses);
-//
-//        if (isset($_GET['checkout'])) {
-//            Session::set('shipping_address_id', $_GET['shipping_address_id']);
-//            $this->redirect('paypal/paypal');
-//        }
+        //        $this->setTemplate('checkout.tpl');
+        //        $s = Model::load(ShippingAddress::class);
+        //
+        //        $sql = ' WHERE user_id = ? ORDER BY default_address DESC';
+        //        $addresses = $s->getAllCustom($sql, [DI::getContainer()->get('CurrentUser')->getUserID()]);
+        //
+        //        $this->assign('addresses', $addresses);
+        //
+        //        if (isset($_GET['checkout'])) {
+        //            Session::set('shipping_address_id', $_GET['shipping_address_id']);
+        //            $this->redirect('paypal/paypal');
+        //        }
 
 
         Session::set('shipping_address_id', 0);
@@ -448,21 +448,21 @@ class StoreControllerLite extends EController
         //$p->load();
 
         $c = Model::load(CategoryItem::class);
-        $cats = $c->getAncestorIds($p->category_id, array());
+        $cats = $c->getAncestorIds($p->category_id, []);
 
         $cp = Model::load(CategoryProperty::class);
 
         array_push($cats, $p->category_id);
         $props = $cp->getPropertiesByCategory($cats);
 
-        if (!$colours && $p->category_id != 8) {
+        if (!$colours && $p->category_id !== 8) {
             array_push($props, 2); // always allow colour property
         }
 
         //    $this->assign('product', $p);
         //$this->assign('variant', $v);
 
-        $opts = array();
+        $opts = [];
         $pv = Model::load(ProductVariantPropertyOption::class);
         $opts = $pv->buildUnionString($pv->getActiveOptions($p->id));
 

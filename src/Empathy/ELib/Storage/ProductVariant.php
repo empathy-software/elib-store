@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\ELib\Storage;
 
-use Empathy\MVC\Model;
 use Empathy\MVC\Entity;
-use Empathy\MVC\Validate;
+use Empathy\MVC\Model;
 use Empathy\MVC\Session;
+use Empathy\MVC\Validate;
 
 class ProductVariant extends Entity
 {
-    const TABLE = 'product_variant';
+    public const TABLE = 'product_variant';
 
     public int $id;
     public $product_id;
@@ -32,7 +34,7 @@ class ProductVariant extends Entity
 
     public function getVariantName($id)
     {
-        $name = array();
+        $name = [];
         $sql = 'SELECT option_val FROM '.Model::getTable(ProductVariantPropertyOption::class)
             .' t1, '.Model::getTable('PropertyOption').' t2 WHERE t2.id = t1.property_option_id'
             .' AND product_variant_id = ?';
@@ -49,9 +51,9 @@ class ProductVariant extends Entity
 
     public function getAllForProduct($product_id, $name)
     {
-        $variants = array();
-        $variant = array();
-        $variant_name = array($name);
+        $variants = [];
+        $variant = [];
+        $variant_name = [$name];
         $last_id = 0;
 
         $productIdString = $this->buildUnionString($product_id);
@@ -78,12 +80,12 @@ class ProductVariant extends Entity
         $result = $this->query($sql, $error, $productIdString[1]);
         if ($result->rowCount() > 0) {
             foreach ($result as $row) {
-                if ($last_id != 0) {
-                    if ($last_id != $row['id']) {
+                if ($last_id !== 0) {
+                    if ($last_id !== $row['id']) {
                         $variant['name'] = implode('-', str_replace(' ', '-', $variant_name));
                         array_push($variants, $variant);
-                        $variant = array();
-                        $variant_name = array($name);
+                        $variant = [];
+                        $variant_name = [$name];
                     }
                 }
                 if (!isset($variant['id'])) {
@@ -105,7 +107,7 @@ class ProductVariant extends Entity
 
     public function getAllForOption($option_id)
     {
-        $variants = array();
+        $variants = [];
         $sql = 'SELECT v.id AS id, p.name AS name, v.image AS image FROM '.Model::getTable(ProductVariantPropertyOption::class).' o, '.Model::getTable(ProductVariant::class)
             .' v, '.Model::getTable(ProductItem::class).' p WHERE p.id = v.product_id AND o.product_variant_id = v.id AND o.property_option_id = ?';
         $error = 'Could not get variants by property.';
@@ -121,8 +123,8 @@ class ProductVariant extends Entity
 
     public function getCartData($ids)
     {
-        $products = array();
-        $shippingCountry = Session::get('shipping_country') ? Session::get('shipping_country'): 'GB';
+        $products = [];
+        $shippingCountry = Session::get('shipping_country') ? Session::get('shipping_country') : 'GB';
 
         // @todo: override shipping amounts
         // with variant values if they exist
@@ -153,22 +155,22 @@ class ProductVariant extends Entity
         $error = 'Could not load data for shopping cart.';
         $result = $this->query($sql, $error, $ids[1]);
 
-//        $rows = $result->fetchAll();
-//        print_r($rows);
-//        exit();
+        //        $rows = $result->fetchAll();
+        //        print_r($rows);
+        //        exit();
 
         if ($result->rowCount() > 0) {
             $name = '';
-            $options = array();
-            $properties = array();
+            $options = [];
+            $properties = [];
             $id = 0;
             foreach ($result as $row) {
                 /*
                   if ($name != $row['name']) {
                   if ($name != '') {
                 */
-                if ($id != $row['id']) {
-                    if ($id != 0) {
+                if ($id !== $row['id']) {
+                    if ($id !== 0) {
                         $item['name'] = $name;
                         $item['options'] = implode(', ', $options);
                         $item['properties'] = implode(', ', $properties);
@@ -179,8 +181,8 @@ class ProductVariant extends Entity
                             (\Empathy\ELib\Country\Country::isEurope($shippingCountry) ? $shipping_eu : $shipping_other);
                         array_push($products, $item);
                     }
-                    $options = array();
-                    $properties = array();
+                    $options = [];
+                    $properties = [];
                 }
                 $name = $row['name'];
                 $id = $row['id'];
@@ -213,7 +215,7 @@ class ProductVariant extends Entity
 
     public function getAllColourVariants($product_id)
     {
-        $variants = array();
+        $variants = [];
         $sql = 'SELECT t1.id, t1.image, t1.weight_g, t1.weight_lb, t1.weight_oz, t1.price, t3.image AS other_image'
             .' FROM '.Model::getTable(ProductVariant::class).' t1'
             .' LEFT JOIN '.Model::getTable(ProductVariantPropertyOption::class).' t2'
@@ -243,7 +245,7 @@ class ProductVariant extends Entity
         $variant_id = 0;
         $sql = 'SELECT t1.id FROM '.Model::getTable(ProductVariant::class).' t1';
         foreach ($options as $option) {
-            if ($i == 2) {
+            if ($i === 2) {
                 $sql .= ' LEFT JOIN '.Model::getTable(ProductVariantPropertyOption::class).' t'.$i.' ON t'.$i.'.product_variant_id = t'.($i - 1).'.id';
             } else {
                 $sql .= ' LEFT JOIN '.Model::getTable(ProductVariantPropertyOption::class).' t'.$i.' ON t'.$i.'.product_variant_id = t'.($i - 1).'.product_variant_id';
@@ -253,7 +255,7 @@ class ProductVariant extends Entity
 
         $i = 2;
         foreach ($options as $option) {
-            if ($i == 2) {
+            if ($i === 2) {
                 $sql .= ' WHERE t'.$i.'.property_option_id = '.$option;
             } else {
                 $sql .= ' AND t'.$i.'.property_option_id = '.$option;
@@ -265,7 +267,7 @@ class ProductVariant extends Entity
 
         $error = 'Could not do search for variant.';
         $result = $this->query($sql, $error);
-        if ($result->rowCount() == 1) {
+        if ($result->rowCount() === 1) {
             $row = $result->fetch();
             $variant_id = $row['id'];
         }
@@ -276,7 +278,7 @@ class ProductVariant extends Entity
     public function getCategories($ids)
     {
         $idsString = $this->buildUnionString($ids);
-        $cat_ids = array();
+        $cat_ids = [];
         $sql = 'SELECT DISTINCT t1.category_id AS id FROM '.Model::getTable(ProductItem::class).' t1,'
             .' '.Model::getTable(ProductVariant::class).' t2'
             .' WHERE t2.product_id = t1.id'

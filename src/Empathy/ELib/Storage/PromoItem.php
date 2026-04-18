@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\ELib\Storage;
 
 use Empathy\MVC\Entity;
 
 class PromoItem extends Entity
 {
-    const TABLE = 'promo';
+    public const TABLE = 'promo';
 
     public int $id;
     public $category_id;
@@ -18,10 +20,10 @@ class PromoItem extends Entity
 
     public function validates()
     {
-        if ($this->url == '') {
+        if ($this->url === '') {
             $this->addValError('Invalid URL');
         }
-        if ($this->name == '') {
+        if ($this->name === '') {
             $this->addValError('Invliad name.');
         }
     }

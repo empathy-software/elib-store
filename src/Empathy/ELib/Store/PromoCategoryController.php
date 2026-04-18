@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\ELib\Store;
 
-use Empathy\MVC\Model;
+use Empathy\ELib\Storage\BrandItem;
 use Empathy\ELib\Storage\CategoryItem;
 use Empathy\ELib\Storage\PromoItem;
-use Empathy\ELib\Storage\BrandItem;
+use Empathy\MVC\Model;
 
 define('REQUESTS_PER_PAGE', 12);
 
@@ -13,7 +15,7 @@ class PromoCategoryController extends AdminController
 {
     public function assertID()
     {
-        if (!isset($_GET['id'] ) || !is_numeric($_GET['id'])) {
+        if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
             $_GET['id'] = 0;
         }
     }
@@ -31,7 +33,7 @@ class PromoCategoryController extends AdminController
 
         $ct = new PromosTree($c, $_GET['collapsed']);
 
- 
+
         $this->presenter->assign('category', $c);
         $this->presenter->assign('category_has_children', $c->hasChildren());
 
@@ -45,15 +47,15 @@ class PromoCategoryController extends AdminController
     {
 
         $this->setTemplate('elib://admin/promo_category.tpl');
-        $ui_array = array('order_by', 'page', 'id');
+        $ui_array = ['order_by', 'page', 'id'];
         $this->loadUIVars('ui_catalogue', $ui_array);
-        if (!isset($_GET['page']) || $_GET['page'] == '') {
+        if (!isset($_GET['page']) || $_GET['page'] === '') {
             $_GET['page'] = 1;
         }
-        if (!isset($_GET['id']) || $_GET['id'] == '') {
+        if (!isset($_GET['id']) || $_GET['id'] === '') {
             $_GET['id'] = 0;
         }
-        if (!isset($_GET['order_by']) || $_GET['order_by'] == '') {
+        if (!isset($_GET['order_by']) || $_GET['order_by'] === '') {
             $_GET['order_by'] = 'id';
         }
 
@@ -61,7 +63,7 @@ class PromoCategoryController extends AdminController
         $this->presenter->assign('page', $_GET['page']);
         $this->presenter->assign('category_id', $_GET['id']);
 
- 
+
 
         $this->buildNav();
 
@@ -99,7 +101,7 @@ class PromoCategoryController extends AdminController
           }
         */
 
-        $this->presenter->assign("promos", $promo);
+        $this->presenter->assign('promos', $promo);
     }
 
     public function add()

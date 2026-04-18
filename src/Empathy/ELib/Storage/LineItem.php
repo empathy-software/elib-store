@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\ELib\Storage;
 
 use Empathy\MVC\Entity;
 
 class LineItem extends Entity
 {
-    const TABLE = 'line_item';
+    public const TABLE = 'line_item';
 
     public int $id;
     public $order_id;

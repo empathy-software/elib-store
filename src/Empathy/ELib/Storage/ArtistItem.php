@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\ELib\Storage;
 
-use Empathy\MVC\Model;
 use Empathy\MVC\Entity;
+use Empathy\MVC\Model;
 
 class ArtistItem extends Entity
 {
-    const TABLE = 'artist_item';
+    public const TABLE = 'artist_item';
 
     public int $id;
     public $artist_alias;
@@ -19,7 +21,7 @@ class ArtistItem extends Entity
 
     public function validates()
     {
-        if ($this->forename == '' || $this->surname == '') {
+        if ($this->forename === '' || $this->surname === '') {
             $this->addValError('Invalid artist name. Please enter a full name.');
         }
     }
@@ -27,7 +29,7 @@ class ArtistItem extends Entity
     public function buildTree($current, $tree)
     {
         $i = 0;
-        $nodes = array();
+        $nodes = [];
         $sql = 'SELECT id,artist_alias,forename,surname FROM '.Model::getTable(self::class).' ORDER BY surname, forename';
         $error = 'Could not get artists.';
         $result = $this->query($sql, $error);
@@ -49,7 +51,7 @@ class ArtistItem extends Entity
     // not used to produce the artist tree
     public function getArtists()
     {
-        $artist = array();
+        $artist = [];
         $sql = 'SELECT * FROM '.Model::getTable(self::class)
             .' WHERE active = 1'
             .' ORDER BY surname, forename';
@@ -60,7 +62,7 @@ class ArtistItem extends Entity
             foreach ($result as $row) {
                 $id = $row['id'];
 
-                if ($row['artist_alias'] == '') {
+                if ($row['artist_alias'] === '') {
                     //$artist[$id] = $row['surname'].', '.$row['forename'];
                     $artist[$id] = $row['forename'].' '.$row['surname'];
                 } else {
@@ -84,20 +86,20 @@ class ArtistItem extends Entity
         $error = 'Could not get bios.';
         $result = $this->query($sql, $error);
         $last_artist_id = 0;
-        $bio = array();
-        $bios = array();
-        $book = array();
-        $books = array();
+        $bio = [];
+        $bios = [];
+        $book = [];
+        $books = [];
         if ($result->rowCount() > 0) {
             foreach ($result as $row) {
-                if ($last_artist_id != $row['artist_id']) {
+                if ($last_artist_id !== $row['artist_id']) {
                     if (sizeof($books) > 0) {
                         $bio['books'] = $books;
-                        $books = array();
+                        $books = [];
                     }
                     if (sizeof($bio) > 0) {
                         array_push($bios, $bio);
-                        $bio = array();
+                        $bio = [];
                     }
 
                     $last_artist_id = $row['artist_id'];
@@ -105,7 +107,7 @@ class ArtistItem extends Entity
                     $bio['artist_alias'] = $row['artist_alias'];
                     $bio['forename'] = $row['forename'];
                     $bio['surname'] = $row['surname'];
-                    if ($row['artist_alias'] == '') {
+                    if ($row['artist_alias'] === '') {
                         $bio['artist'] = $row['forename'].' '.$row['surname'];
                     } else {
                         $bio['artist'] = $row['artist_alias'];
@@ -114,8 +116,8 @@ class ArtistItem extends Entity
                 }
 
                 if (isset($row['product_id'])) {
-                    if ($row['category_id'] == 14) {
-                        $book = array();
+                    if ($row['category_id'] === 14) {
+                        $book = [];
                         $book['id'] = $row['product_id'];
                         $book['image'] = $row['image'];
                         $book['name'] = $row['name'];

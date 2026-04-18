@@ -1,15 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\ELib\Storage;
 
-use Empathy\MVC\Model;
 use Empathy\MVC\Entity;
+use Empathy\MVC\Model;
 use Empathy\MVC\Validate;
-
 
 class ShippingAddress extends Entity
 {
-    const TABLE = 'shipping_address';
+    public const TABLE = 'shipping_address';
 
     public int $id;
     public $user_id;
@@ -41,12 +42,12 @@ class ShippingAddress extends Entity
         $error = 'Could not get all shipping addresses for user.';
         $result = $this->query($sql, $error, [$user_id]);
 
-        $addresses = array();
+        $addresses = [];
         foreach ($result as $row) {
             array_push($addresses, $row['id']);
         }
 
-        if (in_array($address_id, $addresses)) {
+        if (in_array($address_id, $addresses, true)) {
             $sql = 'UPDATE '.Model::getTable(self::class).' SET default_address = 0 WHERE user_id = ?';
             $error = 'Could not wipe defaults.';
             $this->query($sql, $error, [$user_id]);

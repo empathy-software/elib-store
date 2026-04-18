@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\ELib\Store;
 
-use Empathy\MVC\Model;
 use Empathy\ELib\Storage\Property;
 use Empathy\ELib\Storage\PropertyOption;
+use Empathy\MVC\Model;
 
 class PropertiesController extends AdminController
 {
@@ -12,7 +14,7 @@ class PropertiesController extends AdminController
     {
         $this->setTemplate('elib://admin/properties.tpl');
         $p = Model::load(Property::class);
-        $properties = $p->getAllWithOptions(array());
+        $properties = $p->getAllWithOptions([]);
         $this->presenter->assign('properties', $properties);
 
         if (isset($_POST['add_option'])) {

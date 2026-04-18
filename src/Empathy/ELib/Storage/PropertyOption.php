@@ -1,14 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\ELib\Storage;
 
-use Empathy\MVC\Model;
 use Empathy\MVC\Entity;
+use Empathy\MVC\Model;
 use Empathy\MVC\Validate;
 
 class PropertyOption extends Entity
 {
-    const TABLE = 'property_option';
+    public const TABLE = 'property_option';
 
     public int $id;
     public $property_id;
@@ -25,7 +27,7 @@ class PropertyOption extends Entity
 
     public function getColoursIndexed($property_id)
     {
-        $colour = array();
+        $colour = [];
         $sql = 'SELECT * FROM '.Model::getTable(PropertyOption::class).' WHERE property_id = ?'
             .' ORDER BY option_val';
         $error = 'Could not get colours.';

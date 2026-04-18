@@ -1,24 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\ELib\Store;
 
+use Empathy\ELib\EController;
+use Empathy\ELib\Storage\CategoryItem;
+use Empathy\ELib\Storage\LineItem;
+use Empathy\ELib\Storage\OrderItem;
+use Empathy\ELib\Storage\PaypalTransactions;
+use Empathy\ELib\Storage\ProductVariant;
+use Empathy\ELib\ThirdParty\PaypalClass;
+use Empathy\MVC\Config;
 use Empathy\MVC\DI;
 use Empathy\MVC\LogItem;
 use Empathy\MVC\Model;
-use Empathy\ELib\EController;
-use Empathy\ELib\ThirdParty\PaypalClass;
-use Empathy\MVC\Config;
-use Empathy\ELib\Storage\OrderItem;
-use Empathy\ELib\Storage\ProductVariant;
-use Empathy\ELib\Storage\CategoryItem;
-use Empathy\ELib\Storage\LineItem;
-use Empathy\ELib\Storage\PaypalTransactions;
 use Empathy\MVC\Session;
-
 
 class PaypalController extends EController
 {
-
     private function getPayPalURL()
     {
         $url = '';
@@ -136,7 +136,8 @@ class PaypalController extends EController
                 $this->writeLog(
                     'Out of stock for variant ' . $item['variant_id'] .
                     '. Needed ' . $item['quantity'] .
-                    ', available ' . $v->stock, 'error'
+                    ', available ' . $v->stock,
+                    'error'
                 );
             }
         }
@@ -168,7 +169,7 @@ class PaypalController extends EController
 
     public function assignMessage($message)
     {
-        if ($message != '') {
+        if ($message !== '') {
             $this->presenter->assign('message', $message);
         }
     }
@@ -187,7 +188,7 @@ class PaypalController extends EController
         $o = Model::load(OrderItem::class);
         $o->load($co->getInvoiceNo());
 
-        $products = array();
+        $products = [];
 
         //$product[0]['alias'] = 'Some product';
         //$product[0]['price'] = 1.99;
@@ -201,24 +202,24 @@ class PaypalController extends EController
         $p->add_field('upload', '1');
 
         // address
-//        $p->add_field('first_name', $o->first_name);
-//        $p->add_field('last_name', $o->last_name);
-//        $p->add_field('address1', $o->address1);
-//        $p->add_field('address2', $o->address2);
-//        $p->add_field('city', $o->city);
-//        $p->add_field('state', $o->state);
-//        $p->add_field('zip', $o->zip);
-//        $p->add_field('country', $o->country);
-//        $p->add_field('address_override', 1);
-//        $p->add_field('no_shipping', 1);
+        //        $p->add_field('first_name', $o->first_name);
+        //        $p->add_field('last_name', $o->last_name);
+        //        $p->add_field('address1', $o->address1);
+        //        $p->add_field('address2', $o->address2);
+        //        $p->add_field('city', $o->city);
+        //        $p->add_field('state', $o->state);
+        //        $p->add_field('zip', $o->zip);
+        //        $p->add_field('country', $o->country);
+        //        $p->add_field('address_override', 1);
+        //        $p->add_field('no_shipping', 1);
 
         //$countries = \Empathy\ELib\Country\Country::build();
-        $shippingCountry = Session::get('shipping_country') ? Session::get('shipping_country'): 'GB';
+        $shippingCountry = Session::get('shipping_country') ? Session::get('shipping_country') : 'GB';
         $p->add_field('country', $shippingCountry);
 
 
         // shipping
-        $ids = array();
+        $ids = [];
         foreach ($items as $item) {
             array_push($ids, $item['id']);
         }
@@ -226,7 +227,7 @@ class PaypalController extends EController
         $cat_ids = $v->getCategories($ids);
         $cat = Model::load(CategoryItem::class);
 
-        if ($o->country != 'GB') {
+        if ($o->country !== 'GB') {
             $intl = true;
         } else {
             $intl = false;

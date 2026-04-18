@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*******************************************************************************
  *                      PHP Paypal IPN Integration Class
  *******************************************************************************
@@ -100,8 +102,8 @@ class PaypalClass
     public $ipn_log;                    // bool: log IPN results to text file?
     public $ipn_log_file;               // filename of the IPN log
     public $ipn_response;               // holds the IPN response from paypal
-    public $ipn_data = array();         // array contains the POST values for IPN
-    public $fields = array();           // array holds the fields to submit to paypal
+    public $ipn_data = [];         // array contains the POST values for IPN
+    public $fields = [];           // array holds the fields to submit to paypal
     public $paypal_url = '';
 
 
@@ -127,7 +129,7 @@ class PaypalClass
 
     }
 
-    function add_field($field, $value)
+    public function add_field($field, $value)
     {
 
         // adds a key=>value pair to the fields array, which is what will be
@@ -137,7 +139,7 @@ class PaypalClass
         $this->fields["$field"] = $value;
     }
 
-    function submit_paypal_post()
+    public function submit_paypal_post()
     {
 
         // this function actually generates an entire HTML page consisting of
@@ -155,15 +157,15 @@ class PaypalClass
         echo "<html>\n";
         echo "<head><title>Processing Payment...</title></head>\n";
         echo "<body onLoad=\"document.forms['paypal_form'].submit();\">\n";
-        echo "<center><h2>Please wait, your order is being processed and you";
+        echo '<center><h2>Please wait, your order is being processed and you';
         echo " will be redirected to the paypal website.</h2></center>\n";
-        echo "<form method=\"post\" name=\"paypal_form\" ";
-        echo "action=\"" . $this->paypal_url . "\">\n";
+        echo '<form method="post" name="paypal_form" ';
+        echo 'action="' . $this->paypal_url . "\">\n";
 
         foreach ($this->fields as $name => $value) {
             echo "<input type=\"hidden\" name=\"$name\" value=\"$value\"/>\n";
         }
-        echo "<center><br/><br/>If you are not automatically redirected to ";
+        echo '<center><br/><br/>If you are not automatically redirected to ';
         echo "paypal within 5 seconds...<br/><br/>\n";
         echo "<input type=\"submit\" value=\"Click Here\"></center>\n";
 
@@ -225,17 +227,22 @@ class PaypalClass
         return false;
     }
 
-    function log_ipn_results($success)
+    public function log_ipn_results($success)
     {
 
-        if (!$this->ipn_log) return;  // is logging turned off?
+        if (!$this->ipn_log) {
+            return;
+        }  // is logging turned off?
 
         // Timestamp
         $text = '[' . date('m/d/Y g:i A') . '] - ';
 
         // Success or failure being logged?
-        if ($success) $text .= "SUCCESS!\n";
-        else $text .= 'FAIL: ' . $this->last_error . "\n";
+        if ($success) {
+            $text .= "SUCCESS!\n";
+        } else {
+            $text .= 'FAIL: ' . $this->last_error . "\n";
+        }
 
         // Log the POST variables
         $text .= "IPN POST Vars from Paypal:\n";
@@ -253,28 +260,25 @@ class PaypalClass
         fclose($fp);  // close file
     }
 
-    function dump_fields()
+    public function dump_fields()
     {
 
         // Used for debugging, this function will output all the field/value pairs
         // that are currently defined in the instance of the class using the
         // add_field() function.
 
-        echo "<h3>paypal_class->dump_fields() Output:</h3>";
-        echo "<table width=\"95%\" border=\"1\" cellpadding=\"2\" cellspacing=\"0\">
+        echo '<h3>paypal_class->dump_fields() Output:</h3>';
+        echo '<table width="95%" border="1" cellpadding="2" cellspacing="0">
             <tr>
-               <td bgcolor=\"black\"><b><font color=\"white\">Field Name</font></b></td>
-               <td bgcolor=\"black\"><b><font color=\"white\">Value</font></b></td>
-            </tr>";
+               <td bgcolor="black"><b><font color="white">Field Name</font></b></td>
+               <td bgcolor="black"><b><font color="white">Value</font></b></td>
+            </tr>';
 
         ksort($this->fields);
         foreach ($this->fields as $key => $value) {
-            echo "<tr><td>$key</td><td>" . urldecode($value) . "&nbsp;</td></tr>";
+            echo "<tr><td>$key</td><td>" . urldecode($value) . '&nbsp;</td></tr>';
         }
 
-        echo "</table><br>";
+        echo '</table><br>';
     }
 }
-
-
- 

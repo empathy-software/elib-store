@@ -1,9 +1,11 @@
 <?php
 
-namespace Empathy\ELib\Store;
-use Empathy\ELib\Storage\ProductItem;
-use Empathy\ELib\Storage\CategoryItem;
+declare(strict_types=1);
 
+namespace Empathy\ELib\Store;
+
+use Empathy\ELib\Storage\CategoryItem;
+use Empathy\ELib\Storage\ProductItem;
 use Empathy\MVC\Model;
 
 define('BUTTONS_PER_PAGE', 12);
@@ -14,11 +16,11 @@ class ProductsLayout
     private $product;
     private $variant;
     private $option;
-    private $buttons = array();
-    private $breadcrumb = array();
+    private $buttons = [];
+    private $breadcrumb = [];
     private $redirect = '';
     private $controller;
-    private $p_nav = array();
+    private $p_nav = [];
 
     public function __construct($c, $p, $v, $o, $controller)
     {
@@ -30,11 +32,11 @@ class ProductsLayout
 
         $this->buildBC();
 
-        if ($this->option->id != 0) {
+        if ($this->option->id !== 0) {
             $this->buildByOption();
-        } elseif ($this->variant->id != 0) {
+        } elseif ($this->variant->id !== 0) {
             //
-        } elseif ($this->product->id == 0) {
+        } elseif ($this->product->id === 0) {
             $this->buildByCategory();
         } else {
             $variant_id = $this->product->hasOneVariant();
@@ -64,7 +66,7 @@ class ProductsLayout
     public function randomImage($c_id)
     {
         $image = '';
-        $descendants = array();
+        $descendants = [];
 
         $this->category->buildDescendantIDs($c_id, $descendants);
 
@@ -95,7 +97,7 @@ class ProductsLayout
 
     public function buildByCategory()
     {
-        $button = array();
+        $button = [];
 
         if (!$this->category->getChildren($this->category->id)) {
             $sql = ' WHERE category_id = ?'
@@ -118,7 +120,12 @@ class ProductsLayout
                 $select,
                 Model::getTable('BrandItem'),
                 Model::getTable('ProductVariant'),
-                $sql, $page, $per_page, $group, $order, [$this->category->id]
+                $sql,
+                $page,
+                $per_page,
+                $group,
+                $order,
+                [$this->category->id]
             );
 
             foreach ($products as $p) {
@@ -133,19 +140,25 @@ class ProductsLayout
                 $select,
                 Model::getTable('BrandItem'),
                 Model::getTable('ProductVariant'),
-                $sql, $page, $per_page, $group, $order, [$this->category->id]);
+                $sql,
+                $page,
+                $per_page,
+                $group,
+                $order,
+                [$this->category->id]
+            );
 
         } else {
             $children = $this->category->getChildren($this->category->id);
             foreach ($children as $child) {
-                $button = array();
+                $button = [];
                 $this->category->id = $child;
                 if ($this->category->hasChildren()) {
                     $this->category->load($child);
                     $button['name'] = $this->category->name;
                     $button['image'] = $this->randomImage($this->category->id);
                     $button['category_id'] = $this->category->id;
-                    if ($button['image'] != '') {
+                    if ($button['image'] !== '') {
                         array_push($this->buttons, $button);
                     }
                 } else {
@@ -158,7 +171,7 @@ class ProductsLayout
                     if (sizeof($products) > 0) {
                         $p = $products[0];
                         $button['image'] = $p['image'];
-                        if ($button['image'] != '') {
+                        if ($button['image'] !== '') {
                             array_push($this->buttons, $button);
                         }
                     }
@@ -174,7 +187,7 @@ class ProductsLayout
 
     public function buildByProduct()
     {
-        $button = array();
+        $button = [];
 
         $variants = $this->variant->getAllCustom(' WHERE product_id = ?', [$this->product->id]);
         shuffle($variants);
@@ -188,9 +201,9 @@ class ProductsLayout
 
     public function buildBC()
     {
-        $cats = array();
+        $cats = [];
 
-        if ($this->product->id != 0) {
+        if ($this->product->id !== 0) {
             if (!$this->product->load()) {
                 $this->controller->http_error(404);
             }
@@ -202,7 +215,7 @@ class ProductsLayout
             }
 
             $this->category->id = $this->product->category_id;
-        } elseif ($this->variant->id != 0) {
+        } elseif ($this->variant->id !== 0) {
             if (!$this->variant->load()) {
                 $this->controller->http_error(404);
             }
@@ -215,7 +228,7 @@ class ProductsLayout
             $this->controller->http_error(404);
         }
 
-        if ($this->category->id != 0) {
+        if ($this->category->id !== 0) {
             $current['id'] = $this->category->id;
             $current['name'] = $this->category->name;
             array_push($cats, $current);
@@ -233,7 +246,7 @@ class ProductsLayout
 
     public function buildByOption()
     {
-        $button = array();
+        $button = [];
 
         $variants = $this->variant->getAllForOption($this->option->id);
         if (sizeof($variants) < 1) {
@@ -251,9 +264,9 @@ class ProductsLayout
 
     public static function getTopCats()
     {
-        $categories = array();
+        $categories = [];
         $c = Model::load(CategoryItem::class);
-        if ($_GET['module'] == 'store') {
+        if ($_GET['module'] === 'store') {
             $sql = ' WHERE category_id = 0 AND hidden = 0 ORDER BY name';
             $categories = $c->getAllCustom($sql);
         }

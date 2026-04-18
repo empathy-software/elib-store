@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\ELib\Storage;
 
-use Empathy\MVC\Model;
 use Empathy\MVC\Entity;
+use Empathy\MVC\Model;
 
 class CategoryItem extends Entity
 {
-    const TABLE = 'category';
+    public const TABLE = 'category';
 
     public int $id;
     public $category_id;
@@ -31,7 +33,7 @@ class CategoryItem extends Entity
 
     public function getChildren($id)
     {
-        $c = array();
+        $c = [];
         $sql = 'SELECT id FROM '.Model::getTable(self::class).' WHERE category_id = ?'
             .' AND hidden != 1'
             .' ORDER BY name';
@@ -65,7 +67,7 @@ class CategoryItem extends Entity
         $name = str_replace(' ', '', $name);
         $name = str_replace('-', '', $name);
 
-        if ($this->name == '' || !ctype_alnum(str_replace('\'', '', $name))) {
+        if ($this->name === '' || !ctype_alnum(str_replace('\'', '', $name))) {
             $this->addValError('Invalid name');
         }
     }
@@ -80,7 +82,7 @@ class CategoryItem extends Entity
             $row = $result->fetch();
             $category_id = $row['category_id'];
         }
-        if ($category_id != 0) {
+        if ($category_id !== 0) {
             array_push($ancestors, $category_id);
             $ancestors = $this->getAncestorIDs($category_id, $ancestors);
         }
@@ -91,7 +93,7 @@ class CategoryItem extends Entity
     public function buildTree($current, $tree)
     {
         $i = 0;
-        $nodes = array();
+        $nodes = [];
         $sql = 'SELECT id,name AS label FROM '.Model::getTable(self::class).' WHERE category_id = ? ORDER BY name';
         $error = 'Could not get child sections.';
         $result = $this->query($sql, $error, [$current]);
@@ -129,7 +131,7 @@ class CategoryItem extends Entity
 
     public function buildBreadCrumb($id, &$ancestors)
     {
-        $category = array();
+        $category = [];
         $sql = 'SELECT id,category_id,name FROM '.Model::getTable(self::class).' WHERE id = ?';
         $error = 'Could not get parent id.';
         $result = $this->query($sql, $error, [$id]);
@@ -140,7 +142,7 @@ class CategoryItem extends Entity
         }
         array_push($ancestors, $category);
 
-        if ($row['category_id'] != 0) {
+        if ($row['category_id'] !== 0) {
 
             $this->buildBreadCrumb($row['category_id'], $ancestors);
         }
@@ -149,11 +151,11 @@ class CategoryItem extends Entity
     //public function loadIndexed()
     public function loadIndexed($parent_id)
     {
-        $sql = "SELECT * FROM ".Model::getTable(self::class);
+        $sql = 'SELECT * FROM '.Model::getTable(self::class);
         //$sql .= ' WHERE parent_id = '.$parent_id;
-        $error = "Could not fetch categories.";
+        $error = 'Could not fetch categories.';
         $result = $this->query($sql, $error);
-        $category = array();
+        $category = [];
         foreach ($result as $row) {
             $id = $row['id'];
             $category[$id] = $row['name'];
@@ -165,7 +167,7 @@ class CategoryItem extends Entity
     public function getShipping($ids)
     {
         $idsString = $this->buildUnionString($ids);
-        $shipping = array();
+        $shipping = [];
         $sql = 'SELECT shipping FROM '.Model::getTable(self::class)
             .' WHERE id IN ' . $idsString[0]
             .' AND shipping IS NOT NULL';
@@ -189,7 +191,7 @@ class CategoryItem extends Entity
             .' AND intl_shipping IS NOT NULL GROUP BY id';
         $error = 'Could not get international shipping info from categories.';
         $result = $this->query($sql, $error, $idsString[1]);
-        if ($result->rowCount() == 1) {
+        if ($result->rowCount() === 1) {
             $row = $result->fetch();
             $shipping = $row['intl_shipping'];
         }
@@ -204,7 +206,7 @@ class CategoryItem extends Entity
             .' WHERE name LIKE ?';
         $error = 'Could not get category id by name.';
         $result = $this->query($sql, $error, ['\'' . str_replace('-', ' ', $name) . '\'']);
-        if ($result->rowCount() == 1) {
+        if ($result->rowCount() === 1) {
             $row = $result->fetch();
             $id = $row['id'];
         }

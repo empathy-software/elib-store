@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\ELib\Store;
 
-use Empathy\MVC\Model;
 use Empathy\ELib\Storage\OrderItem;
-
+use Empathy\MVC\Model;
 
 class OrdersController extends AdminController
 {

@@ -1,14 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\ELib\Storage;
 
 use Empathy\ELib\Store\ImageUpload;
-use Empathy\MVC\Model;
 use Empathy\MVC\Entity;
+use Empathy\MVC\Model;
 
 class ProductImage extends Entity
 {
-    const TABLE = 'product_image';
+    public const TABLE = 'product_image';
 
     public int $id;
     public $image;
@@ -17,7 +19,7 @@ class ProductImage extends Entity
 
     public function validates()
     {
-        if ($this->image == '') {
+        if ($this->image === '') {
             $this->addValError('Missing filename');
         }
         if ((int) $this->product_id === 0) {
@@ -44,10 +46,10 @@ class ProductImage extends Entity
             $images = [
                 [
                     'id' => 0,
-                    'image' => $product->image != '' ? $product->image : 'blank.gif',
+                    'image' => $product->image !== '' ? $product->image : 'blank.gif',
                     'default_image' => true,
                     'product_id' => $product->id,
-                ]
+                ],
             ];
         }
         return [ $images, $noneFound ];
@@ -56,13 +58,13 @@ class ProductImage extends Entity
     public function delete(): void
     {
         $images_removed = false;
-        if ($this->image != '') {
-            $u = new ImageUpload('product', false, array());
-            if ($u->remove(array($this->image))) {
+        if ($this->image !== '') {
+            $u = new ImageUpload('product', false, []);
+            if ($u->remove([$this->image])) {
                 $images_removed = true;
             }
         }
-        if ($this->image == '' || $images_removed) {
+        if ($this->image === '' || $images_removed) {
             parent::delete();
             if ($this->default_image) {
                 $p = Model::load(ProductItem::class);

@@ -1,18 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\ELib\Store;
 
-use Empathy\MVC\Model;
 use Empathy\ELib\Country\Country;
-use Empathy\ELib\Storage\CategoryItem;
 use Empathy\ELib\Storage\BrandItem;
+use Empathy\ELib\Storage\CategoryItem;
 use Empathy\ELib\Storage\ProductColour;
 use Empathy\ELib\Storage\ShippingAddress;
 use Empathy\MVC\DI;
+use Empathy\MVC\Model;
 
 class StoreController extends StoreControllerLite
 {
-
     public function default_event(): void
     {
         $this->setTemplate('elib://store_category.tpl');
@@ -20,7 +21,7 @@ class StoreController extends StoreControllerLite
 
     public function defaultLayout()
     {
-        $ui_array = array('page');
+        $ui_array = ['page'];
         $this->loadUIVars('ui_cats', $ui_array);
         if (!isset($_GET['page'])) {
             $_GET['page'] = 1;
@@ -83,7 +84,7 @@ class StoreController extends StoreControllerLite
 
         if (isset($_GET['product_name'])) {
             $name_arr = explode('-', $_GET['product_name']);
-            $product_id = $name_arr[sizeof($name_arr)-1];
+            $product_id = $name_arr[sizeof($name_arr) - 1];
         }
 
         $_GET['product_id'] = $product_id;
@@ -93,7 +94,7 @@ class StoreController extends StoreControllerLite
             $c = Model::load('ProductColour');
             $c->id = $_GET['colour_id'];
             $c->load();
-            $item = array();
+            $item = [];
             $item['image'] = $c->image;
             $item['option_id'] = $c->property_option_id;
             echo json_encode($item);
@@ -112,7 +113,7 @@ class StoreController extends StoreControllerLite
             $o->id = 0;
 
             if (isset($_POST['add'])) {
-                $options = array();
+                $options = [];
                 if (isset($_POST['property'])) {
                     foreach ($_POST['property'] as $option) {
                         array_push($options, $option);
@@ -143,16 +144,15 @@ class StoreController extends StoreControllerLite
 
             $this->assign('p_nav', $l->getPNav());
 
-            if ($_GET['product_id'] != 0) {
+            if ($_GET['product_id'] !== 0) {
                 $c = Model::load(ProductColour::class);
                 $colours = $c->getColoursIndexed($_GET['product_id']);
                 if (sizeof($colours) > 0) {
                     $this->assign('colours', $colours);
                 }
 
-                if(defined('ELIB_USE_PRODUCT_BRANDS') &&
-                   ELIB_USE_PRODUCT_BRANDS == true)
-                {
+                if (defined('ELIB_USE_PRODUCT_BRANDS') &&
+                   ELIB_USE_PRODUCT_BRANDS === true) {
                     $b = Model::load(BrandItem::class);
                     $b->id = $p->brand_id;
                     $b->load($b->id);
@@ -170,7 +170,7 @@ class StoreController extends StoreControllerLite
             $this->assign('product_id', $_GET['product_id']);
             $this->assign('option_id', 0);
 
-            if ($_GET['product_id'] != 0) {
+            if ($_GET['product_id'] !== 0) {
                 $p = $l->getProduct();
                 if (sizeof($colours) > 0) {
                     $p->image = $c->getFirstColourImage($_GET['product_id']);
@@ -178,7 +178,7 @@ class StoreController extends StoreControllerLite
 
                 $this->assign('product', $p);
 
-                $qty = array();
+                $qty = [];
                 $i = 0;
                 for ($i; $i < 31; $i++) {
                     $qty[$i] = $i;
@@ -217,7 +217,7 @@ class StoreController extends StoreControllerLite
         $p = Model::load('PromoItem');
 
         $c = Model::load('CategoryItem');
-        $ids = array();
+        $ids = [];
         $c->buildDescendantIDs($category_id, $ids);
         $cat_string = $c->buildUnionString($ids);
 
@@ -325,11 +325,11 @@ class StoreController extends StoreControllerLite
         }
 
         //    print_r($variants);
-        $fixed_properties = array('id', 'weight_g', 'weight_lb', 'name');
-        $dynamic_properties = array();
+        $fixed_properties = ['id', 'weight_g', 'weight_lb', 'name'];
+        $dynamic_properties = [];
         foreach ($variants as $index => $value) {
             foreach ($value as $index2 => $value2) {
-                if (!in_array($index2, $fixed_properties) && !in_array($index2, $dynamic_properties)) {
+                if (!in_array($index2, $fixed_properties, true) && !in_array($index2, $dynamic_properties, true)) {
                     array_push($dynamic_properties, $index2);
                 }
             }

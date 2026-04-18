@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\ELib\Store;
 
+use Empathy\ELib\Storage\ProductVariant;
 use Empathy\MVC\Model;
 use Empathy\MVC\Session;
-use Empathy\ELib\Storage\ProductVariant;
 
 class ShoppingCart
 {
@@ -20,10 +22,10 @@ class ShoppingCart
 
     public function loadFromCart()
     {
-        $ids = array();
-        $product_data = array();
+        $ids = [];
+        $product_data = [];
 
-        if (($cart = Session::get('cart')) != false) {
+        if (($cart = Session::get('cart')) !== false) {
             foreach ($cart as $v => $qty) {
                 array_push($ids, $v);
             }
@@ -54,8 +56,8 @@ class ShoppingCart
 
     public function add($variant_id, $qty)
     {
-        if (($cart = Session::get('cart')) == false) {
-            $cart = array();
+        if (($cart = Session::get('cart')) === false) {
+            $cart = [];
         }
 
         if (isset($cart[$variant_id])) {
@@ -69,7 +71,7 @@ class ShoppingCart
 
     public function remove($variant_id)
     {
-        if (($cart = Session::get('cart')) != false) {
+        if (($cart = Session::get('cart')) !== false) {
             if (isset($cart[$variant_id])) {
                 unset($cart[$variant_id]);
                 Session::set('cart', $cart);
@@ -79,7 +81,7 @@ class ShoppingCart
 
     public function update($variant_id, $qty)
     {
-        if (($cart = Session::get('cart')) != false) {
+        if (($cart = Session::get('cart')) !== false) {
             if (isset($cart[$variant_id])) {
                 $cart[$variant_id]['qty'] = (int) ($qty);
                 Session::set('cart', $cart);
@@ -90,7 +92,7 @@ class ShoppingCart
     public static function getTotalItems()
     {
         $total = 0;
-        if (($cart = Session::get('cart')) != false) {
+        if (($cart = Session::get('cart')) !== false) {
             foreach ($cart as $v => $qty) {
                 $total += $qty['qty'];
             }
@@ -101,15 +103,14 @@ class ShoppingCart
 
     public function emptyCart()
     {
-        Session::set('cart', array());
+        Session::set('cart', []);
     }
 
     public function isEmpty()
     {
         $empty = false;
-        if(($cart = Session::get('cart')) == false
-           || sizeof($cart) < 1)
-        {
+        if (($cart = Session::get('cart')) === false
+           || sizeof($cart) < 1) {
             $empty = true;
         }
 
@@ -122,7 +123,8 @@ class ShoppingCart
         print_r($c);
     }
 
-    public function getQtyByProductId(int $productId): int {
+    public function getQtyByProductId(int $productId): int
+    {
         $items = $this->loadFromCart();
         $total = 0;
         foreach ($items as $item) {

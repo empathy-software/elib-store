@@ -1,18 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\ELib\Store;
 
-use Empathy\MVC\Model;
 use Empathy\ELib\Storage\BrandItem;
+use Empathy\MVC\Model;
 
 class BrandController extends AdminController
 {
-
     public function default_event(): void
     {
-        $ui_array = array('id');
+        $ui_array = ['id'];
         $this->loadUIVars('ui_banner', $ui_array);
-        if (!isset($_GET['id']) || $_GET['id'] == '') {
+        if (!isset($_GET['id']) || $_GET['id'] === '') {
             $_GET['id'] = 0;
         }
         $this->buildNav();
@@ -72,7 +73,7 @@ class BrandController extends AdminController
     {
         $this->assertID();
         $b = Model::load(BrandItem::class);
-        $b->load( $_GET['id']);
+        $b->load($_GET['id']);
         $b->delete();
         $this->redirect('admin/brand/');
     }

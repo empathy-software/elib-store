@@ -1,19 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\ELib\Store;
 
+use Empathy\ELib\Storage\BrandItem;
+use Empathy\ELib\Storage\CategoryItem;
+use Empathy\ELib\Storage\ProductColour;
+use Empathy\ELib\Storage\ProductItem;
+use Empathy\ELib\Storage\ProductItemStatus;
+use Empathy\ELib\Storage\ProductVariant;
+use Empathy\ELib\Storage\ProductVariantPropertyOption;
+use Empathy\ELib\Storage\ProductVariantStatus;
+use Empathy\ELib\Storage\Property;
+use Empathy\MVC\DI;
 use Empathy\MVC\Model;
 use Empathy\MVC\Session;
-use Empathy\ELib\Storage\ProductItemStatus;
-use Empathy\ELib\Storage\ProductVariantStatus;
-use Empathy\ELib\Storage\ProductItem;
-use Empathy\ELib\Storage\ProductVariant;
-use Empathy\ELib\Storage\ProductColour;
-use Empathy\ELib\Storage\CategoryItem;
-use Empathy\ELib\Storage\BrandItem;
-use Empathy\ELib\Storage\Property;
-use Empathy\ELib\Storage\ProductVariantPropertyOption;
-use Empathy\MVC\DI;
 
 define('REQUESTS_PER_PAGE', 12);
 
@@ -32,18 +34,18 @@ class Store
 
     public function productsView()
     {
-        $ui_array = array('order_by', 'page', 'id', 'brand_id');
+        $ui_array = ['order_by', 'page', 'id', 'brand_id'];
         Session::loadUIVars('ui_catalogue', $ui_array);
-        if (!isset($_GET['page']) || $_GET['page'] == '') {
+        if (!isset($_GET['page']) || $_GET['page'] === '') {
             $_GET['page'] = 1;
         }
-        if (!isset($_GET['id']) || $_GET['id'] == '') {
+        if (!isset($_GET['id']) || $_GET['id'] === '') {
             $_GET['id'] = 0;
         }
-        if (!isset($_GET['order_by']) || $_GET['order_by'] == '') {
+        if (!isset($_GET['order_by']) || $_GET['order_by'] === '') {
             $_GET['order_by'] = 'id';
         }
-        if (!isset($_GET['brand_id']) || $_GET['brand_id'] == '') {
+        if (!isset($_GET['brand_id']) || $_GET['brand_id'] === '') {
             $_GET['brand_id'] = 0;
         }
 
@@ -98,7 +100,7 @@ class Store
         $c->id = $_GET['id'];
         $category = $c->loadIndexed($c->category_id);
 
-        $this->c->assign("products", $product);
+        $this->c->assign('products', $product);
     }
 
     public function buildNav()
@@ -153,11 +155,11 @@ class Store
                 $p->description = 'No description.';
                 $p->status = 'DEFAULT';
 
-                if(defined('ELIB_MULTIPLE_VENDORS') &&
-                   ELIB_MULTIPLE_VENDORS == true) {
+                if (defined('ELIB_MULTIPLE_VENDORS') &&
+                   ELIB_MULTIPLE_VENDORS === true) {
                     $user_id = DI::getContainer()->get('CurrentUser');
                     $v = Model::load($this->vendorModel);
-                    $v->id = $v->getIDByUserID($user_id);                    
+                    $v->id = $v->getIDByUserID($user_id);
                     if ($v->id > 0) {
                         $v->load($v->id);
 
@@ -186,7 +188,7 @@ class Store
         $p->load($_GET['id']);
         $this->c->assign('product_status', ProductItemStatus::getStatus($p->status));
 
-        $this->c->assign("product", $p);
+        $this->c->assign('product', $p);
 
         $v = Model::load(ProductVariant::class);
         $c = Model::load(ProductColour::class);
@@ -194,11 +196,11 @@ class Store
         $has_colours = $c->hasColours($p->id);
         if ($has_colours) {
             $variants = $v->getAllColourVariants($p->id);
-            $ids = array();
+            $ids = [];
             foreach ($variants as $index => $item) {
                 array_push($ids, $item['id']);
                 //if($item['image'] == '' && $item['other_image'] != '')
-                if ($item['other_image'] != '') { // product colour images override variant images
+                if ($item['other_image'] !== '') { // product colour images override variant images
                     $variants[$index]['image'] = $variants[$index]['other_image'];
                 }
             }
@@ -223,26 +225,24 @@ class Store
             if (sizeof($props) > 0) {
                 $v['properties'] = $props;
             }
-            if($this->setStatusFlags($v) == true
-               && $available_variant != true)
-            {
+            if ($this->setStatusFlags($v) === true
+               && $available_variant !== true) {
                 $available_variant = true;
             }
             $v['status_text'] = ProductVariantStatus::getStatus($v['status']);
         }
 
-        if($available_variant == true
-           && $p->name != 'New Product'
-           && !($p->description == 'No description.' || $p->description == '<p>No description.</p>')
-           && count($p->getImages()))
-        {
-            if ($p->status != ProductItemStatus::AVAILABLE) {
+        if ($available_variant === true
+           && $p->name !== 'New Product'
+           && !($p->description === 'No description.' || $p->description === '<p>No description.</p>')
+           && count($p->getImages())) {
+            if ($p->status !== ProductItemStatus::AVAILABLE) {
                 $this->c->assign('product_available_link', true);
             }
-            if ($p->status != ProductItemStatus::SOLD_OUT) {
+            if ($p->status !== ProductItemStatus::SOLD_OUT) {
                 $this->c->assign('product_sold_out_link', true);
             }
-            if ($p->status != ProductItemStatus::CREATED) {
+            if ($p->status !== ProductItemStatus::CREATED) {
                 $this->c->assign('product_unavailable_link', true);
             }
         }
@@ -256,7 +256,7 @@ class Store
     {
         $available = false;
         if (isset($v['properties']) && $v['price'] > 0) {
-            if ($v['status'] != ProductVariantStatus::AVAILABLE) {
+            if ($v['status'] !== ProductVariantStatus::AVAILABLE) {
                 $v['available_link'] = true;
             } else {
                 $available = true;
@@ -349,9 +349,9 @@ class Store
         $v = Model::load(ProductVariant::class);
         $v->load($_GET['id']);
 
-        $i = new ImageUpload(null, false, array());
-        if ($v->image != '') {
-            $i->remove(array($v->image));
+        $i = new ImageUpload(null, false, []);
+        if ($v->image !== '') {
+            $i->remove([$v->image]);
             unset($v->image);
             $v->save();
         }
@@ -381,13 +381,13 @@ class Store
             $p->description = $_POST['description'];
 
             if (isset($_POST['sold_in_store']) &&
-                $_POST['sold_in_store'] == 1) {
+                $_POST['sold_in_store'] === 1) {
                 $p->status = 1;
             } else {
                 $p->status = 0;
             }
 
-            $p->brand_id = (isset($_POST['brand_id']))? $_POST['brand_id']: NULL;
+            $p->brand_id = (isset($_POST['brand_id'])) ? $_POST['brand_id'] : null;
 
             $p->validates();
             if ($p->hasValErrors()) {
@@ -420,10 +420,10 @@ class Store
             //$this->presenter->assign("product_ranges", $product_ranges);
             //$this->presenter->assign("ranges", $ranges);
 
-            $this->c->assign("product", $p);
-            $this->c->assign("categories", $category);
+            $this->c->assign('product', $p);
+            $this->c->assign('categories', $category);
 
-            $sold = array();
+            $sold = [];
             $sold[0] = 'No';
             $sold[1] = 'Yes';
             $this->c->assign('sold_in_store', $sold);
@@ -446,21 +446,21 @@ class Store
         $p = Model::load(ProductItem::class);
         $p->load($_GET['id']);
 
-        $this->c->assign("product", $p);
+        $this->c->assign('product', $p);
 
         if (isset($_POST['upload'])) {
-            $d = array(
-                array('l_', 450, 450),
-                array('tn_', 100, 100),
-                array('mid_', 400, 276)
-                );
+            $d = [
+                ['l_', 450, 450],
+                ['tn_', 100, 100],
+                ['mid_', 400, 276],
+                ];
             $u = new ImageUpload('products', true, $d);
 
-            if ($u->error != '') {
-                $this->c->assign("error", $u->error);
+            if ($u->error !== '') {
+                $this->c->assign('error', $u->error);
             } else {
-                if ($p->image != "") {
-                    $u->remove(array($p->image));
+                if ($p->image !== '') {
+                    $u->remove([$p->image]);
                 }
                 // update db
                 $p->image = $u->file;
@@ -507,9 +507,9 @@ class Store
         } elseif (isset($_POST['save'])) {
             $v = Model::load(ProductVariant::class);
             $v->load($_POST['id']);
-            $v->weight_g = (isset($_POST['weight_g']))? $_POST['weight_g']: NULL;
-            $v->weight_lb = (isset($_POST['weight_lb']))? $_POST['weight_lb']: NULL;
-            $v->weight_oz = (isset($_POST['weight_oz']))? $_POST['weight_oz']: NULL;
+            $v->weight_g = (isset($_POST['weight_g'])) ? $_POST['weight_g'] : null;
+            $v->weight_lb = (isset($_POST['weight_lb'])) ? $_POST['weight_lb'] : null;
+            $v->weight_oz = (isset($_POST['weight_oz'])) ? $_POST['weight_oz'] : null;
             $v->price = $_POST['price'];
             $v->validates();
             if ($v->hasValErrors()) {
@@ -543,19 +543,19 @@ class Store
         $p = Model::load(ProductItem::class);
         $p->id = $v->product_id;
         $p->load($p->id);
-        $this->c->assign("product", $p);
+        $this->c->assign('product', $p);
 
         if (isset($_POST['cancel'])) {
             $this->c->redirect('storeadmin/product/'.$v->product_id);
         } elseif (isset($_POST['upload'])) {
-            $d = array(array('tn_', 100, 100), array('mid_', 400, 276));
+            $d = [['tn_', 100, 100], ['mid_', 400, 276]];
             $u = new ImageUpload('products', true, $d);
 
-            if ($u->error != '') {
+            if ($u->error !== '') {
                 $this->c->assign('error', $u->error);
             } else {
-                if ($v->image != '') {
-                    $u->remove(array($v->image));
+                if ($v->image !== '') {
+                    $u->remove([$v->image]);
                 }
                 $v->image = $u->file;
                 $v->save();
@@ -588,7 +588,7 @@ class Store
                     $p->insert();
                 }
             }
-        // }
+            // }
             $v = Model::load(ProductVariant::class);
             $v->load($_GET['id']);
             $this->c->redirect('storeadmin/product/'.$v->product_id);
@@ -602,7 +602,7 @@ class Store
         $p->load($p->id);
 
         $c = Model::load(CategoryItem::class);
-        $cats = $c->getAncestorIds($p->category_id, array());
+        $cats = $c->getAncestorIds($p->category_id, []);
 
         $cp = Model::load(CategoryProperty::class);
 
@@ -622,7 +622,7 @@ class Store
             $pv = Model::load(ProductVariantPropertyOption::class);
             $sql = ' WHERE product_variant_id = ?';
             $options = $pv->getAllCustom($sql, [$_GET['id']]);
-            $o = array();
+            $o = [];
             foreach ($options as $index => $value) {
                 array_push($o, $value['property_option_id']);
             }

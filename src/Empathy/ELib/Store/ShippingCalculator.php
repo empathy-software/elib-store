@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\ELib\Store;
 
 define('FLAT_FEE', 3.00);
@@ -48,7 +50,7 @@ class ShippingCalculator
         } elseif ($total > FREE_THRESHOLD) {
             $this->fee = 0;
         } else {
-            if ($this->item_count == 1 && $lowest < FLAT_FEE) {
+            if ($this->item_count === 1 && $lowest < FLAT_FEE) {
                 $this->fee = $lowest;
             } else {
                 $this->fee = FLAT_FEE;

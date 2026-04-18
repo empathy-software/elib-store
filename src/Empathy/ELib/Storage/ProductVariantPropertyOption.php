@@ -1,14 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\ELib\Storage;
 
-use Empathy\MVC\Model;
 use Empathy\MVC\Entity;
-
+use Empathy\MVC\Model;
 
 class ProductVariantPropertyOption extends Entity
 {
-    const TABLE = 'product_variant_property_option';
+    public const TABLE = 'product_variant_property_option';
 
     public int $id;
     public $product_variant_id;
@@ -23,7 +24,7 @@ class ProductVariantPropertyOption extends Entity
 
     public function getActiveOptions($product_id)
     {
-        $ids = array();
+        $ids = [];
 
         $sql = 'SELECT DISTINCT property_option_id AS id'
             .' FROM '.Model::getTable(self::class).' t1,'

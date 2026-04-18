@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\ELib\Storage;
 
 use Empathy\MVC\Entity;
 
 class OrderStatus extends Entity
 {
-    const TABLE = 'order_status';
+    public const TABLE = 'order_status';
 
     public int $id;
     public $user_id;

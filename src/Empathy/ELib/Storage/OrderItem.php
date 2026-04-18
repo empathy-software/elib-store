@@ -1,18 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\ELib\Storage;
 
-use Empathy\MVC\Model;
 use Empathy\MVC\Entity;
-use Empathy\ELib\Storage\UserItem;
-use Empathy\ELib\Storage\OrderStatus;
-use Empathy\ELib\Storage\LineItem;
-use Empathy\ELib\Storage\ProductItem;
+use Empathy\MVC\Model;
 use OV\Misc;
 
 class OrderItem extends Entity
 {
-    const TABLE = 'e_order';
+    public const TABLE = 'e_order';
 
     public int $id;
     public $user_id;

@@ -1,16 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\ELib\Storage;
 
-use Empathy\MVC\Model;
 use Empathy\MVC\Entity;
-use Empathy\ELib\Storage\BrandItem;
-
-
+use Empathy\MVC\Model;
 
 class ProductItem extends Entity
 {
-    const TABLE = 'product';
+    public const TABLE = 'product';
 
     public int $id;
     public $category_id;
@@ -34,10 +33,10 @@ class ProductItem extends Entity
 
     public function validates()
     {
-        if ($this->name == '') { // || !ctype_alnum(str_replace(' ', '', $this->name))) 
+        if ($this->name === '') { // || !ctype_alnum(str_replace(' ', '', $this->name)))
             $this->addValError('Invalid product name');
         }
-        if ($this->description == '') {
+        if ($this->description === '') {
             $this->addValError('Invalid product description');
         }
     }
@@ -60,7 +59,8 @@ class ProductItem extends Entity
         return true;
     }
 
-    public function getStock() {
+    public function getStock()
+    {
         return $this->stock;
     }
 
@@ -85,7 +85,7 @@ class ProductItem extends Entity
         $sql = 'SELECT id FROM '.Model::getTable(ProductVariant::class).' WHERE product_id = ?';
         $error = 'Could not check for single variant on product.';
         $result = $this->query($sql, $error, [$this->id]);
-        if ($result->rowCount() == 1) {
+        if ($result->rowCount() === 1) {
             $row = $result->fetch();
             $id = $row['id'];
         }
@@ -108,8 +108,8 @@ class ProductItem extends Entity
 
     public function convertCategory()
     {
-        $sql = "SELECT name from ".Model::getTable(CategoryItem::class)." WHERE id = ?";
-        $error = "Could not get category name.";
+        $sql = 'SELECT name from '.Model::getTable(CategoryItem::class).' WHERE id = ?';
+        $error = 'Could not get category name.';
         $result = $this->query($sql, $error, [$this->category_id]);
         $row = $result->fetch();
 
@@ -135,7 +135,7 @@ class ProductItem extends Entity
 
     public function getAllImages()
     {
-        $image = array();
+        $image = [];
         $sql = 'SELECT image FROM '.Model::getTable(ProductItem::class);
         $error = 'Could not get product images.';
         $result = $this->query($sql, $error);
@@ -164,7 +164,7 @@ class ProductItem extends Entity
             .' AND product_id > 0';
         $error = 'Could not get price.';
         $result = $this->query($sql, $error, [$this->id]);
-        if ($result->rowCount() == 1) {
+        if ($result->rowCount() === 1) {
             $row = $result->fetch();
             $price = $row['price'];
         }
@@ -181,7 +181,7 @@ class ProductItem extends Entity
             .' AND status = '.ProductVariantStatus::AVAILABLE;
         $error = 'Could not get price.';
         $result = $this->query($sql, $error, [$id]);
-        if ($result->rowCount() == 1) {
+        if ($result->rowCount() === 1) {
             $row = $result->fetch();
             $price = $row['price'];
         }
@@ -198,7 +198,7 @@ class ProductItem extends Entity
         echo $sql;
         $error = 'Could not get product id by name.';
         $result = $this->query($sql, $error, ['\''.str_replace('-', ' ', $name).'\'']);
-        if ($result->rowCount() == 1) {
+        if ($result->rowCount() === 1) {
             $row = $result->fetch();
             $id = $row['id'];
         }

@@ -1,23 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\ELib\Storage;
 
-use Empathy\MVC\Model;
 use Empathy\MVC\Entity;
+use Empathy\MVC\Model;
 use Empathy\MVC\Validate;
-
-
 
 class Property extends Entity
 {
-    const TABLE = 'property';
+    public const TABLE = 'property';
 
     public int $id;
     public $name;
 
     public function loadForVariant($variant_id)
     {
-        $p = array();
+        $p = [];
         $sql = 'SELECT t1.name as property_name, t2.option_val '
             .' FROM '.Model::getTable(ProductVariantPropertyOption::class).', '.Model::getTable(Property::class).' t1 LEFT JOIN '
             .' '.Model::getTable(PropertyOption::class).' t2 ON t1.id = t2.property_id WHERE '
@@ -49,7 +49,7 @@ class Property extends Entity
         $propsString = $this->buildUnionString($props);
 
         $params = [];
-        $property = array();
+        $property = [];
         $sql = 'SELECT t1.id, t1.name, t2.id AS option_id, t2.option_val FROM '
             .Model::getTable(Property::class).' t1 '
             .'LEFT JOIN '.Model::getTable(PropertyOption::class).' t2 ON t2.property_id = t1.id';
@@ -103,7 +103,7 @@ class Property extends Entity
     {
         $propsString = $this->buildUnionString($props);
 
-        $property = array();
+        $property = [];
         $sql = 'SELECT t1.id, t1.name, t2.id AS option_id, t2.option_val FROM '
             .Model::getTable(Property::class).' t1 '
             .'LEFT JOIN '.Model::getTable(PropertyOption::class).' t2 ON t2.property_id = t1.id';

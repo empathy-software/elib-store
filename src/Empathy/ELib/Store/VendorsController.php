@@ -1,16 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\ELib\Store;
 
-use Empathy\MVC\Model;
 use Empathy\ELib\Storage\ProductItem;
-use Empathy\ELib\Storage\UserItem;
 use Empathy\ELib\Storage\ShippingAddress;
+use Empathy\ELib\Storage\UserItem;
 use Empathy\MVC\DI;
+use Empathy\MVC\Model;
 
 class VendorsController extends AdminController
 {
-
     public function default_event(): void
     {
         $vendorModel = DI::getContainer()->get('VendorModel');
@@ -25,7 +26,7 @@ class VendorsController extends AdminController
             $u->id = $v->user_id;
             $u->load($u->id);
 
-            if ($u->active && $v->name != '') {
+            if ($u->active && $v->name !== '') {
                 $u->auth = Access::VENDOR;
                 $u->save();
 

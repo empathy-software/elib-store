@@ -1,14 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\ELib\Storage;
 
-use Empathy\MVC\Model;
 use Empathy\MVC\Entity;
-
+use Empathy\MVC\Model;
 
 class ProductColour extends Entity
 {
-    const TABLE = 'product_colour';
+    public const TABLE = 'product_colour';
 
     public int $id;
     public $product_id;
@@ -17,7 +18,7 @@ class ProductColour extends Entity
 
     public function validates()
     {
-        if ($this->name == '') {
+        if ($this->name === '') {
             $this->addValError('Invalid brand name.');
         }
     }
@@ -35,7 +36,7 @@ class ProductColour extends Entity
 
     public function getColoursIndexed($product_id)
     {
-        $colours = array();
+        $colours = [];
         $sql = 'SELECT t1.id AS id, t2.option_val FROM '.Model::getTable(self::class).' t1,'
             .' '.Model::getTable(PropertyOption::class).' t2'
             .' WHERE t1.property_option_id = t2.id'
@@ -71,7 +72,7 @@ class ProductColour extends Entity
 
     public function getColourOptionIDs($product_id)
     {
-        $colours = array();
+        $colours = [];
         $sql = 'SELECT property_option_id FROM '.Model::getTable(self::class)
             .' WHERE product_id = ?';
         $error = 'Could not get product colours for variants wizard.';

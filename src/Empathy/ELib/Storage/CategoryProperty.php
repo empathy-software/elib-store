@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\ELib\Storage;
 
-use Empathy\MVC\Model;
 use Empathy\MVC\Entity;
+use Empathy\MVC\Model;
 
 class CategoryProperty extends Entity
 {
-    const TABLE = 'category_property';
+    public const TABLE = 'category_property';
 
     public int $id;
     public $category_id;
@@ -24,10 +26,10 @@ class CategoryProperty extends Entity
     public function getPropertiesByCategory($cat)
     {
         $catString = $this->buildUnionString($cat);
-        $properties = array();
+        $properties = [];
         $sql = 'SELECT property_id FROM '.Model::getTable(self::class)
             .' WHERE category_id IN ' . $catString[0];
-        $error = "Could not find active category properties.";
+        $error = 'Could not find active category properties.';
         $result = $this->query($sql, $error, $catString[1]);
 
         $i = 0;

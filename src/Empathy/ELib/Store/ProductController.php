@@ -1,20 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\ELib\Store;
 
-use Empathy\ELib\Storage\ProductImage;
-use Empathy\MVC\Model;
-use Empathy\ELib\Storage\ProductItem;
-use Empathy\ELib\Storage\Property;
-use Empathy\ELib\Storage\CategoryItem;
-use Empathy\ELib\Storage\ProductVariant;
-use Empathy\ELib\Storage\ProductColour;
-use Empathy\ELib\Storage\BrandItem;
-use Empathy\ELib\Storage\CategoryProperty;
-use Empathy\ELib\Storage\PropertyOption;
-use Empathy\ELib\Storage\ProductVariantPropertyOption;
 use Empathy\ELib\File\Image as EImageUpload;
-
+use Empathy\ELib\Storage\BrandItem;
+use Empathy\ELib\Storage\CategoryItem;
+use Empathy\ELib\Storage\CategoryProperty;
+use Empathy\ELib\Storage\ProductColour;
+use Empathy\ELib\Storage\ProductImage;
+use Empathy\ELib\Storage\ProductItem;
+use Empathy\ELib\Storage\ProductVariant;
+use Empathy\ELib\Storage\ProductVariantPropertyOption;
+use Empathy\ELib\Storage\Property;
+use Empathy\ELib\Storage\PropertyOption;
+use Empathy\MVC\Model;
 
 class ProductController extends AdminController
 {
@@ -49,7 +50,7 @@ class ProductController extends AdminController
             $p->shipping_eu = $_POST['shipping_eu'];
             $p->shipping_other = $_POST['shipping_other'];
 
-            if ($_POST['sold_in_store'] == 1) {
+            if ($_POST['sold_in_store'] === 1) {
                 $p->status = 1;
             } else {
                 $p->status = 0;
@@ -69,7 +70,7 @@ class ProductController extends AdminController
                 $p->save();
                 $this->redirect('admin/product/' . $p->id);
             }
-        } else if (isset($_POST['cancel'])) {
+        } elseif (isset($_POST['cancel'])) {
             $this->redirect('admin/product/' . $_GET['id']);
         } else {
             $p->load($_GET['id']);
@@ -90,10 +91,10 @@ class ProductController extends AdminController
             //$this->presenter->assign("product_ranges", $product_ranges);
             //$this->presenter->assign("ranges", $ranges);
 
-            $this->presenter->assign("product", $p);
-            $this->presenter->assign("categories", $category);
+            $this->presenter->assign('product', $p);
+            $this->presenter->assign('categories', $category);
 
-            $sold = array();
+            $sold = [];
             $sold[0] = 'No';
             $sold[1] = 'Yes';
             $this->presenter->assign('sold_in_store', $sold);
@@ -111,7 +112,7 @@ class ProductController extends AdminController
         $p = Model::load(ProductItem::class);
         $p->load($_GET['id']);
 
-        $this->presenter->assign("product", $p);
+        $this->presenter->assign('product', $p);
 
         if (is_numeric($p->brand_id)) {
             $b = Model::load(BrandItem::class);
@@ -125,13 +126,13 @@ class ProductController extends AdminController
         $has_colours = $c->hasColours($p->id);
         if ($has_colours) {
             $variants = $v->getAllColourVariants($p->id);
-            $ids = array();
+            $ids = [];
             $params = [];
             foreach ($variants as $index => $item) {
                 array_push($ids, $item['id']);
                 //if($item['image'] == '' && $item['other_image'] != '')
                 // product colour images override variant images
-                if ($item['other_image'] != '') {
+                if ($item['other_image'] !== '') {
                     $variants[$index]['image'] = $variants[$index]['other_image'];
                 }
             }
@@ -174,10 +175,10 @@ class ProductController extends AdminController
         $i = Model::load(ProductImage::class);
         $p->load($_GET['id']);
 
-        $this->presenter->assign("product", $p);
+        $this->presenter->assign('product', $p);
 
         if (isset($_POST['upload'])) {
-            $images = array();
+            $images = [];
             if (!is_array($_FILES['file']['name'])) {
 
                 $images[0] = $_FILES['file'];
@@ -190,10 +191,10 @@ class ProductController extends AdminController
             foreach ($images as $index => $image) {
                 $_FILES['file'] = $image;
 
-                $d = array(array('tn_', 100, 100), array('mid_', 400, 276));
+                $d = [['tn_', 100, 100], ['mid_', 400, 276]];
                 $u = new ImageUpload('products', true, $d);
 
-                if ($u->error != '') {
+                if ($u->error !== '') {
                     $error = $u->error;
                     break;
                 } else {
@@ -206,8 +207,8 @@ class ProductController extends AdminController
                 $j++;
             }
 
-            if ($error != '') {
-                $this->presenter->assign("error", $error);
+            if ($error !== '') {
+                $this->presenter->assign('error', $error);
             } else {
                 $this->redirect('admin/product/' . $p->id);
             }
@@ -228,8 +229,8 @@ class ProductController extends AdminController
                 $p = Model::load('ProductItem');
                 $images = $p->getAllImages();
 
-                $d = array(array('tn_', $_POST['tn_width'], $_POST['tn_height']),
-                    array('mid_', $_POST['mid_width'], $_POST['mid_height']));
+                $d = [['tn_', $_POST['tn_width'], $_POST['tn_height']],
+                    ['mid_', $_POST['mid_width'], $_POST['mid_height']]];
                 $u = new ImageUpload('', false, $d);
                 $u->resize($images);
             }
@@ -267,13 +268,13 @@ class ProductController extends AdminController
         $p->load($_GET['id']);
         if (!$p->hasVariants()) {
             $images_removed = false;
-            if ($p->image != '') {
-                $u = new ImageUpload('products', false, array());
-                if ($u->remove(array($p->image))) {
+            if ($p->image !== '') {
+                $u = new ImageUpload('products', false, []);
+                if ($u->remove([$p->image])) {
                     $images_removed = true;
                 }
             }
-            if ($p->image == '' || $images_removed) {
+            if ($p->image === '' || $images_removed) {
                 $p->delete();
                 $this->redirect('admin/category/' . $p->category_id);
             }
@@ -290,13 +291,13 @@ class ProductController extends AdminController
         $v = Model::load(ProductVariant::class);
         $v->load($_GET['id']);
         $images_removed = false;
-        if ($v->image != '') {
-            $i = new ImageUpload('products', false, array());
-            if ($i->remove(array($v->image))) {
+        if ($v->image !== '') {
+            $i = new ImageUpload('products', false, []);
+            if ($i->remove([$v->image])) {
                 $images_removed = true;
             }
         }
-        if ($v->image == '' || $images_removed) {
+        if ($v->image === '' || $images_removed) {
             $o = Model::load(ProductVariantPropertyOption::class);
             $o->emptyByVariant($v->id);
             $v->delete();
@@ -337,7 +338,7 @@ class ProductController extends AdminController
         $this->assertID();
         $this->setTemplate('elib://admin/product.tpl');
         $v = Model::load(ProductVariant::class);
-        $v->load( $_GET['id']);
+        $v->load($_GET['id']);
         $this->assign('variant', $v);
         $p = Model::load(ProductItem::class);
         $p->load($v->product_id);
@@ -386,18 +387,18 @@ class ProductController extends AdminController
 
         $p = Model::load(ProductItem::class);
         $p->load($v->product_id);
-        $this->presenter->assign("product", $p);
+        $this->presenter->assign('product', $p);
 
 
         if (isset($_POST['upload'])) {
-            $d = array(array('tn_', 100, 100), array('mid_', 400, 276));
+            $d = [['tn_', 100, 100], ['mid_', 400, 276]];
             $u = new ImageUpload('products', true, $d);
 
-            if ($u->error != '') {
+            if ($u->error !== '') {
                 $this->presenter->assign('error', $u->error);
             } else {
-                if ($v->image != '') {
-                    $u->remove(array($v->image));
+                if ($v->image !== '') {
+                    $u->remove([$v->image]);
                 }
                 $v->image = $u->file;
                 $v->save();
@@ -448,7 +449,7 @@ class ProductController extends AdminController
         $p->load($v->product_id);
 
         $c = Model::load(CategoryItem::class);
-        $cats = $c->getAncestorIds($p->category_id, array());
+        $cats = $c->getAncestorIds($p->category_id, []);
 
         $cp = Model::load(CategoryProperty::class);
 
@@ -467,7 +468,7 @@ class ProductController extends AdminController
             $pv = Model::load(ProductVariantPropertyOption::class);
             $sql = ' WHERE product_variant_id = ?';
             $options = $pv->getAllCustom($sql, [$_GET['id']]);
-            $o = array();
+            $o = [];
             foreach ($options as $index => $value) {
                 array_push($o, $value['property_option_id']);
             }
@@ -507,11 +508,11 @@ class ProductController extends AdminController
         $this->presenter->assign('colours', $colours);
 
         if (isset($_POST['submit_colour'])) {
-            $d = array(array('tn_', 100, 100), array('mid_', 400, 276));
+            $d = [['tn_', 100, 100], ['mid_', 400, 276]];
             $u = new ImageUpload('', true, $d);
 
-            if ($u->error != '') {
-                $this->presenter->assign("error", $u->error);
+            if ($u->error !== '') {
+                $this->presenter->assign('error', $u->error);
             } else {
                 // update db
                 $c = Model::load(ProductColour::class);
@@ -532,13 +533,13 @@ class ProductController extends AdminController
         $p->load($_GET['id']);
 
         $images_removed = false;
-        if ($p->image != '') {
-            $u = new ImageUpload('', false, array());
-            if ($u->remove(array($p->image))) {
+        if ($p->image !== '') {
+            $u = new ImageUpload('', false, []);
+            if ($u->remove([$p->image])) {
                 $images_removed = true;
             }
         }
-        if ($p->image == '' || $images_removed) {
+        if ($p->image === '' || $images_removed) {
             $p->delete();
         }
         $this->redirect('admin/product/edit_colours/' . $p->product_id);
@@ -553,18 +554,18 @@ class ProductController extends AdminController
             $c->load();
             $c->property_option_id = $_POST['colour'];
 
-            if ($_FILES['file']['name'] != '') {
+            if ($_FILES['file']['name'] !== '') {
                 $images_removed = false;
-                $u = new ImageUpload('', false, array());
-                if ($u->remove(array($c->image))) {
+                $u = new ImageUpload('', false, []);
+                if ($u->remove([$c->image])) {
                     $images_removed = true;
                 }
-                if ($c->image == '' || $images_removed) {
-                    $d = array(array('tn_', 100, 100), array('mid_', 400, 276));
+                if ($c->image === '' || $images_removed) {
+                    $d = [['tn_', 100, 100], ['mid_', 400, 276]];
                     $u = new ImageUpload('', true, $d);
 
-                    if ($u->error != '') {
-                        $this->presenter->assign("error", $u->error);
+                    if ($u->error !== '') {
+                        $this->presenter->assign('error', $u->error);
                     } else {
                         $c->image = $u->file;
                     }
@@ -596,7 +597,7 @@ class ProductController extends AdminController
     {
         $this->setTemplate('elib://admin/product.tpl');
         if (isset($_POST['submit'])) {
-            $sets = array();
+            $sets = [];
             foreach ($_POST['property'] as $index => $value) {
                 array_push($sets, $value);
             }
@@ -636,7 +637,7 @@ class ProductController extends AdminController
         $this->presenter->assign('product', $p);
 
         $c = Model::load(CategoryItem::class);
-        $cats = $c->getAncestorIds($p->category_id, array());
+        $cats = $c->getAncestorIds($p->category_id, []);
         $cp = Model::load(CategoryProperty::class);
         array_push($cats, $p->category_id);
         $props = $cp->getPropertiesByCategory($cats);

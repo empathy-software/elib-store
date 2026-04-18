@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\ELib\Storage;
 
-use Empathy\MVC\Model;
 use Empathy\MVC\Entity;
+use Empathy\MVC\Model;
 
 class BrandItem extends Entity
 {
-    const TABLE = 'brand';
+    public const TABLE = 'brand';
 
     public int $id;
     public $name;
@@ -15,7 +17,7 @@ class BrandItem extends Entity
 
     public function validates()
     {
-        if ($this->name == '') {
+        if ($this->name === '') {
             $this->addValError('Invalid brand name.');
         }
     }
@@ -23,7 +25,7 @@ class BrandItem extends Entity
     public function buildTree($current, $tree)
     {
         $i = 0;
-        $nodes = array();
+        $nodes = [];
         $sql = 'SELECT id,name FROM '.Model::getTable(self::class).' ORDER BY name';
         $error = 'Could not get brands.';
         $result = $this->query($sql, $error);
@@ -43,7 +45,7 @@ class BrandItem extends Entity
     // not used to produce the artist tree
     public function getBrands()
     {
-        $brand = array();
+        $brand = [];
         $brand[0] = 'None';
         $sql = 'SELECT * FROM '.Model::getTable(self::class).' ORDER BY name';
         $error = 'Could not get list of brands.';
