@@ -119,6 +119,8 @@ class PaypalController extends EController
 
         $this->writeLog('Total amount + currency');
 
+        // TODO: enforce shipping country via PayPal `custom` + IPN validation
+
         $l = Model::load(LineItem::class);
         $items = $l->getOrderItems($o->id);
 
