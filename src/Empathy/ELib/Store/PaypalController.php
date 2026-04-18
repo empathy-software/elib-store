@@ -103,6 +103,8 @@ class PaypalController extends EController
             return;
         }
 
+        $this->writeLog('amounts: ' . json_encode([(float) $data['mc_gross'], (float) $o->total, (float) $o->shipping]));
+
         if (
             (float)$data['mc_gross'] !== ((float)$o->total + (float)$o->shipping) ||
             ($data['mc_currency'] ?? '') !== 'PHP'
@@ -177,7 +179,7 @@ class PaypalController extends EController
         $invoice_no = $co->getInvoiceId();
 
         $o = Model::load(OrderItem::class);
-        $o->load($o->id);
+        $o->load($co->getInvoiceNo());
 
         $products = array();
 
