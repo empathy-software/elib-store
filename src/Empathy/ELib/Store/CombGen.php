@@ -15,7 +15,8 @@ class CombGen
         $this->generateCombinations('', 0, $this->sets);
     }
 
-    public function generateCombinations(mixed $string, mixed $start, mixed $sets): void {
+    public function generateCombinations(mixed $string, mixed $start, mixed $sets): void
+    {
         $current = $sets[$start];
         for ($i = 0; $i < sizeof($current); $i++) {
             if ($start + 1 < sizeof($sets)) {
@@ -30,7 +31,8 @@ class CombGen
         }
     }
 
-    public function getResults(): mixed {
+    public function getResults(): mixed
+    {
         return $this->results;
     }
 

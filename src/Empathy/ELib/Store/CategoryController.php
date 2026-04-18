@@ -90,7 +90,8 @@ class CategoryController extends AdminController
         $this->assign('products', $product);
     }
 
-    public function buildNav(): void {
+    public function buildNav(): void
+    {
         $this->setTemplate('elib://admin/category.tpl');
         if (!isset($_GET['collapsed']) || !is_numeric($_GET['collapsed'])) {
             $_GET['collapsed'] = 0;
@@ -110,13 +111,15 @@ class CategoryController extends AdminController
         $this->assign('brands', $b->getBrands());
     }
 
-    public function assertID(): void {
+    public function assertID(): void
+    {
         if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
             $_GET['id'] = 0;
         }
     }
 
-    public function add_category(): void {
+    public function add_category(): void
+    {
         if (isset($_GET['id']) && is_numeric($_GET['id'])) {
             $c = Model::load(CategoryItem::class);
             $c->category_id = (int) $_GET['id'];
@@ -127,7 +130,8 @@ class CategoryController extends AdminController
         $this->redirect('admin/category/'.$_GET['id']);
     }
 
-    public function rename(): void {
+    public function rename(): void
+    {
         $this->buildNav();
         if (isset($_POST['save'])) {
             $c = Model::load(CategoryItem::class);
@@ -150,7 +154,8 @@ class CategoryController extends AdminController
         }
     }
 
-    public function delete(): void {
+    public function delete(): void
+    {
         $this->assertID();
         $c = Model::load(CategoryItem::class);
         $c->load($_GET['id']);
@@ -163,7 +168,8 @@ class CategoryController extends AdminController
 
     }
 
-    public function active_properties(): void {
+    public function active_properties(): void
+    {
         $this->buildNav();
 
         if (isset($_POST['save'])) {

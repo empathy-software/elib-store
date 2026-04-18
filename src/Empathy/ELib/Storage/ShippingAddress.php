@@ -27,7 +27,8 @@ class ShippingAddress extends Entity
 
     public int $default_address = 0;
 
-    public function validates(): void {
+    public function validates(): void
+    {
         $this->doValType(Validate::TEXT, 'first_name', $this->first_name, false);
         $this->doValType(Validate::TEXT, 'last_name', $this->last_name, false);
         $this->doValType(Validate::TEXT, 'address1', $this->address1, false);
@@ -38,7 +39,8 @@ class ShippingAddress extends Entity
         $this->doValType(Validate::TEXT, 'country', $this->country, false);
     }
 
-    public function setDefault(mixed $user_id, mixed $address_id): void {
+    public function setDefault(mixed $user_id, mixed $address_id): void
+    {
         $sql = 'SELECT id FROM '.Model::getTable(self::class).' WHERE user_id = ?';
         $error = 'Could not get all shipping addresses for user.';
         $result = $this->query($sql, $error, [$user_id]);

@@ -18,7 +18,8 @@ class PropertyOption extends Entity
 
     public string $option_val;
 
-    public function validates(): void {
+    public function validates(): void
+    {
         if ($this->property_id < 1) {
             $this->addValError('Invalid property id');
         }
@@ -26,7 +27,8 @@ class PropertyOption extends Entity
         $this->doValType(Validate::TEXT, 'option_val', $this->option_val, false);
     }
 
-    public function getColoursIndexed(mixed $property_id): mixed {
+    public function getColoursIndexed(mixed $property_id): mixed
+    {
         $colour = [];
         $sql = 'SELECT * FROM '.Model::getTable(PropertyOption::class).' WHERE property_id = ?'
             .' ORDER BY option_val';

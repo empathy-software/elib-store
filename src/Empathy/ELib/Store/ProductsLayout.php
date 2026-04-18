@@ -7,8 +7,8 @@ namespace Empathy\ELib\Store;
 use Empathy\ELib\Storage\BrandItem;
 use Empathy\ELib\Storage\CategoryItem;
 use Empathy\ELib\Storage\ProductItem;
-use Empathy\ELib\Storage\ProductVariant;
 use Empathy\ELib\Storage\ProductItemStatus;
+use Empathy\ELib\Storage\ProductVariant;
 use Empathy\MVC\Model;
 
 define('BUTTONS_PER_PAGE', 12);
@@ -51,19 +51,23 @@ class ProductsLayout
         }
     }
 
-    public function getRedirect(): mixed {
+    public function getRedirect(): mixed
+    {
         return $this->redirect;
     }
 
-    public function getBreadCrumb(): mixed {
+    public function getBreadCrumb(): mixed
+    {
         return $this->breadcrumb;
     }
 
-    public function getProduct(): mixed {
+    public function getProduct(): mixed
+    {
         return $this->product;
     }
 
-    public function randomImage(mixed $c_id): mixed {
+    public function randomImage(mixed $c_id): mixed
+    {
         $image = '';
         $descendants = [];
 
@@ -89,11 +93,13 @@ class ProductsLayout
         return $image;
     }
 
-    public function getButtons(): mixed {
+    public function getButtons(): mixed
+    {
         return $this->buttons;
     }
 
-    public function buildByCategory(): void {
+    public function buildByCategory(): void
+    {
         $button = [];
 
         if (!$this->category->getChildren($this->category->id)) {
@@ -175,11 +181,13 @@ class ProductsLayout
         }
     }
 
-    public function getPNav(): mixed {
+    public function getPNav(): mixed
+    {
         return $this->p_nav;
     }
 
-    public function buildByProduct(): void {
+    public function buildByProduct(): void
+    {
         $button = [];
 
         $variants = $this->variant->getAllCustom(' WHERE product_id = ?', [$this->product->id]);
@@ -192,7 +200,8 @@ class ProductsLayout
         }
     }
 
-    public function buildBC(): void {
+    public function buildBC(): void
+    {
         $cats = [];
 
         if ($this->product->id !== 0) {
@@ -235,7 +244,8 @@ class ProductsLayout
         $this->breadcrumb = array_reverse($cats);
     }
 
-    public function buildByOption(): void {
+    public function buildByOption(): void
+    {
         $button = [];
 
         $variants = $this->variant->getAllForOption($this->option->id);
@@ -252,7 +262,8 @@ class ProductsLayout
         }
     }
 
-    public static function getTopCats(): mixed {
+    public static function getTopCats(): mixed
+    {
         $categories = [];
         $c = Model::load(CategoryItem::class);
         if ($_GET['module'] === 'store') {

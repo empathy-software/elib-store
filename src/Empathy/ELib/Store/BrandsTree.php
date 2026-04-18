@@ -25,14 +25,16 @@ class BrandsTree extends Tree
         $this->markup = $this->buildMarkup($this->data, 0, $current_id, 0);
     }
 
-    public function buildTree(mixed $id, mixed $tree): mixed {
+    public function buildTree(mixed $id, mixed $tree): mixed
+    {
         $nodes = [];
         $nodes = $tree->brand->buildTree($id, $tree);
 
         return $nodes;
     }
 
-    private function buildMarkup(mixed $data, mixed $level, mixed $current_id, mixed $last_id): mixed {
+    private function buildMarkup(mixed $data, mixed $level, mixed $current_id, mixed $last_id): mixed
+    {
         $markup = "\n<ul";
 
         $ancestors = $this->brand_ancestors;

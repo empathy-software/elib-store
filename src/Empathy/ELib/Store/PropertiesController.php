@@ -53,7 +53,8 @@ class PropertiesController extends AdminController
         }
     }
 
-    public function add(): void {
+    public function add(): void
+    {
         $this->setTemplate('elib://admin/properties.tpl');
         $p = Model::load(Property::class);
         $p->name = '#New Property';
@@ -61,7 +62,8 @@ class PropertiesController extends AdminController
         $this->redirect('admin/properties');
     }
 
-    public function rename(): void {
+    public function rename(): void
+    {
         $this->setTemplate('elib://admin/properties.tpl');
         if (isset($_GET['id']) && is_numeric($_GET['id'])) {
             if (isset($_POST['save'])) {

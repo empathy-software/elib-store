@@ -24,11 +24,18 @@
     "minimum-stability": "dev",
     "require-dev": {
         "laravel/pint": "dev-main",
-        "phpstan/phpstan": "2.2.x-dev"
+        "phpstan/phpstan": "2.2.x-dev",
+        "rector/rector": "dev-main"
     },
     "scripts": {
         "format": "pint ./src",
         "format-check": "pint --test ./src",
-        "analyse": "phpstan analyse -c phpstan.neon.dist --memory-limit=512M"
+        "analyse": "phpstan analyse -c phpstan.neon.dist --memory-limit=512M",
+        "rector": "rector process",
+        "rector:dry": "rector process --dry-run",
+        "check": [
+            "@format-check",
+            "@analyse"
+        ]
     }
 }

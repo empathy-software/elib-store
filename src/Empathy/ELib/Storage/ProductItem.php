@@ -43,7 +43,8 @@ class ProductItem extends Entity
     /** Populated in {@see load()} from {@see BrandItem::name}. */
     private ?string $brand = null;
 
-    public function validates(): void {
+    public function validates(): void
+    {
         if ($this->name === '') { // || !ctype_alnum(str_replace(' ', '', $this->name)))
             $this->addValError('Invalid product name');
         }
@@ -70,23 +71,28 @@ class ProductItem extends Entity
         return true;
     }
 
-    public function getStock(): mixed {
+    public function getStock(): mixed
+    {
         return $this->stock;
     }
 
-    public function getImages(): mixed {
+    public function getImages(): mixed
+    {
         return $this->images;
     }
 
-    public function getNoImageFound(): mixed {
+    public function getNoImageFound(): mixed
+    {
         return $this->noImageFound;
     }
 
-    public function getDefaultImage(): mixed {
+    public function getDefaultImage(): mixed
+    {
         return $this->images[0];
     }
 
-    public function hasOneVariant(): mixed {
+    public function hasOneVariant(): mixed
+    {
         $id = 0;
         $sql = 'SELECT id FROM '.Model::getTable(ProductVariant::class).' WHERE product_id = ?';
         $error = 'Could not check for single variant on product.';
@@ -99,7 +105,8 @@ class ProductItem extends Entity
         return $id;
     }
 
-    public function hasVariants(): mixed {
+    public function hasVariants(): mixed
+    {
         $variants = false;
         $sql = 'SELECT id FROM '.Model::getTable(ProductVariant::class).' WHERE product_id = ?';
         $error = 'Could not check for product variants.';
@@ -111,7 +118,8 @@ class ProductItem extends Entity
         return $variants;
     }
 
-    public function convertCategory(): mixed {
+    public function convertCategory(): mixed
+    {
         $sql = 'SELECT name from '.Model::getTable(CategoryItem::class).' WHERE id = ?';
         $error = 'Could not get category name.';
         $result = $this->query($sql, $error, [$this->category_id]);
@@ -120,7 +128,8 @@ class ProductItem extends Entity
         return $row['name'];
     }
 
-    public function getOnlyVariantID(): mixed {
+    public function getOnlyVariantID(): mixed
+    {
         $id = 0;
         $sql = 'SELECT id FROM '.Model::getTable(ProductVariant::class)
             .' WHERE product_id = ? LIMIT 0,1';
@@ -136,7 +145,8 @@ class ProductItem extends Entity
 
     // including variants
 
-    public function getAllImages(): mixed {
+    public function getAllImages(): mixed
+    {
         $image = [];
         $sql = 'SELECT image FROM '.Model::getTable(ProductItem::class);
         $error = 'Could not get product images.';
@@ -158,7 +168,8 @@ class ProductItem extends Entity
         return $image;
     }
 
-    public function getPrice(): mixed {
+    public function getPrice(): mixed
+    {
         $price = 0;
         $sql = 'SELECT MIN(price) AS price FROM '.Model::getTable(ProductVariant::class)
             .' WHERE product_id = ?'
@@ -174,7 +185,8 @@ class ProductItem extends Entity
     }
 
     // new get price function
-    public function getMinPrice(mixed $id): mixed {
+    public function getMinPrice(mixed $id): mixed
+    {
         $price = 0;
         $sql = 'SELECT MIN(price) AS price FROM '.Model::getTable(ProductVariant::class)
             .' WHERE product_id = ?'
@@ -189,7 +201,8 @@ class ProductItem extends Entity
         return $price;
     }
 
-    public function loadIDByName(mixed $name): mixed {
+    public function loadIDByName(mixed $name): mixed
+    {
         $id = 0;
         $sql = 'SELECT id FROM '.Model::getTable(ProductItem::class)
             .' WHERE name LIKE ?';
@@ -205,15 +218,18 @@ class ProductItem extends Entity
         return $id;
     }
 
-    public function setSoldInStore(mixed $soldInStore): void {
+    public function setSoldInStore(mixed $soldInStore): void
+    {
         $this->soldInStore = $soldInStore;
     }
 
-    public function getSoldInStore(): mixed {
+    public function getSoldInStore(): mixed
+    {
         return $this->soldInStore;
     }
 
-    public function getBrand(): mixed {
+    public function getBrand(): mixed
+    {
         return $this->brand;
     }
 

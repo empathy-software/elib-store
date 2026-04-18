@@ -19,7 +19,8 @@ class BrandController extends AdminController
         $this->buildNav();
     }
 
-    public function buildNav(): void {
+    public function buildNav(): void
+    {
         $this->setTemplate('elib://admin/brand.tpl');
         $b = Model::load(BrandItem::class);
         $b->load($_GET['id']);
@@ -29,14 +30,16 @@ class BrandController extends AdminController
         $this->assign('artist', $b);
     }
 
-    public function add(): void {
+    public function add(): void
+    {
         $b = Model::load(BrandItem::class);
         $b->name = 'New Brand';
         $id = $b->insert();
         $this->redirect('admin/brand/'.$id);
     }
 
-    public function rename(): void {
+    public function rename(): void
+    {
         $this->buildNav();
         if (isset($_POST['save'])) {
             $b = Model::load(BrandItem::class);
@@ -59,13 +62,15 @@ class BrandController extends AdminController
         }
     }
 
-    public function assertID(): void {
+    public function assertID(): void
+    {
         if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
             $_GET['id'] = 0;
         }
     }
 
-    public function delete(): void {
+    public function delete(): void
+    {
         $this->assertID();
         $b = Model::load(BrandItem::class);
         $b->load($_GET['id']);
@@ -73,7 +78,8 @@ class BrandController extends AdminController
         $this->redirect('admin/brand/');
     }
 
-    public function edit_bio(): void {
+    public function edit_bio(): void
+    {
         if (isset($_POST['save'])) {
             $b = Model::load(BrandItem::class);
             $b->load($_POST['id']);

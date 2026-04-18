@@ -57,7 +57,8 @@ class ShippingCalculator
 
     }
 
-    public function getFee(): mixed {
+    public function getFee(): mixed
+    {
         if ($this->calc_intl) {
             $fee = $this->fee + $this->intl_shipping + INTL_STANDARD;
         } else {

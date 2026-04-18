@@ -32,7 +32,8 @@ class Store
 
     // from category controller
 
-    public function productsView(): void {
+    public function productsView(): void
+    {
         $ui_array = ['order_by', 'page', 'id', 'brand_id'];
         Session::loadUIVars('ui_catalogue', $ui_array);
         if (!isset($_GET['page']) || $_GET['page'] === '') {
@@ -102,7 +103,8 @@ class Store
         $this->c->assign('products', $product);
     }
 
-    public function buildNav(): void {
+    public function buildNav(): void
+    {
         if (!isset($_GET['collapsed']) || !is_numeric($_GET['collapsed'])) {
             $_GET['collapsed'] = 0;
         }
@@ -123,14 +125,16 @@ class Store
 
     // from product controller
 
-    public function addProductVariant(): void {
+    public function addProductVariant(): void
+    {
         //$this->assertID();
         $this->addProductVariantInternal($_GET['id']);
         $this->c->redirect('storeadmin/product/'.$_GET['id']);
     }
 
     // (new function)
-    public function addProductVariantInternal(mixed $product_id): void {
+    public function addProductVariantInternal(mixed $product_id): void
+    {
         $v = Model::load(ProductVariant::class);
         $v->product_id = $product_id;
         $v->price = 'DEFAULT';
@@ -138,7 +142,8 @@ class Store
         $v->insert();
     }
 
-    public function addProduct(): void {
+    public function addProduct(): void
+    {
         $_GET['id'] = (int) $_GET['id'];
         if ($_GET['id'] > 0) {
             $c = Model::load(CategoryItem::class);
@@ -176,7 +181,8 @@ class Store
         $this->c->redirect('storeadmin/products/'.$_GET['id']);
     }
 
-    public function viewProduct(): void {
+    public function viewProduct(): void
+    {
         //$this->setTemplate('elib://admin/product.tpl');
         $p = Model::load(ProductItem::class);
         $p->load($_GET['id']);
@@ -252,7 +258,8 @@ class Store
     /**
      * @param array<string, mixed> $v
      */
-    public function setStatusFlags(array &$v): bool {
+    public function setStatusFlags(array &$v): bool
+    {
         $available = false;
         if (isset($v['properties']) && $v['price'] > 0) {
             if ($v['status'] !== ProductVariantStatus::AVAILABLE) {
@@ -266,7 +273,8 @@ class Store
         return $available;
     }
 
-    public function setVariantAvailable(): void {
+    public function setVariantAvailable(): void
+    {
         $v = Model::load(ProductVariant::class);
         $v->load($_GET['id']);
         $v->status = ProductVariantStatus::AVAILABLE;
@@ -274,7 +282,8 @@ class Store
         $this->c->redirect('storeadmin/product/'.$v->product_id);
     }
 
-    public function productAutoGetMinPrice(mixed $product_id): void {
+    public function productAutoGetMinPrice(mixed $product_id): void
+    {
         $p = Model::load(ProductItem::class);
         $price = $p->getMinPrice($product_id);
         if ($price > 0) {
@@ -284,7 +293,8 @@ class Store
         }
     }
 
-    public function productAutoHide(mixed $product_id): void {
+    public function productAutoHide(mixed $product_id): void
+    {
         $v = Model::load(ProductVariant::class);
         $sql = ' WHERE status = ?'
             .' AND product_id = ?';
@@ -297,7 +307,8 @@ class Store
         }
     }
 
-    public function setVariantUnavailable(): void {
+    public function setVariantUnavailable(): void
+    {
         $v = Model::load(ProductVariant::class);
         $v->load($_GET['id']);
         $v->status = ProductVariantStatus::CREATED;
@@ -308,7 +319,8 @@ class Store
         $this->c->redirect('storeadmin/product/'.$v->product_id);
     }
 
-    public function setProductAvailable(): void {
+    public function setProductAvailable(): void
+    {
         $this->productAutoGetMinPrice($_GET['id']);
 
         $p = Model::load(ProductItem::class);
@@ -318,7 +330,8 @@ class Store
         $this->c->redirect('storeadmin/product/'.$p->id);
     }
 
-    public function setProductUnAvailable(): void {
+    public function setProductUnAvailable(): void
+    {
         $p = Model::load(ProductItem::class);
         $p->load($_GET['id']);
         $p->status = ProductItemStatus::CREATED;
@@ -326,7 +339,8 @@ class Store
         $this->c->redirect('storeadmin/product/'.$p->id);
     }
 
-    public function setProductSoldOut(): void {
+    public function setProductSoldOut(): void
+    {
         $p = Model::load(ProductItem::class);
         $p->load($_GET['id']);
         $p->status = ProductItemStatus::SOLD_OUT;
@@ -334,7 +348,8 @@ class Store
         $this->c->redirect('storeadmin/product/'.$p->id);
     }
 
-    public function clearVariantImage(): void {
+    public function clearVariantImage(): void
+    {
         $v = Model::load(ProductVariant::class);
         $v->load($_GET['id']);
 
@@ -347,7 +362,8 @@ class Store
         $this->c->redirect('storeadmin/product/'.$v->product_id);
     }
 
-    public function editProduct(): void {
+    public function editProduct(): void
+    {
         //$this->setTemplate('elib://admin/product.tpl');
         $p = Model::load(ProductItem::class);
         //$pr = new ProductRange($this);
@@ -422,7 +438,8 @@ class Store
         }
     }
 
-    public function uploadProductImage(): void {
+    public function uploadProductImage(): void
+    {
         //$this->setTemplate('elib://admin/product.tpl');
         if (isset($_POST['cancel'])) {
             $this->c->redirect('storeadmin/product/'.$_POST['id']);
@@ -462,7 +479,8 @@ class Store
     }
 
     // new function (using status codes)
-    public function deleteProduct(): void {
+    public function deleteProduct(): void
+    {
         $p = Model::load(ProductItem::class);
         $p->load($_GET['id']);
         $p->status = ProductItemStatus::DELETED;
@@ -471,7 +489,8 @@ class Store
     }
 
     // new function
-    public function deleteVariant(): void {
+    public function deleteVariant(): void
+    {
         $v = Model::load(ProductVariant::class);
         $v->load($_GET['id']);
         $v->status = ProductVariantStatus::DELETED;
@@ -482,7 +501,8 @@ class Store
         $this->c->redirect('storeadmin/product/'.$v->product_id);
     }
 
-    public function editProductVariant(): void {
+    public function editProductVariant(): void
+    {
         //$this->setTemplate('elib://admin/product.tpl');
         if (isset($_POST['cancel'])) {
             $v = Model::load(ProductVariant::class);
@@ -515,7 +535,8 @@ class Store
         $this->c->assign('product', $p);
     }
 
-    public function uploadVariantImage(): void {
+    public function uploadVariantImage(): void
+    {
         //$this->setTemplate('elib://admin/product.tpl');
         //$this->assertID();
         $v = Model::load(ProductVariant::class);
@@ -548,7 +569,8 @@ class Store
         }
     }
 
-    public function variantProperties(): void {
+    public function variantProperties(): void
+    {
         //$this->setTemplate('elib://admin/product.tpl');
         //$this->assertID();
 

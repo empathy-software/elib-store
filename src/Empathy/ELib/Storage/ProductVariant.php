@@ -37,14 +37,16 @@ class ProductVariant extends Entity
 
     public int $stock = 0;
 
-    public function validates(): void {
+    public function validates(): void
+    {
         $this->doValType(Validate::NUM, 'weight_g', $this->weight_g, true);
         $this->doValType(Validate::NUM, 'weight_lb', $this->weight_lb, true);
         $this->doValType(Validate::NUM, 'weight_oz', $this->weight_oz, true);
         $this->doValType(Validate::NUM, 'price', $this->price, false);
     }
 
-    public function getVariantName(mixed $id): mixed {
+    public function getVariantName(mixed $id): mixed
+    {
         $name = [];
         $sql = 'SELECT option_val FROM '.Model::getTable(ProductVariantPropertyOption::class)
             .' t1, '.Model::getTable(PropertyOption::class).' t2 WHERE t2.id = t1.property_option_id'
@@ -60,7 +62,8 @@ class ProductVariant extends Entity
         return implode(' / ', $name);
     }
 
-    public function getAllForProduct(mixed $product_id, mixed $name): mixed {
+    public function getAllForProduct(mixed $product_id, mixed $name): mixed
+    {
         $variants = [];
         $variant = [];
         $variant_name = [$name];
@@ -115,7 +118,8 @@ class ProductVariant extends Entity
         return $variants;
     }
 
-    public function getAllForOption(mixed $option_id): mixed {
+    public function getAllForOption(mixed $option_id): mixed
+    {
         $variants = [];
         $sql = 'SELECT v.id AS id, p.name AS name, v.image AS image FROM '.Model::getTable(ProductVariantPropertyOption::class).' o, '.Model::getTable(ProductVariant::class)
             .' v, '.Model::getTable(ProductItem::class).' p WHERE p.id = v.product_id AND o.product_variant_id = v.id AND o.property_option_id = ?';
@@ -130,7 +134,8 @@ class ProductVariant extends Entity
         return $variants;
     }
 
-    public function getCartData(mixed $ids): mixed {
+    public function getCartData(mixed $ids): mixed
+    {
         $products = [];
         $shippingCountry = Session::get('shipping_country') ? Session::get('shipping_country') : 'GB';
 
@@ -226,7 +231,8 @@ class ProductVariant extends Entity
         return $products;
     }
 
-    public function getAllColourVariants(mixed $product_id): mixed {
+    public function getAllColourVariants(mixed $product_id): mixed
+    {
         $variants = [];
         $sql = 'SELECT t1.id, t1.image, t1.weight_g, t1.weight_lb, t1.weight_oz, t1.price, t3.image AS other_image'
             .' FROM '.Model::getTable(ProductVariant::class).' t1'
@@ -251,7 +257,8 @@ class ProductVariant extends Entity
         return $variants;
     }
 
-    public function findVariant(mixed $options, mixed $product_id): mixed {
+    public function findVariant(mixed $options, mixed $product_id): mixed
+    {
         $i = 2;
         $variant_id = 0;
         $sql = 'SELECT t1.id FROM '.Model::getTable(ProductVariant::class).' t1';
@@ -286,7 +293,8 @@ class ProductVariant extends Entity
         return $variant_id;
     }
 
-    public function getCategories(mixed $ids): mixed {
+    public function getCategories(mixed $ids): mixed
+    {
         $idsString = $this->buildUnionString($ids);
         $cat_ids = [];
         $sql = 'SELECT DISTINCT t1.category_id AS id FROM '.Model::getTable(ProductItem::class).' t1,'
@@ -304,7 +312,8 @@ class ProductVariant extends Entity
         return $cat_ids;
     }
 
-    public function getStockLevels(mixed $id): mixed {
+    public function getStockLevels(mixed $id): mixed
+    {
         $stock = 0;
         $sql = 'SELECT SUM(v.stock) as stock FROM ' . Model::getTable(ProductVariant::class)
             .' v, '.Model::getTable(ProductItem::class).' p WHERE p.id = v.product_id'

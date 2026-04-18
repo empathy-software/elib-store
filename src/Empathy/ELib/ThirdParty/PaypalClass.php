@@ -129,7 +129,8 @@ class PaypalClass
 
     }
 
-    public function add_field(mixed $field, mixed $value): void {
+    public function add_field(mixed $field, mixed $value): void
+    {
 
         // adds a key=>value pair to the fields array, which is what will be
         // sent to paypal as POST variables.  If the value is already in the
@@ -138,7 +139,8 @@ class PaypalClass
         $this->fields["$field"] = $value;
     }
 
-    public function submit_paypal_post(): void {
+    public function submit_paypal_post(): void
+    {
 
         // this function actually generates an entire HTML page consisting of
         // a form with hidden elements which is submitted to paypal via the
@@ -172,7 +174,8 @@ class PaypalClass
 
     }
 
-    public function validate_ipn(): mixed {
+    public function validate_ipn(): mixed
+    {
         $raw_post_data = file_get_contents('php://input');
         if (!is_string($raw_post_data)) {
             $this->last_error = 'Empty IPN body';
@@ -230,7 +233,8 @@ class PaypalClass
         return false;
     }
 
-    public function log_ipn_results(mixed $success): void {
+    public function log_ipn_results(mixed $success): void
+    {
 
         if (!$this->ipn_log) {
             return;
@@ -265,7 +269,8 @@ class PaypalClass
         fclose($fp);  // close file
     }
 
-    public function dump_fields(): void {
+    public function dump_fields(): void
+    {
 
         // Used for debugging, this function will output all the field/value pairs
         // that are currently defined in the instance of the class using the

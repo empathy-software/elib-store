@@ -19,13 +19,15 @@ use Empathy\MVC\Model;
 
 class ProductController extends AdminController
 {
-    public function assertID(): void {
+    public function assertID(): void
+    {
         if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
             $this->redirect('admin/category');
         }
     }
 
-    public function edit(): void {
+    public function edit(): void
+    {
         $this->setTemplate('elib://admin/product.tpl');
         $p = Model::load(ProductItem::class);
         //$pr = new ProductRange($this);
@@ -162,7 +164,8 @@ class ProductController extends AdminController
         $this->assign('variants', $variants);
     }
 
-    public function upload_image(): void {
+    public function upload_image(): void
+    {
         $this->setTemplate('elib://admin/product.tpl');
         if (isset($_POST['upload'])) {
             $_GET['id'] = $_POST['id'];
@@ -215,7 +218,8 @@ class ProductController extends AdminController
         }
     }
 
-    public function resize_images(): void {
+    public function resize_images(): void
+    {
         $this->setTemplate('elib://admin/product.tpl');
         if (isset($_POST['submit'])) {
             set_time_limit(300);
@@ -233,7 +237,8 @@ class ProductController extends AdminController
         }
     }
 
-    public function delete_image(): void {
+    public function delete_image(): void
+    {
         $productId = (int) $_GET['product_id'];
         $imageId = (int) $_GET['image_id'];
 
@@ -248,7 +253,8 @@ class ProductController extends AdminController
         $this->redirect('admin/product/' . $i->product_id);
     }
 
-    public function make_default_image(): void {
+    public function make_default_image(): void
+    {
         $imageId = (int) $_GET['image_id'];
         $i = Model::load(ProductImage::class);
         $i->load($imageId);
@@ -256,7 +262,8 @@ class ProductController extends AdminController
         $this->redirect('admin/product/' . $i->product_id);
     }
 
-    public function delete(): void {
+    public function delete(): void
+    {
         $p = Model::load(ProductItem::class);
         $p->load($_GET['id']);
         if (!$p->hasVariants()) {
@@ -276,7 +283,8 @@ class ProductController extends AdminController
         }
     }
 
-    public function delete_variant(): void {
+    public function delete_variant(): void
+    {
         if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
             $_GET['id'] = 0;
         }
@@ -297,7 +305,8 @@ class ProductController extends AdminController
         $this->redirect('admin/product/' . $v->product_id);
     }
 
-    public function add_variant(): void {
+    public function add_variant(): void
+    {
         $this->assertID();
         $v = Model::load(ProductVariant::class);
         $v->product_id = $_GET['id'];
@@ -310,7 +319,8 @@ class ProductController extends AdminController
         $this->redirect('admin/product/' . $_GET['id']);
     }
 
-    public function add(): void {
+    public function add(): void
+    {
         $p = Model::load(ProductItem::class);
         $p->category_id = $_GET['id'];
         $p->brand_id = 0;
@@ -323,7 +333,8 @@ class ProductController extends AdminController
         $this->redirect('admin/category/' . $_GET['id']);
     }
 
-    public function edit_variant(): void {
+    public function edit_variant(): void
+    {
         $this->assertID();
         $this->setTemplate('elib://admin/product.tpl');
         $v = Model::load(ProductVariant::class);
@@ -359,7 +370,8 @@ class ProductController extends AdminController
         }
     }
 
-    public function upload_variant_image(): void {
+    public function upload_variant_image(): void
+    {
         $this->setTemplate('elib://admin/product.tpl');
         $this->assertID();
         $v = Model::load(ProductVariant::class);
@@ -397,7 +409,8 @@ class ProductController extends AdminController
         }
     }
 
-    public function variant_properties(): void {
+    public function variant_properties(): void
+    {
         $this->setTemplate('elib://admin/product.tpl');
         $this->assertID();
 
@@ -463,7 +476,8 @@ class ProductController extends AdminController
         }
     }
 
-    public function edit_colours(): void {
+    public function edit_colours(): void
+    {
         $this->setTemplate('elib://admin/product.tpl');
         $p = Model::load(ProductItem::class);
         $p->load($_GET['id']);
@@ -476,7 +490,8 @@ class ProductController extends AdminController
         $this->assign('product', $p);
     }
 
-    public function add_colour(): void {
+    public function add_colour(): void
+    {
         $this->setTemplate('elib://admin/product.tpl');
         $p = Model::load(ProductItem::class);
         $p->load($_GET['id']);
@@ -512,7 +527,8 @@ class ProductController extends AdminController
         }
     }
 
-    public function delete_colour(): void {
+    public function delete_colour(): void
+    {
         $p = Model::load(ProductColour::class);
         $p->load($_GET['id']);
 
@@ -529,7 +545,8 @@ class ProductController extends AdminController
         $this->redirect('admin/product/edit_colours/' . $p->product_id);
     }
 
-    public function edit_colour(): void {
+    public function edit_colour(): void
+    {
         $this->setTemplate('elib://admin/product.tpl');
         if (isset($_POST['save_colour'])) {
             $c = Model::load(ProductColour::class);
@@ -575,7 +592,8 @@ class ProductController extends AdminController
         $this->assign('colour', $colours[$c->property_option_id]);
     }
 
-    public function variants_wizard(): void {
+    public function variants_wizard(): void
+    {
         $this->setTemplate('elib://admin/product.tpl');
         if (isset($_POST['submit'])) {
             $sets = [];

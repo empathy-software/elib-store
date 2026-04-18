@@ -22,7 +22,8 @@ class LineItem extends Entity
 
     public ?string $notes = null;
 
-    public function getOrderItems(mixed $orderId): mixed {
+    public function getOrderItems(mixed $orderId): mixed
+    {
         return $this->getAllCustom('where order_id = ? and variant_id > 0', [$orderId]);
     }
 }

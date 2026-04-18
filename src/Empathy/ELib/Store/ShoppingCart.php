@@ -10,7 +10,8 @@ use Empathy\MVC\Session;
 
 class ShoppingCart
 {
-    public function calcTotal(mixed $items): mixed {
+    public function calcTotal(mixed $items): mixed
+    {
         $total = 0;
         foreach ($items as $item) {
             $total += $item['line'];
@@ -19,7 +20,8 @@ class ShoppingCart
         return $total;
     }
 
-    public function loadFromCart(): mixed {
+    public function loadFromCart(): mixed
+    {
         $ids = [];
         $product_data = [];
 
@@ -53,7 +55,8 @@ class ShoppingCart
         return $product_data;
     }
 
-    public function add(mixed $variant_id, mixed $qty): void {
+    public function add(mixed $variant_id, mixed $qty): void
+    {
         if (($cart = Session::get('cart')) === false) {
             $cart = [];
         }
@@ -67,7 +70,8 @@ class ShoppingCart
         Session::set('cart', $cart);
     }
 
-    public function remove(mixed $variant_id): void {
+    public function remove(mixed $variant_id): void
+    {
         if (($cart = Session::get('cart')) !== false) {
             if (isset($cart[$variant_id])) {
                 unset($cart[$variant_id]);
@@ -76,7 +80,8 @@ class ShoppingCart
         }
     }
 
-    public function update(mixed $variant_id, mixed $qty): void {
+    public function update(mixed $variant_id, mixed $qty): void
+    {
         if (($cart = Session::get('cart')) !== false) {
             if (isset($cart[$variant_id])) {
                 $cart[$variant_id]['qty'] = (int) ($qty);
@@ -85,7 +90,8 @@ class ShoppingCart
         }
     }
 
-    public static function getTotalItems(): mixed {
+    public static function getTotalItems(): mixed
+    {
         $total = 0;
         if (($cart = Session::get('cart')) !== false) {
             foreach ($cart as $v => $qty) {
@@ -96,11 +102,13 @@ class ShoppingCart
         return $total;
     }
 
-    public function emptyCart(): void {
+    public function emptyCart(): void
+    {
         Session::set('cart', []);
     }
 
-    public function isEmpty(): mixed {
+    public function isEmpty(): mixed
+    {
         $empty = false;
         if (($cart = Session::get('cart')) === false
            || sizeof($cart) < 1) {
@@ -110,7 +118,8 @@ class ShoppingCart
         return $empty;
     }
 
-    public static function dump(): void {
+    public static function dump(): void
+    {
         $c = Session::get('cart');
         print_r($c);
     }

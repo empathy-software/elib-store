@@ -88,7 +88,8 @@ class ImageUpload
         return $error;
     }
 
-    public function makeDerived(mixed $prefix, mixed $max_width, mixed $max_height): void {
+    public function makeDerived(mixed $prefix, mixed $max_width, mixed $max_height): void
+    {
         if ($max_width < 300 || $max_height < 300) {
             $quality = 100;
         } else {
@@ -119,7 +120,8 @@ class ImageUpload
         imagedestroy($img);
     }
 
-    public function resize(mixed $files): void {
+    public function resize(mixed $files): void
+    {
         foreach ($files as $file) {
             $this->file = $file;
             $this->target = $this->target_dir.$file;
@@ -135,7 +137,8 @@ class ImageUpload
         }
     }
 
-    public function remove(mixed $files): mixed {
+    public function remove(mixed $files): mixed
+    {
         $success_arr = [];
         $all_files = [];
 
@@ -160,7 +163,8 @@ class ImageUpload
     }
 
     /** @phpstan-impure */
-    public function upload(): void {
+    public function upload(): void
+    {
         if ($_FILES['file']['name'] === '') {
             $this->error .= 'Problem uploading file. Empty file?';
         } else {

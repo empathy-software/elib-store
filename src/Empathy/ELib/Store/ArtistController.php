@@ -19,7 +19,8 @@ class ArtistController extends AdminController
         $this->buildNav();
     }
 
-    public function toggle_active(): void {
+    public function toggle_active(): void
+    {
         $a = Model::load(ArtistItem::class);
         $a->load($_GET['id']);
         $a->active = ($a->active) ? 0 : 1;
@@ -27,7 +28,8 @@ class ArtistController extends AdminController
         $this->redirect('admin/artist/'.$a->id);
     }
 
-    public function buildNav(): void {
+    public function buildNav(): void
+    {
         $this->setTemplate('elib://admin/artist.tpl');
         //$this->assertID();
 
@@ -39,7 +41,8 @@ class ArtistController extends AdminController
         $this->assign('artist', $a);
     }
 
-    public function add(): void {
+    public function add(): void
+    {
         if (isset($_POST['save'])) {
             $a = Model::load(ArtistItem::class);
             //$a->artist_alias = $_POST['artist_alias'];
@@ -62,7 +65,8 @@ class ArtistController extends AdminController
         $this->setTemplate('elib://admin/add_artist.tpl');
     }
 
-    public function rename(): void {
+    public function rename(): void
+    {
         $this->buildNav();
         if (isset($_POST['save'])) {
             $a = Model::load(ArtistItem::class);
@@ -88,13 +92,15 @@ class ArtistController extends AdminController
         }
     }
 
-    public function assertID(): void {
+    public function assertID(): void
+    {
         if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
             $_GET['id'] = 0;
         }
     }
 
-    public function delete(): void {
+    public function delete(): void
+    {
         $this->assertID();
         $a = Model::load(ArtistItem::class);
         $a->load($_GET['id']);
@@ -113,7 +119,8 @@ class ArtistController extends AdminController
         }
     }
 
-    public function edit_bio(): void {
+    public function edit_bio(): void
+    {
         if (isset($_POST['save'])) {
             $a = Model::load(ArtistItem::class);
             $a->load($_POST['id']);
@@ -136,7 +143,8 @@ class ArtistController extends AdminController
         $this->assign('artist', $a);
     }
 
-    public function upload_image(): void {
+    public function upload_image(): void
+    {
         $this->setTemplate('elib://admin/artist.tpl');
         if (isset($_POST['upload'])) {
             $_GET['id'] = $_POST['id'];

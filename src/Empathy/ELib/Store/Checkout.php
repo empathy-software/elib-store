@@ -77,15 +77,18 @@ class Checkout
         $l->insert();
     }
 
-    public function getInvoiceNo(): mixed {
+    public function getInvoiceNo(): mixed
+    {
         return $this->invoice_no;
     }
 
-    public function setInvoiceNo(mixed $id): void {
+    public function setInvoiceNo(mixed $id): void
+    {
         $this->invoice_no = $id;
     }
 
-    public function getInvoiceId(): mixed {
+    public function getInvoiceId(): mixed
+    {
         return $this->invoice_id;
     }
 }

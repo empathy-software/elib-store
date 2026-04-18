@@ -37,7 +37,8 @@ class StoreControllerLite extends EController
         }
     }
 
-    public function filterInt(mixed $name): mixed {
+    public function filterInt(mixed $name): mixed
+    {
         if (isset($_GET[$name])) {
             return (int) $_GET[$name];
         } else {
@@ -50,7 +51,8 @@ class StoreControllerLite extends EController
         $this->setTemplate('elib://store_category.tpl');
     }
 
-    public function minimalLayout(): void {
+    public function minimalLayout(): void
+    {
         //        if (0 && CurrentUser::loggedIn()) {
         //            $ui_array = array('page', 'vendor_id', 'id');
         //            $this->loadUIVars('ui_blog', $ui_array);
@@ -232,7 +234,8 @@ class StoreControllerLite extends EController
         }
     }
 
-    public function addProductToCart(mixed $product_id): void {
+    public function addProductToCart(mixed $product_id): void
+    {
         $options = [];
         $variant_id = 0;
         if (isset($_POST['property'])) {
@@ -282,7 +285,8 @@ class StoreControllerLite extends EController
         }
     }
 
-    public function minimalProductView(): void {
+    public function minimalProductView(): void
+    {
         $this->setTemplate('store_product.tpl');
         $p = Model::load(ProductItem::class);
         $p->load($this->filterInt('id'));
@@ -319,7 +323,8 @@ class StoreControllerLite extends EController
         }
     }
 
-    public function cart(): void {
+    public function cart(): void
+    {
         $sc = DI::getContainer()->get('ShippingCalculator');
 
         if (isset($_GET['get_shipping']) && $_GET['get_shipping']) {
@@ -417,7 +422,8 @@ class StoreControllerLite extends EController
         }
     }
 
-    public function checkout(): void {
+    public function checkout(): void
+    {
         //        $this->setTemplate('checkout.tpl');
         //        $s = Model::load(ShippingAddress::class);
         //
@@ -437,7 +443,8 @@ class StoreControllerLite extends EController
     }
 
     // taken from product admin (variant properties)
-    public function getPropertiesAndOptions(mixed $p, mixed $colours): void {
+    public function getPropertiesAndOptions(mixed $p, mixed $colours): void
+    {
         /*
           $v = new ProductVariant($this);
           $v->id = $_GET['id'];

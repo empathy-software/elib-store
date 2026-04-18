@@ -11,7 +11,8 @@ class ProductItemStatus
     public const DELETED = 2;
     public const SOLD_OUT = 3;
 
-    public static function getStatus(mixed $status): mixed {
+    public static function getStatus(mixed $status): mixed
+    {
         $status_text = '';
         switch ($status) {
             case self::CREATED:

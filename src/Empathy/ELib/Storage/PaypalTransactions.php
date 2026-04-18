@@ -16,13 +16,15 @@ class PaypalTransactions extends Entity
 
     public ?string $created_at = null;
 
-    public function txnExists(mixed $txnId): mixed {
+    public function txnExists(mixed $txnId): mixed
+    {
         $sql = 'SELECT COUNT(*) FROM paypal_transactions WHERE txn_id = ?';
         $result = $this->query($sql, 'Could not check for existing transaction', [$txnId]);
         return $result->fetchColumn() > 0;
     }
 
-    public function storeTxn(mixed $txnId): void {
+    public function storeTxn(mixed $txnId): void
+    {
         $sql = 'INSERT INTO paypal_transactions (txn_id) VALUES (?)';
         $this->query($sql, 'Could not insert transaction', [$txnId]);
     }

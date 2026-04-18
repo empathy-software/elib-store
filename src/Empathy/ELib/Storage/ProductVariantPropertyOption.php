@@ -17,13 +17,15 @@ class ProductVariantPropertyOption extends Entity
 
     public int $property_option_id = 0;
 
-    public function emptyByVariant(mixed $variant_id): void {
+    public function emptyByVariant(mixed $variant_id): void
+    {
         $sql = 'DELETE FROM '.Model::getTable(self::class).' WHERE product_variant_id = '.$variant_id;
         $error = 'Could not clear property options associated with product variants.';
         $this->query($sql, $error);
     }
 
-    public function getActiveOptions(mixed $product_id): mixed {
+    public function getActiveOptions(mixed $product_id): mixed
+    {
         $ids = [];
 
         $sql = 'SELECT DISTINCT property_option_id AS id'

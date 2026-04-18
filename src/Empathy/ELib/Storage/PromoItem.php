@@ -21,7 +21,8 @@ class PromoItem extends Entity
 
     public string $hidden = '';
 
-    public function validates(): void {
+    public function validates(): void
+    {
         if (($this->url ?? '') === '') {
             $this->addValError('Invalid URL');
         }

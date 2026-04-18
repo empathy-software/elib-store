@@ -23,7 +23,8 @@ class StoreController extends StoreControllerLite
         $this->setTemplate('elib://store_category.tpl');
     }
 
-    public function defaultLayout(): void {
+    public function defaultLayout(): void
+    {
         $ui_array = ['page'];
         $this->loadUIVars('ui_cats', $ui_array);
         if (!isset($_GET['page'])) {
@@ -76,7 +77,8 @@ class StoreController extends StoreControllerLite
         }
     }
 
-    public function product(): void {
+    public function product(): void
+    {
         $this->setTemplate('store_product.tpl');
         $product_id = 0;
 
@@ -216,7 +218,8 @@ class StoreController extends StoreControllerLite
     }
 
     // copied across from store.php
-    public function getPromos(mixed $category_id): void {
+    public function getPromos(mixed $category_id): void
+    {
         $p = Model::load(PromoItem::class);
 
         $c = Model::load(CategoryItem::class);
@@ -237,11 +240,13 @@ class StoreController extends StoreControllerLite
         $this->assign('promos', $promos);
     }
 
-    public function accepting_paypal(): void {
+    public function accepting_paypal(): void
+    {
         $this->setTemplate('accepting_paypal.tpl');
     }
 
-    public function edit_address(): void {
+    public function edit_address(): void
+    {
         $this->setTemplate('address.tpl');
         if (isset($_GET['id']) && is_numeric($_GET['id'])) {
             if (isset($_POST['save'])) {
@@ -278,7 +283,8 @@ class StoreController extends StoreControllerLite
         }
     }
 
-    public function add_address(): void {
+    public function add_address(): void
+    {
         $this->setTemplate('address.tpl');
         $countries = Country::build();
         $this->assign('countries', $countries);
@@ -307,7 +313,8 @@ class StoreController extends StoreControllerLite
         }
     }
 
-    public function assignVariantsTableData(mixed $p, mixed $v): mixed {
+    public function assignVariantsTableData(mixed $p, mixed $v): mixed
+    {
         $variants = $v->getAllForProduct($p->id, $p->name);
 
         $total_weight_g = 0;

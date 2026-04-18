@@ -40,7 +40,8 @@ class OrderItem extends Entity
 
     public ?string $order_id = null;
 
-    public function getOrders(): mixed {
+    public function getOrders(): mixed
+    {
         $order = [];
         $sql = 'select t3.order_id as order_id, t3.stamp, t5.id as product_id,  t5.name, t2.status, t4.price, t4.quantity, t4.notes from '
             . Model::getTable(OrderItem::class) . ' t3 '
@@ -92,7 +93,8 @@ class OrderItem extends Entity
         return $order;
     }
 
-    public function loadByOrderId(mixed $order_id): mixed {
+    public function loadByOrderId(mixed $order_id): mixed
+    {
         $sql = 'select id from ' . Model::getTable(OrderItem::class) . ' where order_id = ?';
         $result = $this->query($sql, 'Could not load by order id', [$order_id]);
         if ($result->rowCount() > 0) {
