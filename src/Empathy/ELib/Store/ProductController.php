@@ -60,9 +60,9 @@ class ProductController extends AdminController
             if ($p->hasValErrors()) {
                 // old_product_name along with code in admin_header
                 // prevents breadcrumb from breaking on errors
-                $this->presenter->assign('product', $p);
-                $this->presenter->assign('old_product_name', $old_product_name);
-                $this->presenter->assign('errors', $p->getValErrors());
+                $this->assign('product', $p);
+                $this->assign('old_product_name', $old_product_name);
+                $this->assign('errors', $p->getValErrors());
             } else {
                 //$p->price = $_POST['price'];
                 $p->save();
@@ -86,20 +86,20 @@ class ProductController extends AdminController
             $c = Model::load(CategoryItem::class);
             $category = $c->loadIndexed($c->category_id);
 
-            //$this->presenter->assign("product_ranges", $product_ranges);
-            //$this->presenter->assign("ranges", $ranges);
+            //$this->assign("product_ranges", $product_ranges);
+            //$this->assign("ranges", $ranges);
 
-            $this->presenter->assign('product', $p);
-            $this->presenter->assign('categories', $category);
+            $this->assign('product', $p);
+            $this->assign('categories', $category);
 
             $sold = [];
             $sold[0] = 'No';
             $sold[1] = 'Yes';
-            $this->presenter->assign('sold_in_store', $sold);
+            $this->assign('sold_in_store', $sold);
 
             $b = Model::load(BrandItem::class);
             $brands = $b->getBrands();
-            $this->presenter->assign('brands', $brands);
+            $this->assign('brands', $brands);
 
         }
     }
@@ -110,12 +110,12 @@ class ProductController extends AdminController
         $p = Model::load(ProductItem::class);
         $p->load($_GET['id']);
 
-        $this->presenter->assign('product', $p);
+        $this->assign('product', $p);
 
         if (is_numeric($p->brand_id)) {
             $b = Model::load(BrandItem::class);
             $b->load($p->brand_id);
-            $this->presenter->assign('brand', $b->name);
+            $this->assign('brand', $b->name);
         }
 
         $v = Model::load(ProductVariant::class);
@@ -157,9 +157,9 @@ class ProductController extends AdminController
             $variants[$index]['properties'] = $props;
         }
 
-        $this->presenter->assign('has_colours', $has_colours);
+        $this->assign('has_colours', $has_colours);
 
-        $this->presenter->assign('variants', $variants);
+        $this->assign('variants', $variants);
     }
 
     public function upload_image(): void {
@@ -172,7 +172,7 @@ class ProductController extends AdminController
         $i = Model::load(ProductImage::class);
         $p->load($_GET['id']);
 
-        $this->presenter->assign('product', $p);
+        $this->assign('product', $p);
 
         if (isset($_POST['upload'])) {
             $images = [];
@@ -205,7 +205,7 @@ class ProductController extends AdminController
             }
 
             if ($error !== '') {
-                $this->presenter->assign('error', $error);
+                $this->assign('error', $error);
             } else {
                 $this->redirect('admin/product/' . $p->id);
             }
@@ -331,9 +331,9 @@ class ProductController extends AdminController
         $this->assign('variant', $v);
         $p = Model::load(ProductItem::class);
         $p->load($v->product_id);
-        $this->presenter->assign('product', $p);
+        $this->assign('product', $p);
         // get variant data
-        $v_array = json_decode(json_encode($v), true);
+        $v_array = self::entityToJsonArray($v);
         $props = Model::load(Property::class);
         $v_array['properties'] = $props->loadForVariant($v_array['id']);
         $this->assign('v', $v_array);
@@ -348,8 +348,8 @@ class ProductController extends AdminController
             $v->stock = $_POST['stock'];
             $v->validates();
             if ($v->hasValErrors()) {
-                $this->presenter->assign('variant', $v);
-                $this->presenter->assign('errors', $v->getValErrors());
+                $this->assign('variant', $v);
+                $this->assign('errors', $v->getValErrors());
             } else {
                 $v->save();
                 $this->redirect('admin/product/' . $v->product_id);
@@ -365,17 +365,17 @@ class ProductController extends AdminController
         $v = Model::load(ProductVariant::class);
         $v->load($_GET['id']);
 
-        $this->presenter->assign('variant', $v);
+        $this->assign('variant', $v);
 
         // get variant data
-        $v_array = json_decode(json_encode($v), true);
+        $v_array = self::entityToJsonArray($v);
         $props = Model::load(Property::class);
         $v_array['properties'] = $props->loadForVariant($v_array['id']);
         $this->assign('v', $v_array);
 
         $p = Model::load(ProductItem::class);
         $p->load($v->product_id);
-        $this->presenter->assign('product', $p);
+        $this->assign('product', $p);
 
 
         if (isset($_POST['upload'])) {
@@ -383,7 +383,7 @@ class ProductController extends AdminController
             $u = new ImageUpload('products', true, $d);
 
             if ($u->error !== '') {
-                $this->presenter->assign('error', $u->error);
+                $this->assign('error', $u->error);
             } else {
                 if ($v->image !== '') {
                     $u->remove([$v->image]);
@@ -409,7 +409,7 @@ class ProductController extends AdminController
             // {
             foreach ($_POST['property'] as $index => $item) {
                 if ($item > 0 && is_numeric($item)) {
-                    $p->property_option_id = $item;
+                    $p->property_option_id = (int) $item;
                     $p->insert();
                 }
             }
@@ -426,7 +426,7 @@ class ProductController extends AdminController
         $v->load($_GET['id']);
 
         // get variant data
-        $v_array = json_decode(json_encode($v), true);
+        $v_array = self::entityToJsonArray($v);
         $property = Model::load(Property::class);
         $v_array['properties'] = $property->loadForVariant($v_array['id']);
         $this->assign('v', $v_array);
@@ -445,12 +445,12 @@ class ProductController extends AdminController
 
         //array_push($props, 2); // always allow colour property
 
-        $this->presenter->assign('product', $p);
-        $this->presenter->assign('variant', $v);
+        $this->assign('product', $p);
+        $this->assign('variant', $v);
 
         if (sizeof($props) > 0) {
             $properties = $property->getAllWithOptions($props);
-            $this->presenter->assign('properties', $properties);
+            $this->assign('properties', $properties);
 
             $pv = Model::load(ProductVariantPropertyOption::class);
             $sql = ' WHERE product_variant_id = ?';
@@ -459,7 +459,7 @@ class ProductController extends AdminController
             foreach ($options as $index => $value) {
                 array_push($o, $value['property_option_id']);
             }
-            $this->presenter->assign('options', $o);
+            $this->assign('options', $o);
         }
     }
 
@@ -472,15 +472,15 @@ class ProductController extends AdminController
         $sql = ' WHERE t1.property_option_id = t2.id AND t1.product_id = ?';
         $select = 't1.id AS id,t1.image,t2.option_val';
         $colours = $c->getAllCustomPaginateSimpleJoin($select, Model::getTable(PropertyOption::class), $sql, 1, 100, '', [$p->id]);
-        $this->presenter->assign('colours', $colours);
-        $this->presenter->assign('product', $p);
+        $this->assign('colours', $colours);
+        $this->assign('product', $p);
     }
 
     public function add_colour(): void {
         $this->setTemplate('elib://admin/product.tpl');
         $p = Model::load(ProductItem::class);
         $p->load($_GET['id']);
-        $this->presenter->assign('product', $p);
+        $this->assign('product', $p);
 
         $pr = Model::load(Property::class);
         $colour_id = $pr->findColourId();
@@ -490,14 +490,14 @@ class ProductController extends AdminController
             $o = Model::load(PropertyOption::class);
             $colours = $o->getColoursIndexed(2);
         }
-        $this->presenter->assign('colours', $colours);
+        $this->assign('colours', $colours);
 
         if (isset($_POST['submit_colour'])) {
             $d = [['tn_', 100, 100], ['mid_', 400, 276]];
             $u = new ImageUpload('', true, $d);
 
             if ($u->error !== '') {
-                $this->presenter->assign('error', $u->error);
+                $this->assign('error', $u->error);
             } else {
                 // update db
                 $c = Model::load(ProductColour::class);
@@ -533,8 +533,7 @@ class ProductController extends AdminController
         $this->setTemplate('elib://admin/product.tpl');
         if (isset($_POST['save_colour'])) {
             $c = Model::load(ProductColour::class);
-            $c->id = $_POST['id'];
-            $c->load();
+            $c->load((int) $_POST['id']);
             $c->property_option_id = $_POST['colour'];
 
             if ($_FILES['file']['name'] !== '') {
@@ -548,7 +547,7 @@ class ProductController extends AdminController
                     $u = new ImageUpload('', true, $d);
 
                     if ($u->error !== '') {
-                        $this->presenter->assign('error', $u->error);
+                        $this->assign('error', $u->error);
                     } else {
                         $c->image = $u->file;
                     }
@@ -565,15 +564,15 @@ class ProductController extends AdminController
         $p = Model::load(ProductItem::class);
         $p->load($c->product_id);
 
-        $this->presenter->assign('product', $p);
-        $this->presenter->assign('product_colour', $c);
+        $this->assign('product', $p);
+        $this->assign('product_colour', $c);
 
         $o = Model::load(PropertyOption::class);
         $colours = $o->getColoursIndexed(2);
 
-        $this->presenter->assign('colours', $colours);
+        $this->assign('colours', $colours);
 
-        $this->presenter->assign('colour', $colours[$c->property_option_id]);
+        $this->assign('colour', $colours[$c->property_option_id]);
     }
 
     public function variants_wizard(): void {
@@ -616,7 +615,7 @@ class ProductController extends AdminController
 
         $p = Model::load(ProductItem::class);
         $p->load($_GET['id']);
-        $this->presenter->assign('product', $p);
+        $this->assign('product', $p);
 
         $c = Model::load(CategoryItem::class);
         $cats = $c->getAncestorIds($p->category_id, []);
@@ -628,7 +627,7 @@ class ProductController extends AdminController
         if (sizeof($props) > 0) {
             $property = Model::load(Property::class);
             $properties = $property->getAllWithOptions($props);
-            $this->presenter->assign('properties', $properties);
+            $this->assign('properties', $properties);
 
             /*
               $pv = new ProductVariantPropertyOption($this);
@@ -638,7 +637,7 @@ class ProductController extends AdminController
               foreach ($options as $index => $value) {
               array_push($o, $value['property_option_id']);
               }
-              $this->presenter->assign('options', $o);
+              $this->assign('options', $o);
             */
         }
 
@@ -647,13 +646,30 @@ class ProductController extends AdminController
         $v->weight_lb = '0.00';
         $v->weight_oz = '0.00';
         $v->price = '0.00';
-        $this->presenter->assign('variant', $v);
+        $this->assign('variant', $v);
 
         // get colours
         $c = Model::load(ProductColour::class);
         $colours = $c->getColourOptionIDs($p->id);
-        $this->presenter->assign('colours', $colours);
+        $this->assign('colours', $colours);
 
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function entityToJsonArray(object $entity): array
+    {
+        $json = json_encode($entity);
+        if ($json === false) {
+            throw new \RuntimeException('json_encode failed');
+        }
+        $data = json_decode($json, true);
+        if (!is_array($data)) {
+            throw new \RuntimeException('json_decode failed');
+        }
+
+        return $data;
     }
 
     /*
@@ -688,10 +704,10 @@ class ProductController extends AdminController
       $attr = $a->loadIndexed();
       $selected_attr = $pa->loadForProduct($p->id);
 
-      $this->presenter->assign("stock_exists", $stock_exists);
-      $this->presenter->assign("selected_attr", $selected_attr);
-      $this->presenter->assign("attributes", $attr);
-      $this->presenter->assign("product", $p);
+      $this->assign("stock_exists", $stock_exists);
+      $this->assign("selected_attr", $selected_attr);
+      $this->assign("attributes", $attr);
+      $this->assign("product", $p);
       }
       }
 
@@ -720,8 +736,8 @@ class ProductController extends AdminController
 
       $data->getItem();
       $this->setTemplate("data_item.tpl");
-      $this->presenter->assign("operation", "Reset Image");
-      $this->presenter->assign("data", $data);
+      $this->assign("operation", "Reset Image");
+      $this->assign("data", $data);
       $this->setNavigation($data->section_id, $data->heading);
       }
     */

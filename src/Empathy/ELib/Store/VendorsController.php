@@ -20,12 +20,10 @@ class VendorsController extends AdminController
 
         if (isset($_POST['verify'])) {
             $v = VendorItem::loadFromContainer();
-            $v->id = (int) $_POST['vendor_id'];
-            $v->load($v->id);
+            $v->load((int) $_POST['vendor_id']);
 
             $u = Model::load(UserItem::class);
-            $u->id = (int) $v->user_id;
-            $u->load($u->id);
+            $u->load((int) $v->user_id);
 
             if ($u->active && $v->name !== '') {
                 $u->auth = Access::VENDOR;

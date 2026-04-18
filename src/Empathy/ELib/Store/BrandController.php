@@ -25,8 +25,8 @@ class BrandController extends AdminController
         $b->load($_GET['id']);
 
         $bt = new BrandsTree($b);
-        $this->presenter->assign('banners', $bt->getMarkup());
-        $this->presenter->assign('artist', $b);
+        $this->assign('banners', $bt->getMarkup());
+        $this->assign('artist', $b);
     }
 
     public function add(): void {
@@ -44,8 +44,8 @@ class BrandController extends AdminController
             $b->name = $_POST['artist_alias'];
             $b->validates();
             if ($b->hasValErrors()) {
-                $this->presenter->assign('brand', $b);
-                $this->presenter->assign('errors', $b->getValErrors());
+                $this->assign('brand', $b);
+                $this->assign('errors', $b->getValErrors());
             } else {
                 $b->save();
                 $this->redirect('admin/brand/' . $b->id);
@@ -55,7 +55,7 @@ class BrandController extends AdminController
         } else {
             $b = Model::load(BrandItem::class);
             $b->load($_GET['id']);
-            $this->presenter->assign('brand', $b);
+            $this->assign('brand', $b);
         }
     }
 
@@ -80,8 +80,8 @@ class BrandController extends AdminController
             $b->about = $_POST['bio'];
             $b->validates();
             if ($b->hasValErrors()) {
-                $this->presenter->assign('brand', $b);
-                $this->presenter->assign('errors', $b->getValErrors());
+                $this->assign('brand', $b);
+                $this->assign('errors', $b->getValErrors());
             } else {
                 $b->save(['bio']);
                 $this->redirect('admin/brand/'.$_GET['id']);
@@ -93,7 +93,7 @@ class BrandController extends AdminController
         $this->buildNav();
         $b = Model::load(BrandItem::class);
         $b->load($_GET['id']);
-        $this->presenter->assign('brand', $b);
+        $this->assign('brand', $b);
     }
 
 }

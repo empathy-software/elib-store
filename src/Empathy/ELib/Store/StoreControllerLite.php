@@ -174,9 +174,17 @@ class StoreControllerLite extends EController
         }
 
         if (is_array($_GET['brands']) && count($_GET['brands']) > 0) {
-            $brands = $p->buildUnionString($_GET['brands']);
-            $sql .= ' AND brand_id IN ' . $brands[0];
-            $params = array_merge($params, $brands[1]);
+            $brandIds = [];
+            foreach ($_GET['brands'] as $bid) {
+                if (is_numeric($bid)) {
+                    $brandIds[] = (int) $bid;
+                }
+            }
+            if ($brandIds !== []) {
+                $brands = $p->buildUnionString($brandIds);
+                $sql .= ' AND brand_id IN ' . $brands[0];
+                $params = array_merge($params, $brands[1]);
+            }
         }
 
         $sql .= ' AND vendor_verified = 1';
@@ -277,14 +285,12 @@ class StoreControllerLite extends EController
     public function minimalProductView(): void {
         $this->setTemplate('store_product.tpl');
         $p = Model::load(ProductItem::class);
-        $p->id = $this->filterInt('id');
-        $p->load($p->id);
+        $p->load($this->filterInt('id'));
 
         $vendorModel = DI::getContainer()->get('VendorModel');
-        if (is_string($vendorModel) && $vendorModel !== '') {
+        if (is_string($vendorModel) && $vendorModel !== '' && $p->vendor_id !== null && $p->vendor_id > 0) {
             $v = VendorItem::loadFromContainer();
-            $v->id = $p->vendor_id;
-            $v->load($v->id);
+            $v->load($p->vendor_id);
             $this->assign('vendor', $v);
         }
 

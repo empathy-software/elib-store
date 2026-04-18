@@ -32,9 +32,9 @@ class CategoryController extends AdminController
             $_GET['brand_id'] = 0;
         }
 
-        $this->presenter->assign('order_by', $_GET['order_by']);
-        $this->presenter->assign('page', $_GET['page']);
-        $this->presenter->assign('category_id', $_GET['id']);
+        $this->assign('order_by', $_GET['order_by']);
+        $this->assign('page', $_GET['page']);
+        $this->assign('category_id', $_GET['id']);
 
         $this->buildNav();
 
@@ -59,7 +59,7 @@ class CategoryController extends AdminController
         $params[] = $_GET['order_by'];
 
         $p_nav = $p->getPaginatePages($sql, $_GET['page'], REQUESTS_PER_PAGE, $params);
-        $this->presenter->assign('p_nav', $p_nav);
+        $this->assign('p_nav', $p_nav);
         $this->assign('page', $_GET['page']);
         $product = $p->getAllCustomPaginate($sql, $_GET['page'], REQUESTS_PER_PAGE, $params);
 
@@ -87,7 +87,7 @@ class CategoryController extends AdminController
           }
         */
 
-        $this->presenter->assign('products', $product);
+        $this->assign('products', $product);
     }
 
     public function buildNav(): void {
@@ -101,13 +101,13 @@ class CategoryController extends AdminController
 
         $ct = new CategoriesTree($c, $_GET['collapsed']);
 
-        $this->presenter->assign('category', $c);
-        $this->presenter->assign('category_has_children', $c->hasChildren());
+        $this->assign('category', $c);
+        $this->assign('category_has_children', $c->hasChildren());
 
-        $this->presenter->assign('nav', $ct->getMarkup());
+        $this->assign('nav', $ct->getMarkup());
 
         $b = Model::load(BrandItem::class);
-        $this->presenter->assign('brands', $b->getBrands());
+        $this->assign('brands', $b->getBrands());
     }
 
     public function assertID(): void {
@@ -119,7 +119,7 @@ class CategoryController extends AdminController
     public function add_category(): void {
         if (isset($_GET['id']) && is_numeric($_GET['id'])) {
             $c = Model::load(CategoryItem::class);
-            $c->category_id = $_GET['id'];
+            $c->category_id = (int) $_GET['id'];
             $c->name = 'New Category';
             $c->hidden = 'DEFAULT';
             $c->insert();
@@ -135,8 +135,8 @@ class CategoryController extends AdminController
             $c->name = $_POST['name'];
             $c->validates();
             if ($c->hasValErrors()) {
-                $this->presenter->assign('category', $c);
-                $this->presenter->assign('errors', $c->getValErrors());
+                $this->assign('category', $c);
+                $this->assign('errors', $c->getValErrors());
             } else {
                 $c->save();
                 $this->redirect('admin/category/'.$c->id);
@@ -146,7 +146,7 @@ class CategoryController extends AdminController
         } else {
             $c = Model::load(CategoryItem::class);
             $c->load($_GET['id']);
-            $this->presenter->assign('category', $c);
+            $this->assign('category', $c);
         }
     }
 
@@ -182,7 +182,7 @@ class CategoryController extends AdminController
         } else {
             $p = Model::load(Property::class);
             $properties = $p->getAllWithOptions([]);
-            $this->presenter->assign('properties', $properties);
+            $this->assign('properties', $properties);
 
             $c = Model::load(CategoryItem::class);
             $ancestors = $c->getAncestorIds($_GET['id'], []);
@@ -196,8 +196,8 @@ class CategoryController extends AdminController
 
             $active = $cp->getPropertiesByCategory([$_GET['id']]);
             //array_push($inherited, 2); // always use colour
-            $this->presenter->assign('active_properties', $active);
-            $this->presenter->assign('inherited_properties', $inherited);
+            $this->assign('active_properties', $active);
+            $this->assign('inherited_properties', $inherited);
         }
     }
 

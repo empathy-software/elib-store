@@ -15,17 +15,17 @@ class PropertiesController extends AdminController
         $this->setTemplate('elib://admin/properties.tpl');
         $p = Model::load(Property::class);
         $properties = $p->getAllWithOptions([]);
-        $this->presenter->assign('properties', $properties);
+        $this->assign('properties', $properties);
 
         if (isset($_POST['add_option'])) {
             if (isset($_POST['id']) && is_numeric($_POST['id'])) {
                 $o = Model::load(PropertyOption::class);
-                $o->property_id = $_POST['id'];
+                $o->property_id = (int) $_POST['id'];
                 $o->option_val = $_POST['option'];
                 $o->validates();
                 if ($o->hasValErrors()) {
-                    $this->presenter->assign('submitted_option', $o);
-                    $this->presenter->assign('errors', $o->getValErrors());
+                    $this->assign('submitted_option', $o);
+                    $this->assign('errors', $o->getValErrors());
                 } else {
                     $o->insert();
                     $this->redirect('admin/properties');
@@ -70,8 +70,8 @@ class PropertiesController extends AdminController
                 $p->name = $_POST['name'];
                 $p->validates();
                 if ($p->hasValErrors()) {
-                    $this->presenter->assign('property', $p);
-                    $this->presenter->assign('errors', $p->getValErrors());
+                    $this->assign('property', $p);
+                    $this->assign('errors', $p->getValErrors());
                 } else {
                     $p->save();
                     $this->redirect('admin/properties');
@@ -82,7 +82,7 @@ class PropertiesController extends AdminController
             } else {
                 $p = Model::load(Property::class);
                 $p->load($_GET['id']);
-                $this->presenter->assign('property', $p);
+                $this->assign('property', $p);
             }
         }
     }

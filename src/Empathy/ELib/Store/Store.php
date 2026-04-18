@@ -154,16 +154,16 @@ class Store
                    ELIB_MULTIPLE_VENDORS === true) {
                     $user_id = DI::getContainer()->get('CurrentUser');
                     $v = VendorItem::loadFromContainer();
-                    $v->id = $v->getIDByUserID($user_id->getUserID());
-                    if ($v->id > 0) {
-                        $v->load($v->id);
+                    $vendorId = $v->getIDByUserID($user_id->getUserID());
+                    if ($vendorId > 0) {
+                        $v->load($vendorId);
 
                         if ($v->verified !== null) {
                             $p->vendor_verified = 1;
                         } else {
                             $p->vendor_verified = 0;
                         }
-                        $p->vendor_id = $v->id;
+                        $p->vendor_id = $vendorId;
                     }
                 } else {
                     $p->vendor_verified = 1;
@@ -278,8 +278,7 @@ class Store
         $p = Model::load(ProductItem::class);
         $price = $p->getMinPrice($product_id);
         if ($price > 0) {
-            $p->id = $product_id;
-            $p->load($p->id);
+            $p->load((int) $product_id);
             $p->min_price = $price;
             $p->save();
         }
@@ -292,8 +291,7 @@ class Store
         $variants = $v->getAllCustom($sql, [ProductVariantStatus::AVAILABLE, $product_id]);
         if (sizeof($variants) < 1) {
             $p = Model::load(ProductItem::class);
-            $p->id = $product_id;
-            $p->load($p->id);
+            $p->load((int) $product_id);
             $p->status = ProductItemStatus::CREATED;
             $p->save();
         }
@@ -407,8 +405,8 @@ class Store
             $c = Model::load(CategoryItem::class);
             $category = $c->loadIndexed($c->category_id);
 
-            //$this->presenter->assign("product_ranges", $product_ranges);
-            //$this->presenter->assign("ranges", $ranges);
+            //$this->assign("product_ranges", $product_ranges);
+            //$this->assign("ranges", $ranges);
 
             $this->c->assign('product', $p);
             $this->c->assign('categories', $category);
@@ -513,8 +511,7 @@ class Store
         }
 
         $p = Model::load(ProductItem::class);
-        $p->id = $v->product_id;
-        $p->load($p->id);
+        $p->load($v->product_id);
         $this->c->assign('product', $p);
     }
 
@@ -526,8 +523,7 @@ class Store
         $this->c->assign('variant', $v);
 
         $p = Model::load(ProductItem::class);
-        $p->id = $v->product_id;
-        $p->load($p->id);
+        $p->load($v->product_id);
         $this->c->assign('product', $p);
 
         if (isset($_POST['cancel'])) {
@@ -568,7 +564,7 @@ class Store
             // {
             foreach ($_POST['property'] as $index => $item) {
                 if ($item > 0 && is_numeric($item)) {
-                    $p->property_option_id = $item;
+                    $p->property_option_id = (int) $item;
                     $p->insert();
                 }
             }
@@ -582,8 +578,7 @@ class Store
         $v->load($_GET['id']);
 
         $p = Model::load(ProductItem::class);
-        $p->id = $v->product_id;
-        $p->load($p->id);
+        $p->load($v->product_id);
 
         $c = Model::load(CategoryItem::class);
         $cats = $c->getAncestorIds($p->category_id, []);

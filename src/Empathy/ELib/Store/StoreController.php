@@ -59,20 +59,20 @@ class StoreController extends StoreControllerLite
 
         $l = new ProductsLayout($c, $p, $v, $o, $this);
 
-        $this->presenter->assign('breadcrumb', $l->getBreadCrumb());
-        $this->presenter->assign('buttons', $l->getButtons());
-        $this->presenter->assign('p_nav', $l->getPNav());
+        $this->assign('breadcrumb', $l->getBreadCrumb());
+        $this->assign('buttons', $l->getButtons());
+        $this->assign('p_nav', $l->getPNav());
 
-        $this->presenter->assign('category_id', $_GET['category_id']);
-        $this->presenter->assign('product_id', $_GET['product_id']);
-        $this->presenter->assign('option_id', $_GET['option_id']);
+        $this->assign('category_id', $_GET['category_id']);
+        $this->assign('product_id', $_GET['product_id']);
+        $this->assign('option_id', $_GET['option_id']);
 
         $this->getPromos($_GET['category_id']);
 
         // seo
         if ($category_id > 0) {
-            $this->presenter->assign('custom_title', $c->name.' at Brighton BMX Co');
-            $this->presenter->assign('category_name', $c->name);
+            $this->assign('custom_title', $c->name.' at Brighton BMX Co');
+            $this->assign('category_name', $c->name);
         }
     }
 
@@ -94,8 +94,7 @@ class StoreController extends StoreControllerLite
         if ($this->isXMLHttpRequest()) {
             header('Content-type: application/json');
             $c = Model::load(ProductColour::class);
-            $c->id = $_GET['colour_id'];
-            $c->load();
+            $c->load((int) $_GET['colour_id']);
             $item = [];
             $item['image'] = $c->image;
             $item['option_id'] = $c->property_option_id;
@@ -103,6 +102,7 @@ class StoreController extends StoreControllerLite
             exit();
         } else {
             $colours = [];
+            $b = null;
             // default event from store.php
 
             $p = Model::load(ProductItem::class);
@@ -111,7 +111,7 @@ class StoreController extends StoreControllerLite
             $o = Model::load(ProductVariantPropertyOption::class);
 
             $c->id = 0;
-            $p->id = $_GET['product_id'];
+            $p->id = (int) $_GET['product_id'];
             $v->id = 0;
             $o->id = 0;
 
@@ -148,18 +148,19 @@ class StoreController extends StoreControllerLite
 
             $this->assign('p_nav', $l->getPNav());
 
+            $productColour = null;
             if ($_GET['product_id'] !== 0) {
-                $c = Model::load(ProductColour::class);
-                $colours = $c->getColoursIndexed($_GET['product_id']);
+                $productColour = Model::load(ProductColour::class);
+                $colours = $productColour->getColoursIndexed($_GET['product_id']);
                 if (sizeof($colours) > 0) {
                     $this->assign('colours', $colours);
                 }
 
                 if (defined('ELIB_USE_PRODUCT_BRANDS') &&
-                   ELIB_USE_PRODUCT_BRANDS === true) {
+                   ELIB_USE_PRODUCT_BRANDS === true &&
+                   $p->brand_id !== null && $p->brand_id > 0) {
                     $b = Model::load(BrandItem::class);
-                    $b->id = $p->brand_id;
-                    $b->load($b->id);
+                    $b->load($p->brand_id);
                     $this->assign('brand', $b->name);
                 }
                 $this->assign('product_view', 1);
@@ -176,8 +177,8 @@ class StoreController extends StoreControllerLite
 
             if ($_GET['product_id'] !== 0) {
                 $p = $l->getProduct();
-                if (sizeof($colours) > 0) {
-                    $p->image = $c->getFirstColourImage($_GET['product_id']);
+                if (sizeof($colours) > 0 && $productColour instanceof ProductColour) {
+                    $p->image = $productColour->getFirstColourImage((int) $_GET['product_id']);
                 }
 
                 $this->assign('product', $p);
@@ -194,14 +195,13 @@ class StoreController extends StoreControllerLite
 
         // seo
         $c = Model::load(CategoryItem::class);
-        $c->id = $p->category_id;
-        $c->load($c->id);
+        $c->load($p->category_id);
         $this->assign('price', $p->getPrice());
 
         $custom_title = '';
         $custom_keywords = '';
         $custom_description = '';
-        if (isset($b)) {
+        if ($b instanceof BrandItem) {
             $custom_title = $b->name.' ';
             $custom_keywords = $b->name.' ';
             $custom_description = $b->name.' ';
@@ -234,7 +234,7 @@ class StoreController extends StoreControllerLite
             .' ORDER BY id DESC';
         $promos = $p->getAllCustom($sql, $cat_string[1]);
         shuffle($promos);
-        $this->presenter->assign('promos', $promos);
+        $this->assign('promos', $promos);
     }
 
     public function accepting_paypal(): void {
@@ -257,10 +257,10 @@ class StoreController extends StoreControllerLite
                 $s->country = $_POST['country'];
                 $s->validates();
                 if ($s->hasValErrors()) {
-                    $this->presenter->assign('address', $s);
-                    $this->presenter->assign('sc', $s->country);
+                    $this->assign('address', $s);
+                    $this->assign('sc', $s->country);
 
-                    $this->presenter->assign('errors', $s->getValErrors());
+                    $this->assign('errors', $s->getValErrors());
 
                 } else {
                     $s->save();
@@ -268,22 +268,21 @@ class StoreController extends StoreControllerLite
                 }
             } else {
                 $s = Model::load(ShippingAddress::class);
-                $s->id = $_GET['id'];
-                $s->load();
-                $this->presenter->assign('address', $s);
-                $this->presenter->assign('sc', $s->country);
+                $s->load((int) $_GET['id']);
+                $this->assign('address', $s);
+                $this->assign('sc', $s->country);
             }
 
             $countries = Country::build();
-            $this->presenter->assign('countries', $countries);
+            $this->assign('countries', $countries);
         }
     }
 
     public function add_address(): void {
         $this->setTemplate('address.tpl');
         $countries = Country::build();
-        $this->presenter->assign('countries', $countries);
-        $this->presenter->assign('sc', 'GB');
+        $this->assign('countries', $countries);
+        $this->assign('sc', 'GB');
 
         if (isset($_POST['save'])) {
             $s = Model::load(ShippingAddress::class);
@@ -298,9 +297,9 @@ class StoreController extends StoreControllerLite
             $s->country = $_POST['country'];
             $s->validates();
             if ($s->hasValErrors()) {
-                $this->presenter->assign('address', $s);
-                $this->presenter->assign('sc', $s->country);
-                $this->presenter->assign('errors', $s->getValErrors());
+                $this->assign('address', $s);
+                $this->assign('sc', $s->country);
+                $this->assign('errors', $s->getValErrors());
             } else {
                 $s->insert();
                 $this->redirect('store/checkout');
@@ -333,10 +332,10 @@ class StoreController extends StoreControllerLite
                 }
             }
         }
-        $this->presenter->assign('variants', $variants);
-        $this->presenter->assign('dynamic_properties', $dynamic_properties);
-        $this->presenter->assign('total_weight_g', $total_weight_g);
-        $this->presenter->assign('total_weight_lb', $total_weight_lb);
+        $this->assign('variants', $variants);
+        $this->assign('dynamic_properties', $dynamic_properties);
+        $this->assign('total_weight_g', $total_weight_g);
+        $this->assign('total_weight_lb', $total_weight_lb);
 
         return sizeof($variants);
     }

@@ -149,9 +149,8 @@ class ProductsLayout
             $children = $this->category->getChildren($this->category->id);
             foreach ($children as $child) {
                 $button = [];
-                $this->category->id = $child;
+                $this->category->load((int) $child);
                 if ($this->category->hasChildren()) {
-                    $this->category->load($child);
                     $button['name'] = $this->category->name;
                     $button['image'] = $this->randomImage($this->category->id);
                     $button['category_id'] = $this->category->id;
@@ -159,7 +158,6 @@ class ProductsLayout
                         array_push($this->buttons, $button);
                     }
                 } else {
-                    $this->category->load();
                     $button['name'] = $this->category->name;
                     $button['category_id'] = $this->category->id;
 
@@ -198,7 +196,7 @@ class ProductsLayout
         $cats = [];
 
         if ($this->product->id !== 0) {
-            if (!$this->product->load()) {
+            if (!$this->product->load($this->product->id)) {
                 $this->controller->http_error(404);
             }
 
@@ -210,15 +208,14 @@ class ProductsLayout
 
             $this->category->id = $this->product->category_id;
         } elseif ($this->variant->id !== 0) {
-            if (!$this->variant->load()) {
+            if (!$this->variant->load($this->variant->id)) {
                 $this->controller->http_error(404);
             }
-            $this->product->id = $this->variant->product_id;
-            $this->product->load();
+            $this->product->load($this->variant->product_id);
             $this->category->id = $this->product->category_id;
         }
 
-        if ($this->category->id > 0 && !$this->category->load()) {
+        if ($this->category->id > 0 && !$this->category->load((int) $this->category->id)) {
             $this->controller->http_error(404);
         }
 

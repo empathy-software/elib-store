@@ -164,7 +164,7 @@ class PaypalController extends EController
 
     public function assignMessage(mixed $message): void {
         if ($message !== '') {
-            $this->presenter->assign('message', $message);
+            $this->assign('message', $message);
         }
     }
 
@@ -262,8 +262,8 @@ class PaypalController extends EController
         $p->add_field('cancel_return', $interface.'cancel');
         $p->paypal_url = $this->getPayPalURL();
 
-        $this->presenter->assign('paypal_url', $p->paypal_url);
-        $this->presenter->assign('fields', $p->fields);
+        $this->assign('paypal_url', $p->paypal_url);
+        $this->assign('fields', $p->fields);
 
         //$p->dump_fields();
         //exit();

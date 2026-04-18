@@ -19,8 +19,8 @@ class Checkout
     public function __construct(mixed $items)
     {
         $s = Model::load(ShippingAddress::class);
-        $s->id = Session::get('shipping_address_id');
-        $s->load();
+        $addressId = Session::get('shipping_address_id');
+        $s->load(is_numeric($addressId) ? (int) $addressId : 0);
 
         $o = Model::load(OrderItem::class);
         $o->user_id = DI::getContainer()->get('CurrentUser')->getUserID();

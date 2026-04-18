@@ -38,22 +38,21 @@ class PromoController extends AdminController
             if ($p->hasValErrors()) {
                 // old_product_name along with code in admin_header
                 // prevents breadcrumb from breaking on errors
-                $this->presenter->assign('promo', $p);
-                $this->presenter->assign('old_promo', $old_promo);
-                $this->presenter->assign('errors', $p->getValErrors());
+                $this->assign('promo', $p);
+                $this->assign('old_promo', $old_promo);
+                $this->assign('errors', $p->getValErrors());
             } else {
                 //$p->price = $_POST['price'];
                 $p->save();
                 $this->redirect('admin/promo/'.$p->id);
             }
         } else {
-            $p->id = $_GET['id'];
-            $p->load();
+            $p->load((int) $_GET['id']);
             //$product_ranges = $pr->loadForProduct($p->id);
 
             //$r = new RangeItem($this);
             //$ranges = $r->loadAllIndexed();
-            $this->presenter->assign('promo', $p);
+            $this->assign('promo', $p);
         }
     }
 
@@ -63,7 +62,7 @@ class PromoController extends AdminController
         $p = Model::load(PromoItem::class);
         $p->load($_GET['id']);
 
-        $this->presenter->assign('promo', $p);
+        $this->assign('promo', $p);
     }
 
     public function upload_image(): void {
@@ -75,14 +74,14 @@ class PromoController extends AdminController
         $p = Model::load(PromoItem::class);
         $p->load($_GET['id']);
 
-        $this->presenter->assign('promo', $p);
+        $this->assign('promo', $p);
 
         if (isset($_POST['upload'])) {
             $d = [['mid_', 770, 300]];
             $u = new ImageUpload('', true, $d);
 
             if ($u->error !== '') {
-                $this->presenter->assign('error', $u->error);
+                $this->assign('error', $u->error);
             } else {
                 if ($p->image !== '') {
                     $u->remove([$p->image]);

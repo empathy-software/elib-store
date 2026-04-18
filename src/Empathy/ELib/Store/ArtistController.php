@@ -35,8 +35,8 @@ class ArtistController extends AdminController
         $a->load($_GET['id']);
 
         $at = new ArtistsTree($a);
-        $this->presenter->assign('banners', $at->getMarkup());
-        $this->presenter->assign('artist', $a);
+        $this->assign('banners', $at->getMarkup());
+        $this->assign('artist', $a);
     }
 
     public function add(): void {
@@ -47,8 +47,8 @@ class ArtistController extends AdminController
             $a->surname = $_POST['surname'];
             $a->validates();
             if ($a->hasValErrors()) {
-                $this->presenter->assign('artist', $a);
-                $this->presenter->assign('errors', $a->getValErrors());
+                $this->assign('artist', $a);
+                $this->assign('errors', $a->getValErrors());
             } else {
                 $a->artist_alias = '';
                 $a->active = 0;
@@ -72,8 +72,8 @@ class ArtistController extends AdminController
             $a->surname = $_POST['surname'];
             $a->validates();
             if ($a->hasValErrors()) {
-                $this->presenter->assign('artist', $a);
-                $this->presenter->assign('errors', $a->getValErrors());
+                $this->assign('artist', $a);
+                $this->assign('errors', $a->getValErrors());
             } else {
                 $a->artist_alias = '';
                 $a->save();
@@ -84,7 +84,7 @@ class ArtistController extends AdminController
         } else {
             $a = Model::load(ArtistItem::class);
             $a->load($_GET['id']);
-            $this->presenter->assign('artist', $a);
+            $this->assign('artist', $a);
         }
     }
 
@@ -120,8 +120,8 @@ class ArtistController extends AdminController
             $a->bio = $_POST['bio'];
             $a->validates();
             if ($a->hasValErrors()) {
-                $this->presenter->assign('artist', $a);
-                $this->presenter->assign('errors', $a->getValErrors());
+                $this->assign('artist', $a);
+                $this->assign('errors', $a->getValErrors());
             } else {
                 $a->save();
                 $this->redirect('admin/artist/'.$_GET['id']);
@@ -133,7 +133,7 @@ class ArtistController extends AdminController
         $this->buildNav();
         $a = Model::load(ArtistItem::class);
         $a->load($_GET['id']);
-        $this->presenter->assign('artist', $a);
+        $this->assign('artist', $a);
     }
 
     public function upload_image(): void {
@@ -147,14 +147,14 @@ class ArtistController extends AdminController
         $a = Model::load(ArtistItem::class);
         $a->load($_GET['id']);
 
-        $this->presenter->assign('artist', $a);
+        $this->assign('artist', $a);
 
         if (isset($_POST['upload'])) {
             $d = [['tn_', 70, 80], ['mid_', 1000, 370]];
             $u = new ImageUpload('', true, $d);
 
             if ($u->error !== '') {
-                $this->presenter->assign('error', $u->error);
+                $this->assign('error', $u->error);
             } else {
                 if ($a->image !== '') {
                     $u->remove([$a->image]);

@@ -47,7 +47,9 @@ class ImageUpload
                         $this->makeDerived($item[0], $item[1], $item[2]);
                     }
                 }
-                imageDestroy($this->orig);
+                if ($this->orig instanceof \GdImage) {
+                    imagedestroy($this->orig);
+                }
             }
         }
     }
@@ -64,7 +66,12 @@ class ImageUpload
     public function create(): bool
     {
         $error = false;
-        $this->orig = imagecreatefromjpeg($this->target);
+        $gd = imagecreatefromjpeg($this->target);
+        if (!$gd instanceof \GdImage) {
+            $this->error = 'Could not load JPEG image.';
+            return true;
+        }
+        $this->orig = $gd;
         $this->origX = imagesx($this->orig);
         $this->origY = imagesy($this->orig);
 
@@ -99,11 +106,13 @@ class ImageUpload
             $factor = 1;
         }
 
-        // chatgpt fix
-        $newX = (int) max(1, round($this->origX * $factor));
-        $newY = (int) max(1, round($this->origY * $factor));
+        $newX = max(1, (int) round($this->origX * $factor));
+        $newY = max(1, (int) round($this->origY * $factor));
 
         $img = imagecreatetruecolor($newX, $newY);
+        if (!$img instanceof \GdImage || !$this->orig instanceof \GdImage) {
+            return;
+        }
         imagecopyresampled($img, $this->orig, 0, 0, 0, 0, $newX, $newY, $this->origX, $this->origY);
         $newTarget = $this->target_dir.$prefix.$this->file;
         imagejpeg($img, $newTarget, $quality);
@@ -119,7 +128,9 @@ class ImageUpload
                 foreach ($this->deriv as $item) {
                     $this->makeDerived($item[0], $item[1], $item[2]);
                 }
-                imageDestroy($this->orig);
+                if ($this->orig instanceof \GdImage) {
+                    imagedestroy($this->orig);
+                }
             }
         }
     }
@@ -130,7 +141,10 @@ class ImageUpload
 
         foreach ($files as $file) {
             if ($file !== '') {
-                $all_files = array_merge($all_files, glob($this->target_dir.'*'.$file));
+                $matches = glob($this->target_dir.'*'.$file);
+                if (is_array($matches)) {
+                    $all_files = array_merge($all_files, $matches);
+                }
             }
         }
         foreach ($all_files as $file) {
@@ -155,9 +169,9 @@ class ImageUpload
             $ext = $name_array[$size - 1];
 
             /* check for jpeg */
-            $imgInfo = getImageSize($_FILES['file']['tmp_name']);
+            $imgInfo = getimagesize($_FILES['file']['tmp_name']);
 
-            if (!preg_match('/jpg|jpeg/', $ext) || $imgInfo['mime'] !== 'image/jpeg') {
+            if (!preg_match('/jpg|jpeg/', $ext) || !is_array($imgInfo) || $imgInfo['mime'] !== 'image/jpeg') {
                 $this->error .= 'Invalid file format.';
             } else {
                 $name = '';

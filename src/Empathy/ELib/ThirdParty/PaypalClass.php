@@ -174,6 +174,12 @@ class PaypalClass
 
     public function validate_ipn(): mixed {
         $raw_post_data = file_get_contents('php://input');
+        if (!is_string($raw_post_data)) {
+            $this->last_error = 'Empty IPN body';
+            $this->log_ipn_results(false);
+
+            return false;
+        }
         $this->ipn_response = '';
 
         // Keep parsed values for your app/logging
@@ -194,9 +200,9 @@ class PaypalClass
             'Connection: close',
         ]);
 
-        $this->ipn_response = curl_exec($ch);
+        $curlBody = curl_exec($ch);
 
-        if ($this->ipn_response === false) {
+        if ($curlBody === false || !is_string($curlBody)) {
             $this->last_error = 'cURL error: ' . curl_error($ch);
             curl_close($ch);
             $this->log_ipn_results(false);
@@ -206,7 +212,7 @@ class PaypalClass
         $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
 
-        $this->ipn_response = trim($this->ipn_response);
+        $this->ipn_response = trim($curlBody);
 
         if ($http_code !== 200) {
             $this->last_error = 'PayPal responded with HTTP ' . $http_code;
@@ -251,6 +257,9 @@ class PaypalClass
 
         // Write to log
         $fp = fopen($this->ipn_log_file, 'a');
+        if ($fp === false) {
+            return;
+        }
         fwrite($fp, $text . "\n\n");
 
         fclose($fp);  // close file

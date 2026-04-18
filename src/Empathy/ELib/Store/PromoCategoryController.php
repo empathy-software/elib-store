@@ -32,13 +32,13 @@ class PromoCategoryController extends AdminController
         $ct = new PromosTree($c, $_GET['collapsed']);
 
 
-        $this->presenter->assign('category', $c);
-        $this->presenter->assign('category_has_children', $c->hasChildren());
+        $this->assign('category', $c);
+        $this->assign('category_has_children', $c->hasChildren());
 
-        $this->presenter->assign('nav', $ct->getMarkup());
+        $this->assign('nav', $ct->getMarkup());
 
         $b = Model::load(BrandItem::class);
-        $this->presenter->assign('brands', $b->getBrands());
+        $this->assign('brands', $b->getBrands());
     }
 
     public function default_event(): void
@@ -57,9 +57,9 @@ class PromoCategoryController extends AdminController
             $_GET['order_by'] = 'id';
         }
 
-        $this->presenter->assign('order_by', $_GET['order_by']);
-        $this->presenter->assign('page', $_GET['page']);
-        $this->presenter->assign('category_id', $_GET['id']);
+        $this->assign('order_by', $_GET['order_by']);
+        $this->assign('page', $_GET['page']);
+        $this->assign('category_id', $_GET['id']);
 
 
 
@@ -80,7 +80,7 @@ class PromoCategoryController extends AdminController
         $p = Model::load(PromoItem::class);
 
         $p_nav = $p->getPaginatePages($sql, $_GET['page'], REQUESTS_PER_PAGE, [$_GET['id'], $_GET['order_by']]);
-        $this->presenter->assign('p_nav', $p_nav);
+        $this->assign('p_nav', $p_nav);
         $promo = $p->getAllCustomPaginate($sql, $_GET['page'], REQUESTS_PER_PAGE, [$_GET['id'], $_GET['order_by']]);
 
         $c = Model::load(CategoryItem::class);
@@ -99,13 +99,13 @@ class PromoCategoryController extends AdminController
           }
         */
 
-        $this->presenter->assign('promos', $promo);
+        $this->assign('promos', $promo);
     }
 
     public function add(): void {
         if (isset($_GET['id']) && is_numeric($_GET['id'])) {
             $p = Model::load(PromoItem::class);
-            $p->category_id = $_GET['id'];
+            $p->category_id = (int) $_GET['id'];
             $p->name = 'New Promo';
             $p->hidden = 'DEFAULT';
             $id = $p->insert();

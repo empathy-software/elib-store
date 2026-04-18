@@ -13,7 +13,7 @@ class OrdersController extends AdminController
     {
         $o = Model::load(OrderItem::class);
         $orders = $o->getOrders();
-        $this->presenter->assign('orders', $orders);
+        $this->assign('orders', $orders);
         $this->setTemplate('elib://admin/orders.tpl');
     }
 }
