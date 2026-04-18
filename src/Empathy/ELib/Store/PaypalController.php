@@ -228,7 +228,7 @@ class PaypalController extends EController
         $sc = DI::getContainer()->get('ShippingCalculator');
         $shipping = $sc->getFee();
 
-        $p->add_field('shipping1', number_format($shipping, 2, '.', ''));
+        $p->add_field('shipping_1', number_format($shipping, 2, '.', ''));
         $o->shipping = $shipping;
         $o->save();
 
