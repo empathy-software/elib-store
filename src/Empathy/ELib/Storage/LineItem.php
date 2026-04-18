@@ -17,7 +17,6 @@ class LineItem extends Entity
 
     public function getOrderItems($orderId)
     {
-        $result = $this->getAllCustom('where order_id = ? and variant_id > 0', [$orderId]);
-        return $result->fetchAll();
+        return $this->getAllCustom('where order_id = ? and variant_id > 0', [$orderId]);
     }
 }

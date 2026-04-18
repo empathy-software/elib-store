@@ -103,6 +103,8 @@ class PaypalController extends EController
             return;
         }
 
+        $this->writeLog('order: ' . json_encode([$data['invoice'], $o->id, $o->stamp]));
+
         $this->writeLog('amounts: ' . json_encode([(float) $data['mc_gross'], (float) $o->total, (float) $o->shipping]));
 
         if (
