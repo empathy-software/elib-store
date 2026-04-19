@@ -276,7 +276,7 @@ class Store
         $price = $p->getMinPrice($product_id);
         if ($price > 0) {
             $p->load((int) $product_id);
-            $p->min_price = $price;
+            $p->min_price = (float) $price;
             $p->save();
         }
     }
@@ -494,10 +494,10 @@ class Store
         } elseif (isset($_POST['save'])) {
             $v = Model::load(ProductVariant::class);
             $v->load($_POST['id']);
-            $v->weight_g = $_POST['weight_g'] ?? null;
-            $v->weight_lb = $_POST['weight_lb'] ?? null;
-            $v->weight_oz = $_POST['weight_oz'] ?? null;
-            $v->price = $_POST['price'];
+            $v->weight_g = isset($_POST['weight_g']) && $_POST['weight_g'] !== '' ? (int) $_POST['weight_g'] : null;
+            $v->weight_lb = ($_POST['weight_lb'] ?? '') === '' ? null : (float) $_POST['weight_lb'];
+            $v->weight_oz = ($_POST['weight_oz'] ?? '') === '' ? null : (float) $_POST['weight_oz'];
+            $v->price = (float) $_POST['price'];
             $v->validates();
             if ($v->hasValErrors()) {
                 $this->c->assign('variant', $v);

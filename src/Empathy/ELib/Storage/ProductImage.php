@@ -44,12 +44,13 @@ class ProductImage extends Entity
     {
         $noneFound = false;
         $images = $this->loadByProductItem($product);
+
         if (count($images) < 1) {
             $noneFound = true;
             $images = [
                 [
                     'id' => 0,
-                    'image' => $product->image !== '' ? $product->image : 'blank.gif',
+                    'image' => $product->image ? $product->image : 'blank.gif',
                     'default_image' => true,
                     'product_id' => $product->id,
                 ],

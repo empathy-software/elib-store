@@ -10,15 +10,15 @@ define('INTL_STANDARD', 10.00);
 
 class ShippingCalculator
 {
-    private mixed $fee;
-    private mixed $intl_shipping = 0;
+    private float $fee = 0.0;
+    private float $intl_shipping = 0.0;
 
     public function __construct(mixed $total, private readonly mixed $cats, private readonly mixed $cat, private readonly mixed $item_count, private readonly mixed $calc_intl)
     {
         $special_shipping = $this->cat->getShipping($this->cats);
 
         if ($this->calc_intl) {
-            $this->intl_shipping = $this->cat->getShippingIntl($this->cats);
+            $this->intl_shipping = (float) $this->cat->getShippingIntl($this->cats);
         }
 
         $highest = FLAT_FEE;
@@ -45,7 +45,7 @@ class ShippingCalculator
 
     }
 
-    public function getFee(): mixed
+    public function getFee(): float
     {
         return $this->calc_intl ? $this->fee + $this->intl_shipping + INTL_STANDARD : $this->fee;
     }

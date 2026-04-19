@@ -19,7 +19,7 @@ use Empathy\MVC\Session;
 
 class PaypalController extends EController
 {
-    private function getPayPalURL(): mixed
+    private function getPayPalURL(): string
     {
         $url = '';
         if (!defined('ELIB_USE_PAYPAL_SANDBOX')) {
@@ -266,7 +266,7 @@ class PaypalController extends EController
         //exit();
     }
 
-    protected function getBusiness(): mixed
+    protected function getBusiness(): string
     {
         return ELIB_PAYPAL_BUSINESS_EMAIL;
     }

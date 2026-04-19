@@ -54,17 +54,17 @@ class CategoryController extends AdminController
         $sql .= ' ORDER BY ?';
         $params[] = $_GET['order_by'];
 
-        $p_nav = $p->getPaginatePages($sql, $_GET['page'], REQUESTS_PER_PAGE, $params);
+        $p_nav = $p->getPaginatePages($sql, (int) $_GET['page'], REQUESTS_PER_PAGE, $params);
         $this->assign('p_nav', $p_nav);
         $this->assign('page', $_GET['page']);
-        $product = $p->getAllCustomPaginate($sql, $_GET['page'], REQUESTS_PER_PAGE, $params);
+        $product = $p->getAllCustomPaginate($sql, (int) $_GET['page'], REQUESTS_PER_PAGE, $params);
 
         foreach ($product as &$product_item) {
             $product_item['sold_in_store'] = $product_item['status'] > 0 ? 1 : 0;
         }
 
         $c = Model::load(CategoryItem::class);
-        $c->id = $_GET['id'];
+        $c->id = (int) $_GET['id'];
         $c->loadIndexed($c->category_id);
 
         /*

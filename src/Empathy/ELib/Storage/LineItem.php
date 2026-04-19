@@ -16,7 +16,7 @@ class LineItem extends Entity
 
     public int $variant_id = 0;
 
-    public string $price = '0.00';
+    public float $price = 0.00;
 
     public int $quantity = 0;
 

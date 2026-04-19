@@ -35,8 +35,8 @@ class OrderItem extends Entity
     public ?string $zip = null;
     public ?string $country = null;
 
-    public ?string $shipping = null;
-    public ?string $total = null;
+    public ?float $shipping = null;
+    public ?float $total = null;
 
     public ?string $order_id = null;
 

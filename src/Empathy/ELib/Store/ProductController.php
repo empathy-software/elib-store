@@ -46,13 +46,13 @@ class ProductController extends AdminController
             $old_product_name = $p->name;
             $p->name = $_POST['name'];
             $p->description = $_POST['description'];
-            $p->shipping_uk = $_POST['shipping_uk'];
-            $p->shipping_eu = $_POST['shipping_eu'];
-            $p->shipping_other = $_POST['shipping_other'];
+            $p->shipping_uk = ($_POST['shipping_uk'] ?? '') === '' ? null : (float) $_POST['shipping_uk'];
+            $p->shipping_eu = ($_POST['shipping_eu'] ?? '') === '' ? null : (float) $_POST['shipping_eu'];
+            $p->shipping_other = ($_POST['shipping_other'] ?? '') === '' ? null : (float) $_POST['shipping_other'];
 
             $p->status = $_POST['sold_in_store'] === 1 ? 1 : 0;
 
-            $p->brand_id = $_POST['brand_id'];
+            $p->brand_id = (int) $_POST['brand_id'];
 
             $p->validates();
             if ($p->hasValErrors()) {
@@ -308,8 +308,8 @@ class ProductController extends AdminController
         $v = Model::load(ProductVariant::class);
         $v->product_id = $_GET['id'];
         $v->weight_g = 0;
-        $v->weight_lb = '0.00';
-        $v->weight_oz = '0.00';
+        $v->weight_lb = 0.0;
+        $v->weight_oz = 0.0;
         $v->price = 'DEFAULT';
         $v->status = 'DEFAULT';
         $v->insert();
@@ -335,7 +335,7 @@ class ProductController extends AdminController
         $this->assertID();
         $this->setTemplate('elib://admin/product.tpl');
         $v = Model::load(ProductVariant::class);
-        $v->load($_GET['id']);
+        $v->load((int) $_GET['id']);
         $this->assign('variant', $v);
         $p = Model::load(ProductItem::class);
         $p->load($v->product_id);
@@ -349,11 +349,11 @@ class ProductController extends AdminController
         if (isset($_POST['save'])) {
             $v = Model::load(ProductVariant::class);
             $v->load($_POST['id']);
-            $v->weight_g = $_POST['weight_g'];
-            $v->weight_lb = $_POST['weight_lb'];
-            $v->weight_oz = $_POST['weight_oz'];
-            $v->price = $_POST['price'];
-            $v->stock = $_POST['stock'];
+            $v->weight_g = (int) $_POST['weight_g'];
+            $v->weight_lb = (float) $_POST['weight_lb'];
+            $v->weight_oz = (float) $_POST['weight_oz'];
+            $v->price = (float) $_POST['price'];
+            $v->stock = (int) $_POST['stock'];
             $v->validates();
             if ($v->hasValErrors()) {
                 $this->assign('variant', $v);
@@ -602,10 +602,10 @@ class ProductController extends AdminController
             $results = $g->getResults();
             $v = Model::load(ProductVariant::class);
             $v->product_id = $_POST['product_id'];
-            $v->weight_g = $_POST['weight_g'];
-            $v->weight_lb = $_POST['weight_lb'];
-            $v->weight_oz = $_POST['weight_oz'];
-            $v->price = $_POST['price'];
+            $v->weight_g = (int) $_POST['weight_g'];
+            $v->weight_lb = ($_POST['weight_lb'] ?? '') === '' ? null : (float) $_POST['weight_lb'];
+            $v->weight_oz = ($_POST['weight_oz'] ?? '') === '' ? null : (float) $_POST['weight_oz'];
+            $v->price = (float) $_POST['price'];
             $v->status = 1;
 
             $v->validates();
@@ -658,9 +658,9 @@ class ProductController extends AdminController
 
         $v = Model::load(ProductVariant::class);
         $v->weight_g = 0;
-        $v->weight_lb = '0.00';
-        $v->weight_oz = '0.00';
-        $v->price = '0.00';
+        $v->weight_lb = 0.0;
+        $v->weight_oz = 0.0;
+        $v->price = 0.0;
         $this->assign('variant', $v);
 
         // get colours

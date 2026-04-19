@@ -24,11 +24,11 @@ class ProductItem extends Entity
      */
     public int|string $status = 0;
     public ?int $vendor_id = null;
-    public ?string $min_price = null;
+    public ?float $min_price = null;
     public int $vendor_verified = 0;
-    public ?string $shipping_uk = null;
-    public ?string $shipping_eu = null;
-    public ?string $shipping_other = null;
+    public ?float $shipping_uk = null;
+    public ?float $shipping_eu = null;
+    public ?float $shipping_other = null;
 
     /** Populated in {@see load()}; not a DB column. */
     /** @var list<array<string, mixed>> */

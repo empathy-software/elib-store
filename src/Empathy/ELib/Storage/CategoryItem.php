@@ -13,7 +13,7 @@ class CategoryItem extends Entity
 
     public int $id;
 
-    public int $category_id;
+    public int $category_id = 0;
 
     /**
      * May be {@see \Empathy\MVC\Entity} insert sentinel <code>'DEFAULT'</code>.
@@ -22,8 +22,8 @@ class CategoryItem extends Entity
 
     public string $name = '';
 
-    public ?string $shipping = null;
-    public ?string $intl_shipping = null;
+    public ?float $shipping = null;
+    public ?float $intl_shipping = null;
 
     public function buildDescendantIDs(mixed $id, mixed &$ids): void
     {
@@ -183,7 +183,7 @@ class CategoryItem extends Entity
         $result = $this->query($sql, $error, $idsString[1]);
         if ($result->rowCount() > 0) {
             foreach ($result as $row) {
-                $shipping[] = $row['shipping'];
+                $shipping[] = (float) $row['shipping'];
             }
         }
 
@@ -193,7 +193,7 @@ class CategoryItem extends Entity
     public function getShippingIntl(mixed $ids): mixed
     {
         $idsString = $this->buildUnionString($ids);
-        $shipping = 0;
+        $shipping = 0.0;
         $sql = 'SELECT MAX(intl_shipping) AS intl_shipping FROM '.Model::getTable(self::class)
             .' WHERE id IN '. $idsString[0]
             .' AND intl_shipping IS NOT NULL GROUP BY id';
@@ -201,7 +201,7 @@ class CategoryItem extends Entity
         $result = $this->query($sql, $error, $idsString[1]);
         if ($result->rowCount() === 1) {
             $row = $result->fetch();
-            $shipping = $row['intl_shipping'];
+            $shipping = (float) $row['intl_shipping'];
         }
 
         return $shipping;

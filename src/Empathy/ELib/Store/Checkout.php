@@ -18,22 +18,22 @@ class Checkout
 
     public function __construct(mixed $items)
     {
-        $s = Model::load(ShippingAddress::class);
-        $addressId = Session::get('shipping_address_id');
-        $s->load(is_numeric($addressId) ? (int) $addressId : 0);
+        // $s = Model::load(ShippingAddress::class);
+        // $addressId = Session::get('shipping_address_id');
+        // $s->load(is_numeric($addressId) ? (int) $addressId : 0);
 
         $o = Model::load(OrderItem::class);
         $o->user_id = DI::getContainer()->get('CurrentUser')->getUserID();
         $o->status = 'DEFAULT';
         $o->stamp = 'MYSQLTIME';
-        $o->first_name = $s->first_name;
-        $o->last_name = $s->last_name;
-        $o->address1 = $s->address1;
-        $o->address2 = $s->address2;
-        $o->city = $s->city;
-        $o->state = $s->state;
-        $o->zip = $s->zip;
-        $o->country = $s->country;
+        // $o->first_name = $s->first_name;
+        // $o->last_name = $s->last_name;
+        // $o->address1 = $s->address1;
+        // $o->address2 = $s->address2;
+        // $o->city = $s->city;
+        // $o->state = $s->state;
+        // $o->zip = $s->zip;
+        // $o->country = $s->country;
 
         $this->invoice_no = $o->insert();
 
@@ -44,10 +44,7 @@ class Checkout
             if (is_numeric($item['qty']) && $item['qty'] > 0) {
                 $l->order_id = $this->invoice_no;
                 $l->variant_id = $item['id'];
-                $price = $item['price'];
-                $l->price = is_string($price)
-                    ? $price
-                    : number_format((float) $price, 2, '.', '');
+                $l->price = (float) $item['price'];
                 $l->quantity = (int) $item['qty'];
                 $total += $l->quantity * (float) $l->price;
                 $l->insert();
@@ -59,7 +56,7 @@ class Checkout
         $o->order_id = 'OV' . $this->invoice_no . '-' . bin2hex(random_bytes(3));
         $this->invoice_id = $o->order_id;
 
-        $o->total = number_format($total, 2, '.', '');
+        $o->total = $total;
         $o->save();
 
         $countries = \Empathy\ELib\Country\Country::build();

@@ -22,13 +22,13 @@ class ProductVariant extends Entity
 
     public ?int $weight_g = null;
 
-    public string|null $weight_lb = null;
-    public string|null $weight_oz = null;
+    public ?float $weight_lb = null;
+    public ?float $weight_oz = null;
 
     /**
-     * May be {@see \Empathy\MVC\Entity} insert sentinel <code>'DEFAULT'</code>.
+     * Numeric variant price, or the string {@see \Empathy\MVC\Entity} insert sentinel <code>'DEFAULT'</code>.
      */
-    public string $price = '0.00';
+    public float|string $price = 0.0;
 
     /**
      * May be {@see \Empathy\MVC\Entity} insert sentinel <code>'DEFAULT'</code>.

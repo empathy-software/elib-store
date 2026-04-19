@@ -22,7 +22,7 @@ use Empathy\MVC\Session;
 class StoreControllerLite extends EController
 {
     protected mixed $pages;
-    protected mixed $vendor_lock;
+    protected mixed $vendor_lock = null;
 
     public function __construct(mixed $boot)
     {
@@ -207,7 +207,7 @@ class StoreControllerLite extends EController
         }
 
         $per_page = 12;
-        $products = $p->getAllCustomPaginate($sql, $_GET['page'], $per_page, $params);
+        $products = $p->getAllCustomPaginate($sql, (int) $_GET['page'], $per_page, $params);
 
         foreach ($products as &$product) {
             $p->load($product['id']);
@@ -216,7 +216,7 @@ class StoreControllerLite extends EController
             $product['stock'] = $p->getStock();
         }
 
-        $p_nav = $p->getPaginatePages($sql, $_GET['page'], $per_page, $params);
+        $p_nav = $p->getPaginatePages($sql, (int) $_GET['page'], $per_page, $params);
 
         $this->pages = $p_nav;
 
