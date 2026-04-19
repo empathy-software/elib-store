@@ -197,7 +197,7 @@ class ProductController extends AdminController
                 } else {
                     // update db
                     $i->image = $u->file;
-                    $i->product_id = $_GET['id'];
+                    $i->product_id = (int) $_GET['id'];
                     $i->default_image = $j === 0 ? $p->getNoImageFound() ? 1 : 0 : 0;
                     $i->insert();
                 }
@@ -306,7 +306,7 @@ class ProductController extends AdminController
     {
         $this->assertID();
         $v = Model::load(ProductVariant::class);
-        $v->product_id = $_GET['id'];
+        $v->product_id = (int) $_GET['id'];
         $v->weight_g = 0;
         $v->weight_lb = 0.0;
         $v->weight_oz = 0.0;
@@ -414,7 +414,7 @@ class ProductController extends AdminController
         if (isset($_POST['save'])) {
             $p = Model::load(ProductVariantPropertyOption::class);
             $p->emptyByVariant($_GET['id']);
-            $p->product_variant_id = $_GET['id'];
+            $p->product_variant_id = (int) $_GET['id'];
             //if(isset($_POST['property']))
             // {
             foreach ($_POST['property'] as $item) {
