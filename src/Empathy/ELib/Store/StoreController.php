@@ -252,7 +252,7 @@ class StoreController extends StoreControllerLite
         if (isset($_GET['id']) && is_numeric($_GET['id'])) {
             if (isset($_POST['save'])) {
                 $s = Model::load(ShippingAddress::class);
-                $s->load($_GET['id']);
+                $s->load((int) $_GET['id']);
                 $s->first_name = $_POST['first_name'];
                 $s->last_name = $_POST['last_name'];
                 $s->address1 = $_POST['address1'];

@@ -31,7 +31,7 @@ class PromoController extends AdminController
               $pr->updateForProduct($p->id, $range);
             */
 
-            $p->load($_POST['id']);
+            $p->load((int) $_POST['id']);
             $old_promo = $p->name;
             $p->name = $_POST['name'];
             $p->url = $_POST['url'];
@@ -63,7 +63,7 @@ class PromoController extends AdminController
     {
         $this->setTemplate('elib://admin/promo.tpl');
         $p = Model::load(PromoItem::class);
-        $p->load($_GET['id']);
+        $p->load((int) $_GET['id']);
 
         $this->assign('promo', $p);
     }
@@ -76,7 +76,7 @@ class PromoController extends AdminController
         }
 
         $p = Model::load(PromoItem::class);
-        $p->load($_GET['id']);
+        $p->load((int) $_GET['id']);
 
         $this->assign('promo', $p);
 
@@ -104,7 +104,7 @@ class PromoController extends AdminController
     public function delete(): void
     {
         $p = Model::load(PromoItem::class);
-        $p->load($_GET['id']);
+        $p->load((int) $_GET['id']);
 
         $images_removed = false;
         if ($p->image !== '') {

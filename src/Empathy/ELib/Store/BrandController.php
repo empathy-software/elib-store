@@ -24,7 +24,7 @@ class BrandController extends AdminController
     {
         $this->setTemplate('elib://admin/brand.tpl');
         $b = Model::load(BrandItem::class);
-        $b->load($_GET['id']);
+        $b->load((int) $_GET['id']);
 
         $bt = new BrandsTree($b);
         $this->assign('banners', $bt->getMarkup());
@@ -44,7 +44,7 @@ class BrandController extends AdminController
         $this->buildNav();
         if (isset($_POST['save'])) {
             $b = Model::load(BrandItem::class);
-            $b->load($_POST['id']);
+            $b->load((int) $_POST['id']);
             $b->name = $_POST['artist_alias'];
             $b->validates();
             if ($b->hasValErrors()) {
@@ -58,7 +58,7 @@ class BrandController extends AdminController
             $this->redirect('admin/brand/' . $_POST['id']);
         } else {
             $b = Model::load(BrandItem::class);
-            $b->load($_GET['id']);
+            $b->load((int) $_GET['id']);
             $this->assign('brand', $b);
         }
     }
@@ -74,7 +74,7 @@ class BrandController extends AdminController
     {
         $this->assertID();
         $b = Model::load(BrandItem::class);
-        $b->load($_GET['id']);
+        $b->load((int) $_GET['id']);
         $b->delete();
         $this->redirect('admin/brand/');
     }
@@ -83,7 +83,7 @@ class BrandController extends AdminController
     {
         if (isset($_POST['save'])) {
             $b = Model::load(BrandItem::class);
-            $b->load($_POST['id']);
+            $b->load((int) $_POST['id']);
             $b->about = $_POST['bio'];
             $b->validates();
             if ($b->hasValErrors()) {
@@ -99,7 +99,7 @@ class BrandController extends AdminController
 
         $this->buildNav();
         $b = Model::load(BrandItem::class);
-        $b->load($_GET['id']);
+        $b->load((int) $_GET['id']);
         $this->assign('brand', $b);
     }
 

@@ -36,7 +36,7 @@ class PropertiesController extends AdminController
             $return_code = 1;
             if (isset($_POST['id']) && is_numeric($_POST['id'])) {
                 $o = Model::load(PropertyOption::class);
-                $o->load($_POST['id']);
+                $o->load((int) $_POST['id']);
                 $o->option_val = $_POST['value'];
                 $o->validates();
                 if ($o->hasValErrors()) {
@@ -67,7 +67,7 @@ class PropertiesController extends AdminController
         if (isset($_GET['id']) && is_numeric($_GET['id'])) {
             if (isset($_POST['save'])) {
                 $p = Model::load(Property::class);
-                $p->load($_GET['id']);
+                $p->load((int) $_GET['id']);
                 $p->name = $_POST['name'];
                 $p->validates();
                 if ($p->hasValErrors()) {
@@ -82,7 +82,7 @@ class PropertiesController extends AdminController
 
             } else {
                 $p = Model::load(Property::class);
-                $p->load($_GET['id']);
+                $p->load((int) $_GET['id']);
                 $this->assign('property', $p);
             }
         }

@@ -90,7 +90,7 @@ class CategoryController extends AdminController
         }
 
         $c = Model::load(CategoryItem::class);
-        $c->load($_GET['id']);
+        $c->load((int) $_GET['id']);
 
         $ct = new CategoriesTree($c, $_GET['collapsed']);
 
@@ -127,7 +127,7 @@ class CategoryController extends AdminController
         $this->buildNav();
         if (isset($_POST['save'])) {
             $c = Model::load(CategoryItem::class);
-            $c->load($_POST['id']);
+            $c->load((int) $_POST['id']);
             $c->name = $_POST['name'];
             $c->validates();
             if ($c->hasValErrors()) {
@@ -141,7 +141,7 @@ class CategoryController extends AdminController
             $this->redirect('admin/category/'.$_POST['id']);
         } else {
             $c = Model::load(CategoryItem::class);
-            $c->load($_GET['id']);
+            $c->load((int) $_GET['id']);
             $this->assign('category', $c);
         }
     }
@@ -150,7 +150,7 @@ class CategoryController extends AdminController
     {
         $this->assertID();
         $c = Model::load(CategoryItem::class);
-        $c->load($_GET['id']);
+        $c->load((int) $_GET['id']);
         if ($c->hasCategoriesOrProducts($c->id)) {
             $this->redirect('admin/category/'.$c->id);
         } else {

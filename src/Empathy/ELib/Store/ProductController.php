@@ -42,7 +42,7 @@ class ProductController extends AdminController
               $pr->updateForProduct($p->id, $range);
             */
 
-            $p->load($_POST['id']);
+            $p->load((int) $_POST['id']);
             $old_product_name = $p->name;
             $p->name = $_POST['name'];
             $p->description = $_POST['description'];
@@ -69,7 +69,7 @@ class ProductController extends AdminController
         } elseif (isset($_POST['cancel'])) {
             $this->redirect('admin/product/' . $_GET['id']);
         } else {
-            $p->load($_GET['id']);
+            $p->load((int) $_GET['id']);
 
             $p->setSoldInStore(0);
             if ($p->status > 0) {
@@ -107,7 +107,7 @@ class ProductController extends AdminController
     {
         $this->setTemplate('elib://admin/product.tpl');
         $p = Model::load(ProductItem::class);
-        $p->load($_GET['id']);
+        $p->load((int) $_GET['id']);
 
         $this->assign('product', $p);
 
@@ -170,7 +170,7 @@ class ProductController extends AdminController
 
         $p = Model::load(ProductItem::class);
         $i = Model::load(ProductImage::class);
-        $p->load($_GET['id']);
+        $p->load((int) $_GET['id']);
 
         $this->assign('product', $p);
 
@@ -262,7 +262,7 @@ class ProductController extends AdminController
     public function delete(): void
     {
         $p = Model::load(ProductItem::class);
-        $p->load($_GET['id']);
+        $p->load((int) $_GET['id']);
         if (!$p->hasVariants()) {
             $images_removed = false;
             if ($p->image !== '') {
@@ -286,7 +286,7 @@ class ProductController extends AdminController
             $_GET['id'] = 0;
         }
         $v = Model::load(ProductVariant::class);
-        $v->load($_GET['id']);
+        $v->load((int) $_GET['id']);
         $images_removed = false;
         if ($v->image !== '') {
             $i = new ImageUpload('products', false, []);
@@ -348,7 +348,7 @@ class ProductController extends AdminController
 
         if (isset($_POST['save'])) {
             $v = Model::load(ProductVariant::class);
-            $v->load($_POST['id']);
+            $v->load((int) $_POST['id']);
             $v->weight_g = (int) $_POST['weight_g'];
             $v->weight_lb = (float) $_POST['weight_lb'];
             $v->weight_oz = (float) $_POST['weight_oz'];
@@ -372,7 +372,7 @@ class ProductController extends AdminController
         $this->setTemplate('elib://admin/product.tpl');
         $this->assertID();
         $v = Model::load(ProductVariant::class);
-        $v->load($_GET['id']);
+        $v->load((int) $_GET['id']);
 
         $this->assign('variant', $v);
 
@@ -425,7 +425,7 @@ class ProductController extends AdminController
             }
             // }
             $v = Model::load(ProductVariant::class);
-            $v->load($_GET['id']);
+            $v->load((int) $_GET['id']);
             $this->redirect('admin/product/' . $v->product_id);
         } elseif (isset($_POST['cancel'])) {
             $this->redirect('admin/product/' . $_GET['id']);
@@ -433,7 +433,7 @@ class ProductController extends AdminController
 
 
         $v = Model::load(ProductVariant::class);
-        $v->load($_GET['id']);
+        $v->load((int) $_GET['id']);
 
         // get variant data
         $v_array = $this->entityToJsonArray($v);
@@ -477,7 +477,7 @@ class ProductController extends AdminController
     {
         $this->setTemplate('elib://admin/product.tpl');
         $p = Model::load(ProductItem::class);
-        $p->load($_GET['id']);
+        $p->load((int) $_GET['id']);
 
         $c = Model::load(ProductColour::class);
         $sql = ' WHERE t1.property_option_id = t2.id AND t1.product_id = ?';
@@ -491,7 +491,7 @@ class ProductController extends AdminController
     {
         $this->setTemplate('elib://admin/product.tpl');
         $p = Model::load(ProductItem::class);
-        $p->load($_GET['id']);
+        $p->load((int) $_GET['id']);
         $this->assign('product', $p);
 
         $pr = Model::load(Property::class);
@@ -527,7 +527,7 @@ class ProductController extends AdminController
     public function delete_colour(): void
     {
         $p = Model::load(ProductColour::class);
-        $p->load($_GET['id']);
+        $p->load((int) $_GET['id']);
 
         $images_removed = false;
         if ($p->image !== '') {
@@ -573,7 +573,7 @@ class ProductController extends AdminController
         }
 
         $c = Model::load(ProductColour::class);
-        $c->load($_GET['id']);
+        $c->load((int) $_GET['id']);
 
         $p = Model::load(ProductItem::class);
         $p->load($c->product_id);
@@ -629,7 +629,7 @@ class ProductController extends AdminController
         }
 
         $p = Model::load(ProductItem::class);
-        $p->load($_GET['id']);
+        $p->load((int) $_GET['id']);
         $this->assign('product', $p);
 
         $c = Model::load(CategoryItem::class);

@@ -23,7 +23,7 @@ class ArtistController extends AdminController
     public function toggle_active(): void
     {
         $a = Model::load(ArtistItem::class);
-        $a->load($_GET['id']);
+        $a->load((int) $_GET['id']);
         $a->active = ($a->active) ? 0 : 1;
         $a->save();
         $this->redirect('admin/artist/'.$a->id);
@@ -35,7 +35,7 @@ class ArtistController extends AdminController
         //$this->assertID();
 
         $a = Model::load(ArtistItem::class);
-        $a->load($_GET['id']);
+        $a->load((int) $_GET['id']);
 
         $at = new ArtistsTree($a);
         $this->assign('banners', $at->getMarkup());
@@ -71,7 +71,7 @@ class ArtistController extends AdminController
         $this->buildNav();
         if (isset($_POST['save'])) {
             $a = Model::load(ArtistItem::class);
-            $a->load($_POST['id']);
+            $a->load((int) $_POST['id']);
             //$a->artist_alias = $_POST['artist_alias'];
             $a->forename = $_POST['forename'];
             $a->surname = $_POST['surname'];
@@ -88,7 +88,7 @@ class ArtistController extends AdminController
             $this->redirect('admin/artist/'.$_POST['id']);
         } else {
             $a = Model::load(ArtistItem::class);
-            $a->load($_GET['id']);
+            $a->load((int) $_GET['id']);
             $this->assign('artist', $a);
         }
     }
@@ -104,7 +104,7 @@ class ArtistController extends AdminController
     {
         $this->assertID();
         $a = Model::load(ArtistItem::class);
-        $a->load($_GET['id']);
+        $a->load((int) $_GET['id']);
         $images_removed = false;
         if ($a->image !== '') {
             $u = new ImageUpload('', false, []);
@@ -124,7 +124,7 @@ class ArtistController extends AdminController
     {
         if (isset($_POST['save'])) {
             $a = Model::load(ArtistItem::class);
-            $a->load($_POST['id']);
+            $a->load((int) $_POST['id']);
             $a->bio = $_POST['bio'];
             $a->validates();
             if ($a->hasValErrors()) {
@@ -140,7 +140,7 @@ class ArtistController extends AdminController
 
         $this->buildNav();
         $a = Model::load(ArtistItem::class);
-        $a->load($_GET['id']);
+        $a->load((int) $_GET['id']);
         $this->assign('artist', $a);
     }
 
@@ -154,7 +154,7 @@ class ArtistController extends AdminController
         }
 
         $a = Model::load(ArtistItem::class);
-        $a->load($_GET['id']);
+        $a->load((int) $_GET['id']);
 
         $this->assign('artist', $a);
 

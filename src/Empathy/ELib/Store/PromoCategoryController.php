@@ -29,7 +29,7 @@ class PromoCategoryController extends AdminController
         }
 
         $c = Model::load(CategoryItem::class);
-        $c->load($_GET['id']);
+        $c->load((int) $_GET['id']);
 
         $ct = new PromosTree($c, $_GET['collapsed']);
 
