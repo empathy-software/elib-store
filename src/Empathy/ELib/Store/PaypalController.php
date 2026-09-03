@@ -163,6 +163,11 @@ class PaypalController extends EController
         $o->status = 2;
         $o->save();
 
+        $cache = $this->stash->get('cache');
+        if (is_object($cache) && method_exists($cache, 'clear')) {
+            $cache->clear();
+        }
+
         $pt->storeTxn($data['txn_id']);
         $this->writeLog('Payment completed');
     }

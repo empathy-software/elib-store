@@ -82,6 +82,20 @@ class ProductItem extends Entity
         return $this->images;
     }
 
+    /**
+     * Apply images/stock/brand from a front-end cache payload without hitting the DB.
+     *
+     * @param list<array<string, mixed>> $images
+     */
+    public function applyCachedFrontState(array $images, mixed $stock, ?string $brand = null): void
+    {
+        $this->images = $images;
+        $this->stock = $stock;
+        if ($brand !== null) {
+            $this->brand = $brand;
+        }
+    }
+
     public function getNoImageFound(): mixed
     {
         return $this->noImageFound;

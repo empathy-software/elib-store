@@ -118,6 +118,7 @@ class CategoryController extends AdminController
             $c->name = 'New Category';
             $c->hidden = 'DEFAULT';
             $c->insert();
+            $this->clearCache();
         }
         $this->redirect('admin/category/'.$_GET['id']);
     }
@@ -135,6 +136,7 @@ class CategoryController extends AdminController
                 $this->assign('errors', $c->getValErrors());
             } else {
                 $c->save();
+                $this->clearCache();
                 $this->redirect('admin/category/'.$c->id);
             }
         } elseif (isset($_POST['cancel'])) {
@@ -157,6 +159,7 @@ class CategoryController extends AdminController
                 $c->description = null;
             }
             $c->save();
+            $this->clearCache();
             $this->redirect('admin/category/'.$c->id);
         } elseif (isset($_POST['cancel'])) {
             $this->redirect('admin/category/'.$_POST['id']);
@@ -175,8 +178,10 @@ class CategoryController extends AdminController
         if ($c->hasCategoriesOrProducts($c->id)) {
             $this->redirect('admin/category/'.$c->id);
         } else {
+            $parentId = $c->category_id;
             $c->delete();
-            $this->redirect('admin/category/'.$c->category_id);
+            $this->clearCache();
+            $this->redirect('admin/category/'.$parentId);
         }
 
     }
@@ -195,6 +200,7 @@ class CategoryController extends AdminController
                     $c->insert();
                 }
             }
+            $this->clearCache();
             $this->redirect('admin/category/' . $_GET['id']);
         } elseif (isset($_POST['cancel'])) {
             $this->redirect('admin/category/' . $_GET['id']);

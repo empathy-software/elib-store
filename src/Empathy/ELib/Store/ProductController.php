@@ -64,6 +64,7 @@ class ProductController extends AdminController
             } else {
                 //$p->price = $_POST['price'];
                 $p->save();
+                $this->clearCache();
                 $this->redirect('admin/product/' . $p->id);
             }
         } elseif (isset($_POST['cancel'])) {
@@ -207,6 +208,7 @@ class ProductController extends AdminController
             if ($error !== '') {
                 $this->assign('error', $error);
             } else {
+                $this->clearCache();
                 $this->redirect('admin/product/' . $p->id);
             }
 
@@ -230,6 +232,7 @@ class ProductController extends AdminController
                     ['mid_', $_POST['mid_width'], $_POST['mid_height']]];
                 $u = new ImageUpload('', false, $d);
                 $u->resize($images);
+                $this->clearCache();
             }
         }
     }
@@ -247,6 +250,7 @@ class ProductController extends AdminController
         $i = Model::load(ProductImage::class);
         $i->load($imageId);
         $i->delete();
+        $this->clearCache();
         $this->redirect('admin/product/' . $i->product_id);
     }
 
@@ -256,6 +260,7 @@ class ProductController extends AdminController
         $i = Model::load(ProductImage::class);
         $i->load($imageId);
         $i->makeDefault();
+        $this->clearCache();
         $this->redirect('admin/product/' . $i->product_id);
     }
 
@@ -273,6 +278,7 @@ class ProductController extends AdminController
             }
             if ($p->image === '' || $images_removed) {
                 $p->delete();
+                $this->clearCache();
                 $this->redirect('admin/category/' . $p->category_id);
             }
         } else {
@@ -299,6 +305,7 @@ class ProductController extends AdminController
             $o->emptyByVariant($v->id);
             $v->delete();
         }
+        $this->clearCache();
         $this->redirect('admin/product/' . $v->product_id);
     }
 
@@ -313,6 +320,7 @@ class ProductController extends AdminController
         $v->price = 'DEFAULT';
         $v->status = 'DEFAULT';
         $v->insert();
+        $this->clearCache();
         $this->redirect('admin/product/' . $_GET['id']);
     }
 
@@ -327,6 +335,7 @@ class ProductController extends AdminController
         $p->vendor_verified = 1;
         $p->vendor_id = 1;
         $p->insert();
+        $this->clearCache();
         $this->redirect('admin/category/' . $_GET['id']);
     }
 
@@ -360,6 +369,7 @@ class ProductController extends AdminController
                 $this->assign('errors', $v->getValErrors());
             } else {
                 $v->save();
+                $this->clearCache();
                 $this->redirect('admin/product/' . $v->product_id);
             }
         } elseif (isset($_POST['cancel'])) {
@@ -399,6 +409,7 @@ class ProductController extends AdminController
                 }
                 $v->image = $u->file;
                 $v->save();
+                $this->clearCache();
                 $this->redirect('admin/product/' . $p->id);
             }
         } elseif (isset($_POST['cancel'])) {
@@ -426,6 +437,7 @@ class ProductController extends AdminController
             // }
             $v = Model::load(ProductVariant::class);
             $v->load((int) $_GET['id']);
+            $this->clearCache();
             $this->redirect('admin/product/' . $v->product_id);
         } elseif (isset($_POST['cancel'])) {
             $this->redirect('admin/product/' . $_GET['id']);
@@ -518,6 +530,7 @@ class ProductController extends AdminController
                 $c->image = $u->file;
                 $c->insert();
 
+                $this->clearCache();
                 $this->redirect('admin/product/edit_colours/' . $_POST['id']);
             }
 
@@ -539,6 +552,7 @@ class ProductController extends AdminController
         if ($p->image === '' || $images_removed) {
             $p->delete();
         }
+        $this->clearCache();
         $this->redirect('admin/product/edit_colours/' . $p->product_id);
     }
 
@@ -569,6 +583,7 @@ class ProductController extends AdminController
             }
 
             $c->save();
+            $this->clearCache();
             $this->redirect('admin/product/edit_colours/' . $c->product_id);
         }
 
@@ -625,6 +640,7 @@ class ProductController extends AdminController
                     }
                 }
             }
+            $this->clearCache();
             $this->redirect('admin/product/' . $v->product_id);
         }
 
