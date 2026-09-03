@@ -25,6 +25,7 @@ id		INT(11)					NOT NULL AUTO_INCREMENT PRIMARY KEY,
 category_id	INT(11)					NOT NULL DEFAULT 0,
 hidden		TINYINT(1)				NOT NULL DEFAULT 0,
 name		VARCHAR(128)				NOT NULL,
+description	TEXT					NULL,
 shipping	DECIMAL(6,2)				NULL,
 intl_shipping   DECIMAL(6,2)				NULL);
 

@@ -146,6 +146,27 @@ class CategoryController extends AdminController
         }
     }
 
+    public function edit_description(): void
+    {
+        $this->buildNav();
+        if (isset($_POST['save'])) {
+            $c = Model::load(CategoryItem::class);
+            $c->load((int) $_POST['id']);
+            $c->description = isset($_POST['description']) ? trim((string) $_POST['description']) : '';
+            if ($c->description === '') {
+                $c->description = null;
+            }
+            $c->save();
+            $this->redirect('admin/category/'.$c->id);
+        } elseif (isset($_POST['cancel'])) {
+            $this->redirect('admin/category/'.$_POST['id']);
+        } else {
+            $c = Model::load(CategoryItem::class);
+            $c->load((int) $_GET['id']);
+            $this->assign('category', $c);
+        }
+    }
+
     public function delete(): void
     {
         $this->assertID();

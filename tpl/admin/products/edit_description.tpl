@@ -1,6 +1,6 @@
 
 
-<h2>Rename Category</h2>
+<h2>Edit Category Description</h2>
 
 
 {include file="elib://comp_errors.tpl"}
@@ -8,8 +8,8 @@
 
 <form method="post" enctype="multipart/form-data">
     <div class="mb-3">
-        <label class="form-label" for="name">Name</label>
-        <input type="text" value="{$category->name}" class="form-control" name="name" id="name">
+        <label class="form-label" for="description">Description</label>
+        <input type="text" value="{$category->description|escape}" class="form-control" name="description" id="description" maxlength="2000">
     </div>
     <div class="mb-3">
         <input type="hidden" name="id" value="{$category->id}" />

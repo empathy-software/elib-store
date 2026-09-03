@@ -11,6 +11,9 @@
     <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/category/rename/{$category->id}" class="btn btn-sm btn-primary {if $category->id eq 0 || $event eq 'rename'} disabled{/if}">
         Rename Category
     </a>
+    <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/category/edit_description/{$category->id}" class="btn btn-sm btn-primary {if $category->id eq 0 || $event eq 'edit_description'} disabled{/if}">
+        Edit Description
+    </a>
     <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/category/delete/{$category->id}" class="confirm btn btn-sm btn-primary {if $category->id eq 0} disabled{/if}">
         Delete Category
     </a>
@@ -37,6 +40,8 @@
     <div class="col-md-7">
         {if $event eq 'rename'}
         {include file="elib://admin/products/rename.tpl"}
+        {elseif $event eq 'edit_description'}
+        {include file="elib://admin/products/edit_description.tpl"}
         {elseif $event eq 'active_properties'}
         {include file="elib://admin/products/active_properties.tpl"}
         {elseif $class eq 'product'}

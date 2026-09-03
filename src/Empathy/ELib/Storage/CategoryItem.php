@@ -22,6 +22,8 @@ class CategoryItem extends Entity
 
     public string $name = '';
 
+    public ?string $description = null;
+
     public ?float $shipping = null;
     public ?float $intl_shipping = null;
 
